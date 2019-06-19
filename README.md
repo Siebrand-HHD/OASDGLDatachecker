@@ -7,5 +7,6 @@ Voorbeelden van checks zijn:
 - Is de putbodem aangeleverd?
 - Ligt de putbodem onder de buisbodem?
 - Liggen er meerdere kunstwerken of leidingen op elkaar?
+- Ligt mijn aanslagpeil van mijn pomp onder maaiveld?
 
 Deze tool is ontwikkeld door OAS DGL in samenwerking met gemeente Schiedam en Nelen & Schuurmans.
