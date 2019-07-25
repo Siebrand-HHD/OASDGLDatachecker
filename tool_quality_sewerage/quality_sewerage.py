@@ -9,7 +9,8 @@ from configparser import RawConfigParser
 
 
 def quality_sewerage(inifile):
-    print('test')
+    print("test")
+
 
 class settingsObject(object):
     """Contains the settings from the ini file"""
@@ -30,10 +31,13 @@ def get_parser():
     """ Return argument parser. """
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
-        "inifile", metavar="INIFILE", help="Location with settings ini for quality checks"
+        "inifile",
+        metavar="INIFILE",
+        help="Location with settings ini for quality checks",
     )
 
     return parser
+
 
 def main():
     """ Call command with args from parser. """
