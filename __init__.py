@@ -33,4 +33,5 @@ def classFactory(iface):  # pylint: disable=invalid-name
     """
     #
     from .Datachecker import OASdglDatachecker
+
     return OASdglDatachecker(iface)

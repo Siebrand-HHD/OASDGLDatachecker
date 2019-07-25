@@ -8,9 +8,9 @@
 
 """
 
-__author__ = 'svanderhoeven@hhdelfland.nl'
-__date__ = '2019-06-24'
-__copyright__ = 'Copyright 2019, OAS De Grote Lucht'
+__author__ = "svanderhoeven@hhdelfland.nl"
+__date__ = "2019-06-24"
+__copyright__ = "Copyright 2019, OAS De Grote Lucht"
 
 import unittest
 
@@ -19,6 +19,7 @@ from PyQt5.QtGui import QDialogButtonBox, QDialog
 from Datachecker_dialog import OASdglDatacheckerDialog
 
 from utilities import get_qgis_app
+
 QGIS_APP = get_qgis_app()
 
 
@@ -48,8 +49,8 @@ class OASdglDatacheckerDialogTest(unittest.TestCase):
         result = self.dialog.result()
         self.assertEqual(result, QDialog.Rejected)
 
+
 if __name__ == "__main__":
     suite = unittest.makeSuite(OASdglDatacheckerDialogTest)
     runner = unittest.TextTestRunner(verbosity=2)
     runner.run(suite)
-
