@@ -3,12 +3,11 @@
 
 import argparse
 import logging
-import datetime
-from collections import OrderedDict
 from configparser import RawConfigParser
 
 
-def quality_sewerage(inifile):
+def quality_checks(inifile):
+    """Overall function for checking our model data"""
     print("test")
 
 
@@ -31,6 +30,14 @@ def get_parser():
     """ Return argument parser. """
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
+        "-v",
+        "--verbose",
+        action="store_true",
+        dest="verbose",
+        default=False,
+        help="Verbose output",
+    )
+    parser.add_argument(
         "inifile",
         metavar="INIFILE",
         help="Location with settings ini for quality checks",
@@ -42,9 +49,13 @@ def get_parser():
 def main():
     """ Call command with args from parser. """
     kwargs = vars(get_parser().parse_args())
-    logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
+    if kwargs.verbose:
+        log_level = logging.DEBUG
+    else:
+        log_level = logging.INFO
+    logging.basicConfig(level=log_level, format="%(levelname)s: %(message)s")
     settings = settingsObject(kwargs["inifile"])
-    quality_sewerage(settings)
+    quality_checks(settings)
 
 
 if __name__ == "__main__":

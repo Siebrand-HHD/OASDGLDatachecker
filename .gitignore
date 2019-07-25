@@ -1,3 +1,4 @@
 
 .vscode/settings.json
 *.pyc
+tool_quality_checks/.coverage
