@@ -28,8 +28,9 @@ from PyQt5 import uic
 from PyQt5 import QtWidgets
 
 # This loads your .ui file so that PyQt can populate your plugin with the elements from Qt Designer
-FORM_CLASS, _ = uic.loadUiType(os.path.join(
-    os.path.dirname(__file__), 'Datachecker_dialog_base.ui'))
+FORM_CLASS, _ = uic.loadUiType(
+    os.path.join(os.path.dirname(__file__), "Datachecker_dialog_base.ui")
+)
 
 
 class OASdglDatacheckerDialog(QtWidgets.QDialog, FORM_CLASS):

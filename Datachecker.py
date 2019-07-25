@@ -27,6 +27,7 @@ from PyQt5.QtWidgets import QAction
 
 # Initialize Qt resources from file resources.py
 from .resources import *
+
 # Import the code for the dialog
 from .Datachecker_dialog import OASdglDatacheckerDialog
 import os.path
@@ -48,22 +49,21 @@ class OASdglDatachecker:
         # initialize plugin directory
         self.plugin_dir = os.path.dirname(__file__)
         # initialize locale
-        locale = QSettings().value('locale/userLocale')[0:2]
+        locale = QSettings().value("locale/userLocale")[0:2]
         locale_path = os.path.join(
-            self.plugin_dir,
-            'i18n',
-            'OASdglDatachecker_{}.qm'.format(locale))
+            self.plugin_dir, "i18n", "OASdglDatachecker_{}.qm".format(locale)
+        )
 
         if os.path.exists(locale_path):
             self.translator = QTranslator()
             self.translator.load(locale_path)
 
-            if qVersion() > '4.3.3':
+            if qVersion() > "4.3.3":
                 QCoreApplication.installTranslator(self.translator)
 
         # Declare instance attributes
         self.actions = []
-        self.menu = self.tr(u'&Datachecker')
+        self.menu = self.tr(u"&Datachecker")
 
         # Check if plugin was started the first time in current QGIS session
         # Must be set in initGui() to survive plugin reloads
@@ -82,8 +82,7 @@ class OASdglDatachecker:
         :rtype: QString
         """
         # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
-        return QCoreApplication.translate('OASdglDatachecker', message)
-
+        return QCoreApplication.translate("OASdglDatachecker", message)
 
     def add_action(
         self,
@@ -95,7 +94,8 @@ class OASdglDatachecker:
         add_to_toolbar=True,
         status_tip=None,
         whats_this=None,
-        parent=None):
+        parent=None,
+    ):
         """Add a toolbar icon to the toolbar.
 
         :param icon_path: Path to the icon for this action. Can be a resource
@@ -151,9 +151,7 @@ class OASdglDatachecker:
             self.iface.addToolBarIcon(action)
 
         if add_to_menu:
-            self.iface.addPluginToMenu(
-                self.menu,
-                action)
+            self.iface.addPluginToMenu(self.menu, action)
 
         self.actions.append(action)
 
@@ -162,25 +160,22 @@ class OASdglDatachecker:
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
 
-        icon_path = ':/plugins/Datachecker/icon.png'
+        icon_path = ":/plugins/Datachecker/icon.png"
         self.add_action(
             icon_path,
-            text=self.tr(u'Datachecker OAS'),
+            text=self.tr(u"Datachecker OAS"),
             callback=self.run,
-            parent=self.iface.mainWindow())
+            parent=self.iface.mainWindow(),
+        )
 
         # will be set False in run()
         self.first_start = True
 
-
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
         for action in self.actions:
-            self.iface.removePluginMenu(
-                self.tr(u'&Datachecker'),
-                action)
+            self.iface.removePluginMenu(self.tr(u"&Datachecker"), action)
             self.iface.removeToolBarIcon(action)
-
 
     def run(self):
         """Run method that performs all the real work"""
