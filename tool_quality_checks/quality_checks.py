@@ -3,12 +3,19 @@
 
 import argparse
 import logging
+
 from configparser import RawConfigParser
+from db import ThreediDatabase
+
+log = logging.getLogger(__name__)
 
 
-def quality_checks(inifile):
+def quality_checks(settings):
     """Overall function for checking our model data"""
-    print("test")
+
+    # get database connection
+    db = ThreediDatabase(settings)
+    print(db)
 
 
 class settingsObject(object):
@@ -49,7 +56,7 @@ def get_parser():
 def main():
     """ Call command with args from parser. """
     kwargs = vars(get_parser().parse_args())
-    if kwargs.verbose:
+    if kwargs["verbose"]:
         log_level = logging.DEBUG
     else:
         log_level = logging.INFO
