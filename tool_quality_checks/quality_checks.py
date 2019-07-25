@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """ TODO Docstring. """
-
+import os
 import argparse
 import logging
 
@@ -15,7 +15,30 @@ def quality_checks(settings):
 
     # get database connection
     db = ThreediDatabase(settings)
-    print(db)
+    print(db.__dict__)
+
+
+def resolve_ini(custom_ini_file):
+    """
+        decide which ini file to use
+        """
+    # get default ini for testing purposes
+    default_ini_relpath = "test\\data\\instellingen_test.ini"
+    default_ini_relpath = os.path.join(os.path.dirname(__file__), default_ini_relpath)
+    if custom_ini_file is None:
+        log.info(
+            "[*] Using default ini file {}".format(
+                os.path.basename(default_ini_relpath)
+            )
+        )
+        return default_ini_relpath
+    if all((os.path.exists(custom_ini_file), os.path.isfile(custom_ini_file))):
+        log.info(
+            "[*] Using custom ini file {}".format(os.path.basename(custom_ini_file))
+        )
+        return custom_ini_file
+    else:
+        raise ("Error: Could not find the ini file {}".format(custom_ini_file))
 
 
 class settingsObject(object):
@@ -45,8 +68,10 @@ def get_parser():
         help="Verbose output",
     )
     parser.add_argument(
-        "inifile",
+        "-i",
+        "--inifile",
         metavar="INIFILE",
+        dest="inifile",
         help="Location with settings ini for quality checks",
     )
 
@@ -61,7 +86,9 @@ def main():
     else:
         log_level = logging.INFO
     logging.basicConfig(level=log_level, format="%(levelname)s: %(message)s")
-    settings = settingsObject(kwargs["inifile"])
+    ini_relpath = resolve_ini(kwargs["inifile"])
+    print(ini_relpath)
+    settings = settingsObject(ini_relpath)
     quality_checks(settings)
 
 
