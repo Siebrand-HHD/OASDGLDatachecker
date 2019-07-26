@@ -2,11 +2,14 @@
 # -*- coding: utf-8 -*-
 
 import psycopg2
+
+# from psycopg2.extras import RealDictCursor
 import logging
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_FETCH = 'default'
+DEFAULT_FETCH = "default"
+
 
 class ThreediDatabase(object):
     """
@@ -49,10 +52,10 @@ class ThreediDatabase(object):
             self._raise(e)
 
     def _get_cursor(self, user_choise=""):
-        if user_choise == 'dict':
-            return self.db.cursor(cursor_factory=RealDictCursor)
-        else:
-            return self.db.cursor()
+        # if user_choise == 'dict':
+        #    return self.db.cursor(cursor_factory=RealDictCursor)
+        # else:
+        return self.db.cursor()
 
     def _raise(self, _exception):
         if self.db:
@@ -71,10 +74,7 @@ class ThreediDatabase(object):
             cur = self._get_cursor(fetch_as)
             cur.execute(sql_statement)
             self.db.commit()
-            logger.debug(
-                "[+] Successfully executed statement {}".format(
-                    sql_statement)
-            )
+            logger.debug("[+] Successfully executed statement {}".format(sql_statement))
             if fetch is True:
                 return cur.fetchall()
 
@@ -88,6 +88,9 @@ class ThreediDatabase(object):
         SELECT table_name
         FROM   information_schema.tables
         WHERE  table_schema = '{schema}'
-        AND    table_name LIKE '{search_table_name}';
-        """.format(schema=schema, search_table_name=search_table_name)
+        AND    table_name LIKE '{search_table_name}'
+        AND    table_type = 'BASE TABLE';
+        """.format(
+            schema=schema, search_table_name=search_table_name
+        )
         return [i[0] for i in self.free_form(statement, fetch=True)]
