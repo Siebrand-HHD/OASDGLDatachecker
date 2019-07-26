@@ -24,3 +24,20 @@ def test_init_threedidatabase_raise(mocker):
     settings.database = "unkown"
     with pytest.raises(Exception):
         ThreediDatabase(settings)
+
+
+def test_get_count():
+    ini_relpath = "data//instellingen_test.ini"
+    ini_abspath = os.path.join(os.path.dirname(__file__), ini_relpath)
+    settings = settingsObject(ini_abspath)
+    db = ThreediDatabase(settings)
+    assert db.get_count("v2_manhole") >= 0
+
+
+def test_get_count_raise():
+    ini_relpath = "data//instellingen_test.ini"
+    ini_abspath = os.path.join(os.path.dirname(__file__), ini_relpath)
+    settings = settingsObject(ini_abspath)
+    db = ThreediDatabase(settings)
+    with pytest.raises(Exception):
+        db.get_count("unknown")

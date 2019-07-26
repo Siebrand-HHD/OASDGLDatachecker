@@ -7,7 +7,7 @@ import logging
 from configparser import RawConfigParser
 from db import ThreediDatabase
 
-log = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 def quality_checks(settings):
@@ -15,7 +15,11 @@ def quality_checks(settings):
 
     # get database connection
     db = ThreediDatabase(settings)
-    print(db.__dict__)
+
+    # get v2_table_names
+    v2_table_names = db.select_table_names("v2%")
+    for table_name in v2_table_names:
+        print(table_name, db.get_count(table_name))
 
 
 def resolve_ini(custom_ini_file):
@@ -26,14 +30,14 @@ def resolve_ini(custom_ini_file):
     default_ini_relpath = "test\\data\\instellingen_test.ini"
     default_ini_relpath = os.path.join(os.path.dirname(__file__), default_ini_relpath)
     if custom_ini_file is None:
-        log.info(
+        logger.info(
             "[*] Using default ini file {}".format(
                 os.path.basename(default_ini_relpath)
             )
         )
         return default_ini_relpath
     if all((os.path.exists(custom_ini_file), os.path.isfile(custom_ini_file))):
-        log.info(
+        logger.info(
             "[*] Using custom ini file {}".format(os.path.basename(custom_ini_file))
         )
         return custom_ini_file
