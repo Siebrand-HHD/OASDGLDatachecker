@@ -54,6 +54,6 @@ class TestDB(TestCase):
         self.db.populate_geometry_columns()
 
     def test_perform_checks_with_sql(self):
-        self.db.perform_checks_with_sql('v2_manhole', 'completeness')
+        self.db.perform_checks_with_sql(self.settings, "v2_manhole", "completeness")
 
-    # TODO: add checks for 
+    # TODO: add checks for all types in sql.py

@@ -17,8 +17,8 @@ FROM v2_manhole;
 DROP TABLE IF EXISTS chk.put_surface_level;
 CREATE TABLE chk.put_surface_level AS
 SELECT * FROM v2_manhole_view WHERE manh_surface_level IS NULL
-				OR manh_surface_level < LeesInstelling_dp('min_levels')
-				or manh_surface_level > LeesInstelling_dp('max_levels');
+				OR manh_surface_level < {min_levels}
+				or manh_surface_level > {max_levels};
 
 DROP TABLE IF EXISTS chk.put_surface_level_0;
 CREATE TABLE chk.put_surface_level_0 AS
@@ -30,8 +30,8 @@ CREATE TABLE chk.put_bottom_level AS
 SELECT * 
 FROM v2_manhole_view 
 WHERE manh_bottom_level IS NULL
-	OR manh_bottom_level < LeesInstelling_dp('min_levels')
-	or manh_bottom_level > LeesInstelling_dp('max_levels')
+	OR manh_bottom_level < {min_levels}
+	or manh_bottom_level > {max_levels}
 ORDER BY manh_bottom_level;
 DROP TABLE IF EXISTS chk.put_bottom_level_0;
 CREATE TABLE chk.put_bottom_level_0 AS
@@ -128,11 +128,11 @@ SELECT *,
 			END
 		) as profiel_hoogte
 FROM v2_pipe_view WHERE pipe_invert_level_start_point IS NULL
-				OR pipe_invert_level_start_point < LeesInstelling_dp('min_levels')
-				or pipe_invert_level_start_point > LeesInstelling_dp('max_levels')
+				OR pipe_invert_level_start_point < {min_levels}
+				or pipe_invert_level_start_point > {max_levels}
 				OR pipe_invert_level_end_point IS NULL
-				OR pipe_invert_level_end_point < LeesInstelling_dp('min_levels')
-				or pipe_invert_level_end_point > LeesInstelling_dp('max_levels');
+				OR pipe_invert_level_end_point < {min_levels}
+				or pipe_invert_level_end_point > {max_levels};
 DROP TABLE IF EXISTS chk.leiding_bobs_0;
 CREATE TABLE chk.leiding_bobs_0 AS
 SELECT * FROM v2_pipe_view WHERE pipe_invert_level_start_point = 0 OR pipe_invert_level_end_point = 0;
@@ -179,13 +179,13 @@ FROM v2_pumpstation;
 DROP TABLE IF EXISTS chk.pomp_levels;
 CREATE TABLE chk.pomp_levels AS
 SELECT * FROM v2_pumpstation_point_view WHERE start_level IS NULL
-				OR start_level < LeesInstelling_dp('min_levels')
-				or start_level > LeesInstelling_dp('max_levels')
+				OR start_level < {min_levels}
+				or start_level > {max_levels}
 				OR lower_stop_level IS NULL
-				OR lower_stop_level < LeesInstelling_dp('min_levels')
-				or lower_stop_level > LeesInstelling_dp('max_levels')
-				OR upper_stop_level < LeesInstelling_dp('min_levels')
-				or upper_stop_level > LeesInstelling_dp('max_levels');
+				OR lower_stop_level < {min_levels}
+				or lower_stop_level > {max_levels}
+				OR upper_stop_level < {min_levels}
+				or upper_stop_level > {max_levels};
 DROP TABLE IF EXISTS chk.pomp_levels_0;
 CREATE TABLE chk.pomp_levels_0 AS
 SELECT * FROM v2_pumpstation_point_view WHERE start_level = 0
@@ -218,8 +218,8 @@ SELECT * FROM v2_weir WHERE connection_node_start_id IS NULL or connection_node_
 DROP TABLE IF EXISTS chk.overstort_crest_level;
 CREATE TABLE chk.overstort_crest_level AS
 SELECT * FROM v2_weir_view WHERE weir_crest_level IS NULL
-				OR weir_crest_level < LeesInstelling_dp('min_levels')
-				or weir_crest_level > LeesInstelling_dp('max_levels');
+				OR weir_crest_level < {min_levels}
+				or weir_crest_level > {max_levels};
 DROP TABLE IF EXISTS chk.overstort_crest_level_0;
 CREATE TABLE chk.overstort_crest_level_0 AS
 SELECT * FROM v2_weir_view WHERE weir_crest_level = 0;
@@ -257,8 +257,8 @@ SELECT * FROM v2_orifice WHERE connection_node_start_id IS NULL or connection_no
 DROP TABLE IF EXISTS chk.doorlaat_crest_level;
 CREATE TABLE chk.doorlaat_crest_level AS
 SELECT * FROM v2_orifice_view WHERE orf_crest_level IS NULL
-				OR orf_crest_level < LeesInstelling_dp('min_levels')
-				or orf_crest_level > LeesInstelling_dp('max_levels');
+				OR orf_crest_level < {min_levels}
+				or orf_crest_level > {max_levels};
 DROP TABLE IF EXISTS chk.doorlaat_crest_level_0;
 CREATE TABLE chk.doorlaat_crest_level_0 AS
 SELECT * FROM v2_orifice_view WHERE orf_crest_level = 0;
@@ -349,14 +349,14 @@ WITH calc_hoogte_verschil AS (
 )
 SELECT *
 FROM calc_hoogte_verschil
-WHERE abs(hoogte_verschil) > LeesInstelling_dp('hoogte_verschil');
+WHERE abs(hoogte_verschil) > {hoogte_verschil};
 
 -- Maaiveldhoogte > bok
 DROP TABLE IF EXISTS chk.put_maaiveld_vs_bok;
 CREATE TABLE chk.put_maaiveld_vs_bok AS
 SELECT (manh_surface_level - manh_bottom_level) as putdiepte, *
 FROM v2_manhole_view
-WHERE manh_surface_level < manh_bottom_level + LeesInstelling_dp('min_dekking')
+WHERE manh_surface_level < manh_bottom_level + {min_dekking}
 ORDER BY (manh_surface_level - manh_bottom_level);
 
 -- BOK > laagste bob
@@ -393,7 +393,7 @@ JOIN v2_pipe_view as pv ON sm.manh_connection_node_id = pv.pipe_connection_node_
 ORDER BY sm_id, pv_id
 )
 -- select the lowest
-select distinct on (sm_id) * from aangesloten_diameters WHERE grootste_put_afm < greatest_width + LeesInstelling_dp('padding_manhole')
+select distinct on (sm_id) * from aangesloten_diameters WHERE grootste_put_afm < greatest_width + {padding_manhole}
 ORDER BY sm_id, greatest_width DESC;
 
 -- Losliggende putten
@@ -511,12 +511,12 @@ WHERE sm.manhole_indicator = 1;
 -- Zeer korte leidingen (< x m)
 DROP TABLE if exists chk.leiding_kort;
 create table chk.leiding_kort AS
-SELECT ST_Length(the_geom),* FROM v2_pipe_view WHERE ST_Length(the_geom) < LeesInstelling_dp('min_length');
+SELECT ST_Length(the_geom),* FROM v2_pipe_view WHERE ST_Length(the_geom) < {min_length};
 
 -- Zeer lange lange leidingen (> x m)
 DROP TABLE if exists chk.leiding_lang;
 create table chk.leiding_lang AS
-SELECT ST_Length(the_geom),* FROM v2_pipe_view WHERE ST_Length(the_geom) > LeesInstelling_dp('max_length');
+SELECT ST_Length(the_geom),* FROM v2_pipe_view WHERE ST_Length(the_geom) > {max_length};
 
 -- Dubbele leidingen
 drop table if exists chk.kunstwerken_dubbel;
@@ -555,7 +555,7 @@ SELECT ST_Length(the_geom)/abs(pipe_invert_level_start_point - pipe_invert_level
 FROM v2_pipe_view
 WHERE pipe_invert_level_start_point != pipe_invert_level_end_point
 	AND (ST_Length(the_geom)/abs(pipe_invert_level_start_point - pipe_invert_level_end_point))
-		< LeesInstelling_dp('max_verhang');
+		< {max_verhang};
 
 -- Dekking minder dan een bepaalde dekking voor start_node
 DROP TABLE IF EXISTS chk.leiding_check_dekking_start;
@@ -597,7 +597,7 @@ WHERE round((manh_surface_level - pipe_invert_level_start_point -
 			ELSE 0
 			END
 		))::numeric,3)
-		< LeesInstelling_dp('min_dekking')
+		< {min_dekking}
 	AND (sm.manh_connection_node_id = pipe_connection_node_start_id
 	AND pipe_invert_level_start_point IS NOT NULL
 	AND sm.manh_surface_level IS NOT NULL);
@@ -642,7 +642,7 @@ WHERE round((manh_surface_level - pipe_invert_level_end_point -
 			ELSE 0
 			END
 		))::numeric,3)
-		< LeesInstelling_dp('min_dekking')
+		< {min_dekking}
 	AND (sm.manh_connection_node_id = pipe_connection_node_end_id
 	AND pipe_invert_level_end_point IS NOT NULL
 	AND sm.manh_surface_level IS NOT NULL);
@@ -684,7 +684,7 @@ SELECT wr.weir_display_name, wr.weir_crest_level, vm.surface_level as model_maai
  END as maaiveld_type, wr.the_geom
 FROM v2_weir_view wr JOIN src.manhole_maaiveld sm ON (wr.weir_connection_node_start_id = sm.manh_connection_node_id OR wr.weir_connection_node_end_id = sm.manh_connection_node_id )
 JOIN v2_manhole vm ON sm.manh_connection_node_id = vm.connection_node_id
-WHERE wr.weir_crest_level > vm.surface_level OR (wr.weir_crest_level > dem AND round((dem - surface_level)::numeric,2)> LeesInstelling_dp('hoogte_verschil')) AND manhole_indicator != 1
+WHERE wr.weir_crest_level > vm.surface_level OR (wr.weir_crest_level > dem AND round((dem - surface_level)::numeric,2)> {hoogte_verschil}) AND manhole_indicator != 1
 ORDER BY start_or_end DESC;
 
 -- Overstorthoogte < bok
@@ -698,7 +698,7 @@ WHERE weir_crest_level < sm.bottom_level;
 -- overstort lengte;
 DROP TABLE IF EXISTS chk.overstort_korte_lengte;
 CREATE table chk.overstort_korte_lengte as
-SELECT ST_Length(the_geom), * FROM v2_weir_view WHERE ST_Length(the_geom) < LeesInstelling_dp('min_length');
+SELECT ST_Length(the_geom), * FROM v2_weir_view WHERE ST_Length(the_geom) < {min_length};
 
 -- dit zijn alle overstorten die door de import sufhyd tool zijn gecreeerd. Van deze overstorten ontbreekt er een eindknoop in het sufhyd.
 drop table if exists chk.overstort_verkeerd_uit_sufhyd;
@@ -723,7 +723,7 @@ SELECT ori.orf_display_name, ori.orf_crest_level, vm.connection_node_id, vm.surf
  END as maaiveld_type, ori.the_geom
 FROM v2_orifice_view ori JOIN src.manhole_maaiveld sm ON (ori.orf_connection_node_start_id = sm.manh_connection_node_id OR ori.orf_connection_node_end_id = sm.manh_connection_node_id)
 JOIN v2_manhole vm ON sm.manh_connection_node_id = vm.connection_node_id
-WHERE ori.orf_crest_level > vm.surface_level OR (ori.orf_crest_level > dem AND round((dem - surface_level)::numeric,2)> LeesInstelling_dp('hoogte_verschil'));
+WHERE ori.orf_crest_level > vm.surface_level OR (ori.orf_crest_level > dem AND round((dem - surface_level)::numeric,2)> {hoogte_verschil});
 
 drop table if exists chk.doorlaat_drempel_boven_maaiveld;
 CREATE table chk.doorlaat_drempel_boven_maaiveld as
@@ -741,7 +741,7 @@ WHERE orf_crest_level < sm.bottom_level;
 
 DROP TABLE IF EXISTS chk.doorlaat_korte_lengte;
 CREATE table chk.doorlaat_korte_lengte as
-SELECT ST_Length(the_geom), * FROM v2_orifice_view WHERE ST_Length(the_geom) < LeesInstelling_dp('min_length');
+SELECT ST_Length(the_geom), * FROM v2_orifice_view WHERE ST_Length(the_geom) < {min_length};
 
 """,
     "sql_quality_cross_section_definition": """
@@ -753,41 +753,41 @@ DROP TABLE IF EXISTS chk.profiel_kleine_breedte;
 CREATE TABLE chk.profiel_kleine_breedte AS
 SELECT width::float as least_width, *
 FROM v2_cross_section_definition_rio_view
-WHERE width::float < LeesInstelling_dp('min_dimensions')::float AND shape < 5
+WHERE width::float < {min_dimensions}::float AND shape < 5
 UNION ALL
 SELECT array_greatest(string_to_array(width,' '))::float as greatest_width,*
 FROM v2_cross_section_definition_rio_view
-WHERE array_greatest(string_to_array(width,' '))::float < LeesInstelling_dp('min_dimensions')::float AND shape > 4;
+WHERE array_greatest(string_to_array(width,' '))::float < {min_dimensions}::float AND shape > 4;
 
 DROP TABLE IF EXISTS chk.profiel_kleine_hoogte;
 CREATE TABLE chk.profiel_kleine_hoogte AS
 SELECT height::float as least_height, *
 FROM v2_cross_section_definition_rio_view
-WHERE height::float < LeesInstelling_dp('min_dimensions')::float AND shape < 5
+WHERE height::float < {min_dimensions}::float AND shape < 5
 UNION ALL
 SELECT array_greatest(string_to_array(height,' '))::float as greatest_height,*
 FROM v2_cross_section_definition_rio_view
-WHERE array_greatest(string_to_array(height,' '))::float < LeesInstelling_dp('min_dimensions')::float AND shape > 4;
+WHERE array_greatest(string_to_array(height,' '))::float < {min_dimensions}::float AND shape > 4;
 
 DROP TABLE IF EXISTS chk.profiel_grote_breedte;
 CREATE TABLE chk.profiel_grote_breedte AS
 SELECT width::float as greatest_width, *
 FROM v2_cross_section_definition_rio_view
-WHERE width::float > LeesInstelling_dp('max_dimensions')::float AND shape < 5
+WHERE width::float > {max_dimensions}::float AND shape < 5
 UNION ALL
 SELECT array_greatest(string_to_array(width,' '))::float as greatest_width,*
 FROM v2_cross_section_definition_rio_view
-WHERE array_greatest(string_to_array(width,' '))::float > LeesInstelling_dp('max_dimensions') AND shape > 4;
+WHERE array_greatest(string_to_array(width,' '))::float > {max_dimensions} AND shape > 4;
 
 DROP TABLE IF EXISTS chk.profiel_grote_hoogte;
 CREATE TABLE chk.profiel_grote_hoogte AS
 SELECT width::float as greatest_height, *
 FROM v2_cross_section_definition_rio_view
-WHERE height::float > LeesInstelling_dp('max_dimensions')::float AND shape < 5
+WHERE height::float > {max_dimensions}::float AND shape < 5
 UNION ALL
 SELECT array_greatest(string_to_array(height,' '))::float as greatest_height,*
 FROM v2_cross_section_definition_rio_view
-WHERE array_greatest(string_to_array(height,' '))::float > LeesInstelling_dp('max_dimensions')::float AND shape > 4;
+WHERE array_greatest(string_to_array(height,' '))::float > {max_dimensions}::float AND shape > 4;
 
 """,
 }

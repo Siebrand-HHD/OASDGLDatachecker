@@ -5,7 +5,8 @@ import psycopg2
 
 # from psycopg2.extras import RealDictCursor
 import logging
-import sql
+import sql_checks
+import sql_views
 
 logger = logging.getLogger(__name__)
 
@@ -40,6 +41,16 @@ class ThreediDatabase(object):
             initialize database for checks
         """
         self.create_schema(schema_name="chk")
+        for view_table in [
+            ["public", "v2_1d_boundary_conditions_view"],
+            ["public", "v2_pumpstation_point_view"],
+            ["public", "v2_1d_lateral_view"],
+            ["public", "v2_cross_section_definition_rio_view"],
+            ["chk", "v2_pipe_view_left_join"],
+            ["chk", "v2_orifice_view_left_join"],
+            ["chk", "v2_weir_view_left_join"],
+        ]:
+            self.create_view(view_table=view_table[1], view_schema=view_table[0])
 
     def get_count(self, table_name):
         """
@@ -99,7 +110,7 @@ class ThreediDatabase(object):
     def create_schema(self, schema_name, drop_schema=False):
         """create a schema"""
         if drop_schema == True:
-            drop_schema = """DROP SCHEMA IF EXISTS {schema_name};""".format(
+            drop_schema = """DROP SCHEMA IF EXISTS {schema_name} CASCADE;""".format(
                 schema_name=schema_name
             )
             self.free_form(drop_schema, fetch=False)
@@ -116,7 +127,7 @@ class ThreediDatabase(object):
         SELECT Populate_Geometry_Columns();"""
         self.free_form(sql_statement=populate_geometry_columns_statement, fetch=False)
 
-    def perform_checks_with_sql(self, check_table, check_type):
+    def perform_checks_with_sql(self, settings, check_table, check_type):
         """
         Performs quality checks on postgres DB
 
@@ -124,8 +135,24 @@ class ThreediDatabase(object):
         :param check_type - select type of check: completeness, quality
 
         """
-        check_table = check_table.strip("v2_")
+        check_table = check_table.replace("v2_", "")
         sql_template_name = "sql_" + check_type + "_" + check_table
-        if sql_template_name in sql.sql_checks:
-            statement = sql.sql_checks[sql_template_name]
+        if sql_template_name in sql_checks.sql_checks:
+            statement = sql_checks.sql_checks[sql_template_name].format(
+                **settings.__dict__
+            )
             self.free_form(sql_statement=statement, fetch=False)
+
+    def create_view(self, view_table, view_schema, drop_view=True):
+        """
+        Creates a view with a join to v2_connection_nodes table
+        
+        :param view_table - table of which the view is created
+        """
+        if drop_view == True:
+            drop_statement = """DROP VIEW IF EXISTS {view_table};""".format(
+                view_table=view_table
+            )
+            self.free_form(drop_statement, fetch=False)
+        create_statement = sql_views.sql_views[view_table].format(schema=view_schema)
+        self.free_form(sql_statement=create_statement, fetch=False)
