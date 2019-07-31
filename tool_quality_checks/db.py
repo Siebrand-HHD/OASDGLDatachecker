@@ -133,7 +133,6 @@ class ThreediDatabase(object):
 
         :param check_table - list of one or more structure tables (e.g. v2_manhole)
         :param check_type - select type of check: completeness, quality
-
         """
         check_table = check_table.replace("v2_", "")
         sql_template_name = "sql_" + check_type + "_" + check_table
