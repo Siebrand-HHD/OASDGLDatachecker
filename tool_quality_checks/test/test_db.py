@@ -26,6 +26,9 @@ class TestDB(TestCase):
         with pytest.raises(Exception):
             ThreediDatabase(self.settings)
 
+    def test_initialize_db(self):
+        self.db.initialize_db()
+
     def test_get_count(self):
         assert self.db.get_count("v2_manhole") >= 0
 
@@ -43,3 +46,14 @@ class TestDB(TestCase):
     def test_select_table_names(self):
         result = self.db.select_table_names("v2%")
         assert "v2_manhole" in result
+
+    def test_create_schema(self):
+        self.db.create_schema(schema_name="chk", drop_schema=True)
+
+    def test_populate_geometry_columns(self):
+        self.db.populate_geometry_columns()
+
+    def test_perform_checks_with_sql(self):
+        self.db.perform_checks_with_sql('v2_manhole', 'completeness')
+
+    # TODO: add checks for 

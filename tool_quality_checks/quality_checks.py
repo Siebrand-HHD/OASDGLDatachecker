@@ -15,17 +15,23 @@ def quality_checks(settings):
 
     # get database connection
     db = ThreediDatabase(settings)
+    db.initialize_db()
 
     # get v2_table_names
     v2_table_names = db.select_table_names("v2%")
     for table_name in v2_table_names:
-        print(table_name, db.get_count(table_name))
+        if db.get_count(table_name) > 0:
+            print(table_name, db.get_count(table_name))
+            db.perform_checks_with_sql(table_name, check_type="completeness")
+            db.perform_checks_with_sql(table_name, check_type="quality")
+
+    db.populate_geometry_columns()
 
 
 def resolve_ini(custom_ini_file):
     """
-        decide which ini file to use
-        """
+    decide which ini file to use
+    """
     # get default ini for testing purposes
     default_ini_relpath = "test\\data\\instellingen_test.ini"
     default_ini_relpath = os.path.join(os.path.dirname(__file__), default_ini_relpath)
