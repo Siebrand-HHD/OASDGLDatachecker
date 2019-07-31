@@ -1,7 +1,0 @@
-[run]
-omit =
-    */site-packages/*
-    */distutils/*
-
-[report]
-show_missing = True
