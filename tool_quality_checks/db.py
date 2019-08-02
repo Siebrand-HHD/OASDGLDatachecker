@@ -7,6 +7,7 @@ import psycopg2
 import logging
 import sql_checks
 import sql_views
+import os
 
 logger = logging.getLogger(__name__)
 
@@ -51,6 +52,11 @@ class ThreediDatabase(object):
             ["chk", "v2_weir_view_left_join"],
         ]:
             self.create_view(view_table=view_table[1], view_schema=view_table[0])
+
+        # install all function out of folder "sql_functions"
+        sql_reldir = "sql_functions"
+        sql_absdir = os.path.join(os.path.dirname(__file__), sql_reldir)
+        self.execute_sql_dir(sql_absdir)
 
     def get_count(self, table_name):
         """
@@ -155,3 +161,19 @@ class ThreediDatabase(object):
             self.free_form(drop_statement, fetch=False)
         create_statement = sql_views.sql_views[view_table].format(schema=view_schema)
         self.free_form(sql_statement=create_statement, fetch=False)
+
+    def execute_sql_file(self, filename):
+        # Open and read the file as a single buffer
+        fd = open(filename, "r")
+        sql_file = fd.read()
+        fd.close()
+
+        self.free_form(sql_statement=sql_file, fetch=False)
+        logger.info("Execute sql file with function:" + filename)
+
+    def execute_sql_dir(self, dirname):
+        for root, subdirs, files in sorted(os.walk(dirname)):
+            for f in sorted(files):
+                file_path = root + "/" + f
+                if file_path.endswith(".sql"):
+                    self.execute_sql_file(file_path)

@@ -57,3 +57,17 @@ class TestDB(TestCase):
         self.db.perform_checks_with_sql(self.settings, "v2_manhole", "completeness")
 
     # TODO: add checks for all types in sql.py
+
+    def test_execute_sql_file(self):
+        sql_relpath = "sql_functions\\function_array_greatest_or_smallest.sql"
+        sql_abspath = os.path.join(
+            os.path.abspath(os.path.join(os.path.dirname(__file__), "..")), sql_relpath
+        )
+        self.db.execute_sql_file(sql_abspath)
+
+    def test_execute_sql_dir(self):
+        sql_reldir = "sql_functions"
+        sql_absdir = os.path.join(
+            os.path.abspath(os.path.join(os.path.dirname(__file__), "..")), sql_reldir
+        )
+        self.db.execute_sql_dir(sql_absdir)
