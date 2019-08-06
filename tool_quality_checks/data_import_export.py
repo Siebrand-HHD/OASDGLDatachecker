@@ -74,29 +74,29 @@ def import_ogrdatasource_to_postgres(path, db): #, schema,table, srid):
     #Create Table using field type from the Dictionary
     FieldType = GetFieldValueasDictFromOgrDatasource(path)[0]
         
-    # TODO append or insert choice
-    sql_parameter = 'CREATE TABLE IF NOT EXISTS __s__.__t__ \n(' + ',\n '.join([str(i)+' '+str(v)  for i,v in FieldType.iteritems()]) + ',\n geom Geometry' + ')'
-        sql = sql_parameter.replace('__s__',schema).replace('__t__',table)
-        cur.execute("DROP TABLE test")
-        cur.execute (sql)
-        #Insert in the Table all the record from the Dictionary
-        for i in range(1,len(GetFieldValueasDictFromOgrDatasource(path))):
-            d=GetFieldValueasDictFromOgrDatasource(path)[i]
-            field_name = ', '.join([str(i)  for i in d.keys()])
-            value= ', '.join([str(repr(i)) for i in d.values()])  #### repr solve the string cast -- http://initd.org/psycopg/docs/usage.html#adapt-string
-            sql= "INSERT INTO %s.%s (%s)" %(schema,table,field_name) + " VALUES (%s)" %(value)
-            cur.execute(sql)
-            # TODO pass srid as function output and Srid Transform
-            sql = 'UPDATE %s.%s SET geom=ST_SetSrid(geom,%s)'%(schema,table,srid)
-            cur.execute(sql)
-        con.commit()
-        print("Import Ok\n for shapefile: %s \n in table: %s.%s" % os.path.basename(path),schema,table)
-    except psycopg2.DatabaseError as e:
-        if con:
-            con.rollback()
-        print('Error %s' % e)
-        sys.exit(1)
-    finally:
-        if con:
-            con.close()
+    # # TODO append or insert choice
+    # sql_parameter = 'CREATE TABLE IF NOT EXISTS __s__.__t__ \n(' + ',\n '.join([str(i)+' '+str(v)  for i,v in FieldType.iteritems()]) + ',\n geom Geometry' + ')'
+    #     sql = sql_parameter.replace('__s__',schema).replace('__t__',table)
+    #     cur.execute("DROP TABLE test")
+    #     cur.execute (sql)
+    #     #Insert in the Table all the record from the Dictionary
+    #     for i in range(1,len(GetFieldValueasDictFromOgrDatasource(path))):
+    #         d=GetFieldValueasDictFromOgrDatasource(path)[i]
+    #         field_name = ', '.join([str(i)  for i in d.keys()])
+    #         value= ', '.join([str(repr(i)) for i in d.values()])  #### repr solve the string cast -- http://initd.org/psycopg/docs/usage.html#adapt-string
+    #         sql= "INSERT INTO %s.%s (%s)" %(schema,table,field_name) + " VALUES (%s)" %(value)
+    #         cur.execute(sql)
+    #         # TODO pass srid as function output and Srid Transform
+    #         sql = 'UPDATE %s.%s SET geom=ST_SetSrid(geom,%s)'%(schema,table,srid)
+    #         cur.execute(sql)
+    #     con.commit()
+    #     print("Import Ok\n for shapefile: %s \n in table: %s.%s" % os.path.basename(path),schema,table)
+    # except psycopg2.DatabaseError as e:
+    #     if con:
+    #         con.rollback()
+    #     print('Error %s' % e)
+    #     sys.exit(1)
+    # finally:
+    #     if con:
+    #         con.close()
 
