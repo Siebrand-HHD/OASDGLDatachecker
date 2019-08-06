@@ -23,7 +23,8 @@
 """
 from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QAction
+from PyQt5.QtWidgets import QAction, QFileDialog
+from qgis.core import QgsProject, Qgis
 
 # Initialize Qt resources from file resources.py
 from .resources import *
@@ -171,6 +172,11 @@ class OASdglDatachecker:
         # will be set False in run()
         self.first_start = True
 
+    def select_output_file(self):
+          filename, _filter = QFileDialog.getSaveFileName(
+            self.dlg, "Select   output file ","", '*.csv')
+          self.dlg.lineEdit.setText(filename)
+
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
         for action in self.actions:
@@ -185,6 +191,14 @@ class OASdglDatachecker:
         if self.first_start == True:
             self.first_start = False
             self.dlg = OASdglDatacheckerDialog()
+            self.dlg.pushButton.clicked.connect(self.select_output_file)
+
+           # Fetch the currently loaded layers
+        layers = QgsProject.instance().layerTreeRoot().children()
+        # Clear the contents of the comboBox from previous runs
+        self.dlg.comboBox.clear()
+        # Populate the comboBox with names of all the loaded layers
+        self.dlg.comboBox.addItems([layer.name() for layer in layers])
 
         # show the dialog
         self.dlg.show()
@@ -194,4 +208,19 @@ class OASdglDatachecker:
         if result:
             # Do something useful here - delete the line containing pass and
             # substitute with your code.
-            pass
+            #pass
+            filename = self.dlg.lineEdit.text()
+            with open(filename, 'w') as output_file:
+              selectedLayerIndex = self.dlg.comboBox.currentIndex()
+              selectedLayer = layers[selectedLayerIndex].layer()
+              fieldnames = [field.name() for field in selectedLayer.fields()]
+              # write header
+              line = ','.join(name for name in fieldnames) + '\n'
+              output_file.write(line)
+              # wirte feature attributes
+              for f in selectedLayer.getFeatures():
+                line = ','.join(str(f[name]) for name in fieldnames) + '\n'
+                output_file.write(line)
+            self.iface.messageBar().pushMessage(
+                "Success", "Output file written at " + filename,
+                level=Qgis.Success, duration=3)
