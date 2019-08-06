@@ -6,6 +6,7 @@ import logging
 
 from configparser import RawConfigParser
 from db import ThreediDatabase
+from data_import_export import import_ogrdatasource_to_postgres
 
 logger = logging.getLogger(__name__)
 
@@ -15,8 +16,12 @@ def quality_checks(settings):
 
     # get database connection
     db = ThreediDatabase(settings)
-    # TODO: Make it only if install is on.
-    db.initialize_db()
+    # first time install things
+    if settings.install == True:
+        db.initialize_db()
+
+    # loading DTM data
+    load_dtm_values(settings, db)
 
     # get v2_table_names
     v2_table_names = db.select_table_names("v2%")
@@ -52,6 +57,20 @@ def resolve_ini(custom_ini_file):
         raise ("Error: Could not find the ini file {}".format(custom_ini_file))
 
 
+def load_dtm_values(settings, db):
+    """
+    Load linked dtm values in db
+    """
+
+    # Get count of original manhole table
+    origin_count = db.get_count("v2_manhole")
+    print(origin_count)
+
+    # load dtm value data
+    import_ogrdatasource_to_postgres(settings.manhole_dtm_level_shape, db)
+    raise
+
+
 class settingsObject(object):
     """Contains the settings from the ini file"""
 
@@ -85,6 +104,14 @@ def get_parser():
         dest="inifile",
         help="Location with settings ini for quality checks",
     )
+    parser.add_argument(
+        "--install",
+        default=False,
+        action="store_true",
+        help="Install schema, views and functions in database"
+        "this option is for first time only",
+        dest="install",
+    )
 
     return parser
 
@@ -100,6 +127,7 @@ def main():
     ini_relpath = resolve_ini(kwargs["inifile"])
     print(ini_relpath)
     settings = settingsObject(ini_relpath)
+    settings.install = kwargs["install"]
     quality_checks(settings)
 
 

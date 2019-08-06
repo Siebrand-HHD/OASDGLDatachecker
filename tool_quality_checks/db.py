@@ -1,5 +1,6 @@
 # (c) Nelen & Schuurmans.  GPL licensed, see LICENSE.rst.
 # -*- coding: utf-8 -*-
+""" TODO Docstring. """
 
 import psycopg2
 
@@ -80,6 +81,54 @@ class ThreediDatabase(object):
             self.db.rollback()
         logger.error("Error %s" % _exception)
         raise
+
+    def create_table(self, table_name, field_names, field_types):
+        """
+        :param table_name: string that will be used as a name in the database.
+        :param field_names: list of field names to add to the tables
+        :param field_types: list of field types
+
+        example::
+            create_table(
+                "my_table", ["foo", "bar", "my_double"],
+                ["serial", "smallint", "double precision"]
+            )
+        """
+
+        if not table_name:
+            raise ValueError("[E] table_name {} is not definied".format(table_name))
+        table_name = table_name
+
+        row_def_raw = []
+        for e, ee in zip(field_names, field_types):
+            s = "%s %s" % (e, ee)
+            row_def_raw.append(s)
+
+        row_def = ",".join(row_def_raw)
+        create_str = """
+            CREATE TABLE
+              {schema}.{table_name}
+            (id serial PRIMARY KEY,{row_definition})
+            ;
+            """.format(
+            schema=self.schema, table_name=table_name, row_definition=row_def
+        )
+
+        try:
+            cur = self.db.cursor()
+            del_str = "DROP TABLE IF EXISTS %s.%s;" % (self.schema, table_name)
+            cur.execute(del_str)
+            cur.execute(create_str)
+            self.db.commit()
+            logger.info(
+                "[+] Successfully created table {}.{}  ...".format(
+                    self.schema, table_name
+                )
+            )
+            return
+
+        except psycopg2.DatabaseError as e:
+            self._raise(e)
 
     def free_form(self, sql_statement, fetch=True, fetch_as=DEFAULT_FETCH):
         """
