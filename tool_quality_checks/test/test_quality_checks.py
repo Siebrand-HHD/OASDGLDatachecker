@@ -29,11 +29,9 @@ def test_resolve_ini_custom():
     ini_path = "data\\dummy.ini"
     ini_path = os.path.join(os.path.dirname(__file__), ini_path)
     ini_path = resolve_ini(ini_path)
-    print(ini_path)
     assert "\\test\\data\\dummy.ini" in ini_path
 
 
 def test_resolve_ini_default():
     ini_path = resolve_ini(None)
-    print(ini_path)
     assert "\\test\\data\\instellingen_test.ini" in ini_path
