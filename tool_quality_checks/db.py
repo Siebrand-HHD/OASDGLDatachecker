@@ -43,6 +43,7 @@ class ThreediDatabase(object):
             initialize database for checks
         """
         self.create_schema(schema_name="chk")
+        self.create_schema(schema_name="src")
         for view_table in [
             ["public", "v2_1d_boundary_conditions_view"],
             ["public", "v2_pumpstation_point_view"],
@@ -81,54 +82,6 @@ class ThreediDatabase(object):
             self.db.rollback()
         logger.error("Error %s" % _exception)
         raise
-
-    def create_table(self, table_name, field_names, field_types):
-        """
-        :param table_name: string that will be used as a name in the database.
-        :param field_names: list of field names to add to the tables
-        :param field_types: list of field types
-
-        example::
-            create_table(
-                "my_table", ["foo", "bar", "my_double"],
-                ["serial", "smallint", "double precision"]
-            )
-        """
-
-        if not table_name:
-            raise ValueError("[E] table_name {} is not definied".format(table_name))
-        table_name = table_name
-
-        row_def_raw = []
-        for e, ee in zip(field_names, field_types):
-            s = "%s %s" % (e, ee)
-            row_def_raw.append(s)
-
-        row_def = ",".join(row_def_raw)
-        create_str = """
-            CREATE TABLE
-              {schema}.{table_name}
-            (id serial PRIMARY KEY,{row_definition})
-            ;
-            """.format(
-            schema=self.schema, table_name=table_name, row_definition=row_def
-        )
-
-        try:
-            cur = self.db.cursor()
-            del_str = "DROP TABLE IF EXISTS %s.%s;" % (self.schema, table_name)
-            cur.execute(del_str)
-            cur.execute(create_str)
-            self.db.commit()
-            logger.info(
-                "[+] Successfully created table {}.{}  ...".format(
-                    self.schema, table_name
-                )
-            )
-            return
-
-        except psycopg2.DatabaseError as e:
-            self._raise(e)
 
     def free_form(self, sql_statement, fetch=True, fetch_as=DEFAULT_FETCH):
         """
@@ -176,6 +129,58 @@ class ThreediDatabase(object):
         )
         self.free_form(sql_statement=create_schema_statement, fetch=False)
 
+    def create_table(self, table_name, field_names, field_types, schema=None):
+        """
+        :param table_name: string that will be used as a name in the database.
+        :param field_names: list of field names to add to the tables
+        :param field_types: list of field types
+
+        example::
+            create_table(
+                "my_table", ["foo", "bar", "my_double"],
+                ["serial", "smallint", "double precision"]
+            )
+        """
+
+        schema = schema or self.schema
+
+        if not table_name:
+            raise ValueError("[E] table_name {} is not definied".format(table_name))
+
+        row_def_raw = []
+        for e, ee in zip(field_names, field_types):
+            s = "%s %s" % (e, ee)
+            row_def_raw.append(s)
+
+        row_def = ",".join(row_def_raw)
+        create_str = """
+            CREATE TABLE
+              {schema}.{table_name}
+            (id serial PRIMARY KEY,{row_definition})
+            ;
+            """.format(
+            schema=schema, table_name=table_name, row_definition=row_def
+        )
+
+        del_str = "DROP TABLE IF EXISTS %s.%s;" % (schema, table_name)
+        self.free_form(del_str, fetch=False)
+        self.free_form(create_str, fetch=False)
+        logger.info("[+] Successfully created table {}.{}".format(schema, table_name))
+
+    def create_view(self, view_table, view_schema, drop_view=True):
+        """
+        Creates a view with a join to v2_connection_nodes table
+        
+        :param view_table - table of which the view is created
+        """
+        if drop_view == True:
+            drop_statement = """DROP VIEW IF EXISTS {view_table};""".format(
+                view_table=view_table
+            )
+            self.free_form(drop_statement, fetch=False)
+        create_statement = sql_views.sql_views[view_table].format(schema=view_schema)
+        self.free_form(sql_statement=create_statement, fetch=False)
+
     def populate_geometry_columns(self):
         """Populate geometry columns"""
         populate_geometry_columns_statement = """
@@ -196,20 +201,6 @@ class ThreediDatabase(object):
                 **settings.__dict__
             )
             self.free_form(sql_statement=statement, fetch=False)
-
-    def create_view(self, view_table, view_schema, drop_view=True):
-        """
-        Creates a view with a join to v2_connection_nodes table
-        
-        :param view_table - table of which the view is created
-        """
-        if drop_view == True:
-            drop_statement = """DROP VIEW IF EXISTS {view_table};""".format(
-                view_table=view_table
-            )
-            self.free_form(drop_statement, fetch=False)
-        create_statement = sql_views.sql_views[view_table].format(schema=view_schema)
-        self.free_form(sql_statement=create_statement, fetch=False)
 
     def execute_sql_file(self, filename):
         # Open and read the file as a single buffer

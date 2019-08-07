@@ -5,50 +5,42 @@ original code from: https://github.com/francot/python-ogr-postgis-tools/blob/mas
 """
 
 
-import sys
 import os
-import psycopg2
-import psycopg2.extras
+import logging
 from osgeo import ogr
-from osgeo import osr
 
-dbname = '__'
-user = '__'
-password = '__'
-host = '__'
-
-connString = "PG: host=%s dbname=%s user=%s password=%s" %(host, dbname, user, password)
-connString_pg = "dbname=%s user=%s password=%s  host=%s" %(dbname, user, password,  host)
+logger = logging.getLogger(__name__)
 
 ###################### import from shp to pg ################################
 #############################################################################
 
+
 def GetFieldValueasDictFromOgrDatasource(path):
-# return a Dictionary with shp field and values
+    # return a Dictionary with shp field and values
     ds = ogr.Open(path)
     if path is None:
-        print('Could not open %s' % path)
+        print("Could not open %s" % path)
     else:
         layer = ds.GetLayer(0)
         lyrDefn = layer.GetLayerDefn()
-        #this Dictionary store field name as keys and field type
+        # this Dictionary store field name as keys and field type
         ds_field = {}
         for i in range(lyrDefn.GetFieldCount()):
             fieldName = lyrDefn.GetFieldDefn(i).GetName()
             fieldTypeCode = lyrDefn.GetFieldDefn(i).GetType()
             fieldType = lyrDefn.GetFieldDefn(i).GetFieldTypeName(fieldTypeCode)
-            if fieldType=='String':
-                fieldType='Varchar'
+            if fieldType == "String":
+                fieldType = "Varchar"
             fieldType
-            ds_field[fieldName]=fieldType
-        ds_records=[]
+            ds_field[fieldName] = fieldType
+        ds_records = []
         for i in range(layer.GetFeatureCount()):
-            if os.path.splitext(path)[1] == '.gpkg':
+            if os.path.splitext(path)[1] == ".gpkg":
                 i = i + 1
-            elif os.path.splitext(path)[1] == '.shp':
+            elif os.path.splitext(path)[1] == ".shp":
                 pass
             else:
-                logger.warning("This file might not be supported: %s"% path)
+                logger.warning("This file might not be supported: %s" % path)
 
             ds_values = {}
             for j in range(lyrDefn.GetFieldCount()):
@@ -56,24 +48,36 @@ def GetFieldValueasDictFromOgrDatasource(path):
                 feature = layer.GetFeature(i)
                 value = feature.GetField(fieldName)
                 wkt = feature.GetGeometryRef().ExportToWkt()
-                ds_values[fieldName]=value
-                ds_values['geom']=wkt
-            #append in the vector all the ds records stored as Dictionary
+                ds_values[fieldName] = value
+                ds_values["geom"] = wkt
+            # append in the vector all the ds records stored as Dictionary
             ds_records.append(ds_values)
-        #insert in the first position of the vector the Dictionary with field type
-        ds_records.insert(0,ds_field)
+        # insert in the first position of the vector the Dictionary with field type
+        ds_records.insert(0, ds_field)
         return ds_records
 
 
-def import_ogrdatasource_to_postgres(path, db): #, schema,table, srid):
+def import_ogrdatasource_to_postgres(
+    db, input_path, table_name, schema=None
+):  # , schema,table, srid):
     """
     Import OgrDatasource to pg
     tested is geopackage and shapefile
     """
 
-    #Create Table using field type from the Dictionary
-    FieldType = GetFieldValueasDictFromOgrDatasource(path)[0]
-        
+    # Create Table using field type from the Dictionary
+    ds_records = GetFieldValueasDictFromOgrDatasource(input_path)
+
+    # get table
+    table_info = ds_records[0]
+    schema = schema or "public"
+    db.create_table(
+        table_name=table_name,
+        field_names=list(table_info.keys()),
+        field_types=list(table_info.values()),
+        schema=schema,
+    )
+
     # # TODO append or insert choice
     # sql_parameter = 'CREATE TABLE IF NOT EXISTS __s__.__t__ \n(' + ',\n '.join([str(i)+' '+str(v)  for i,v in FieldType.iteritems()]) + ',\n geom Geometry' + ')'
     #     sql = sql_parameter.replace('__s__',schema).replace('__t__',table)
@@ -99,4 +103,3 @@ def import_ogrdatasource_to_postgres(path, db): #, schema,table, srid):
     # finally:
     #     if con:
     #         con.close()
-

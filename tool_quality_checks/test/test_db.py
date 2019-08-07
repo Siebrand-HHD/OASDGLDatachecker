@@ -50,6 +50,13 @@ class TestDB(TestCase):
     def test_create_schema(self):
         self.db.create_schema(schema_name="chk", drop_schema=True)
 
+    def test_create_table(self):
+        self.db.create_table("test_create_table", ["test_id"], ["Integer"])
+
+    def test_create_table_raise(self):
+        with pytest.raises(Exception):
+            self.db.create_table(None, ["test_id"], ["Integer"])
+
     def test_populate_geometry_columns(self):
         self.db.populate_geometry_columns()
 

@@ -67,7 +67,12 @@ def load_dtm_values(settings, db):
     print(origin_count)
 
     # load dtm value data
-    import_ogrdatasource_to_postgres(settings.manhole_dtm_level_shape, db)
+    import_ogrdatasource_to_postgres(
+        db,
+        input_path=settings.manhole_dtm_level_shape,
+        table_name="manhole_maaiveld",
+        schema="src",
+    )
     raise
 
 
