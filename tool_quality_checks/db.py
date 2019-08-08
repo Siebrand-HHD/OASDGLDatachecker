@@ -9,6 +9,7 @@ import logging
 import sql_checks
 import sql_views
 import os
+import ogr
 
 logger = logging.getLogger(__name__)
 
@@ -37,6 +38,24 @@ class ThreediDatabase(object):
         except psycopg2.Error as e:
             logger.exception(e)
             raise
+        
+        db_conn = \
+        "PG: dbname={dbname_value} user={user_value} "\
+        "host={host_value} password={password_value}"\
+        .format(
+            dbname_value=settings.database, 
+            user_value=settings.username, 
+            host_value=settings.host, 
+            password_value=settings.password
+         )
+        print(db_conn)
+        #Connect met de database
+        try:
+            #conn = psycopg2.connect(db_conn)
+            self.conn = ogr.Open(db_conn)
+        except:
+            print("I am unable to connect to the database")
+            print(db_conn)
 
     def initialize_db(self):
         """

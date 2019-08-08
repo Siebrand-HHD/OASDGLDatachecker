@@ -3,6 +3,7 @@
 import os
 import argparse
 import logging
+import ogr
 
 from configparser import RawConfigParser
 from db import ThreediDatabase
@@ -67,12 +68,23 @@ def load_dtm_values(settings, db):
     print(origin_count)
 
     # load dtm value data
-    import_ogrdatasource_to_postgres(
-        db,
-        input_path=settings.manhole_dtm_level_shape,
-        table_name="manhole_maaiveld",
-        schema="src",
-    )
+    ds = ogr.Open(settings.manhole_dtm_level_shape)
+    layer = ds.GetLayer()
+    print(ds[0].__dict__)
+    out_layer = db.conn.CopyLayer(layer, "manhole_maaiveld",
+            ["OVERWRITE=YES",
+            "SCHEMA=src",
+            "SPATIAL_INDEX=GIST"])
+    print("hoi", out_layer.__dict__)
+    out_layer = None
+
+
+    # import_ogrdatasource_to_postgres(
+    #     db,
+    #     input_path=settings.manhole_dtm_level_shape,
+    #     table_name="manhole_maaiveld",
+    #     schema="src",
+    # )
     raise
 
 
