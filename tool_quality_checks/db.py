@@ -49,7 +49,7 @@ class ThreediDatabase(object):
         ]:
             self.create_view(view_table=table, view_schema=schema)
 
-        # install all function out of folder "sql_functions"
+        # install all functions out of folder "sql_functions"
         sql_reldir = "sql_functions"
         sql_absdir = os.path.join(os.path.dirname(__file__), sql_reldir)
         self.execute_sql_dir(sql_absdir)
