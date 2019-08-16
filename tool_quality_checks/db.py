@@ -161,7 +161,7 @@ class ThreediDatabase(object):
     def execute_sql_file(self, filename):
         # Open and read the file as a single buffer
         sql_file = open(filename, "r")
-        sql_file = fd.read()
+        sql = sql_file.read()
         fd.close()
 
         self.free_form(sql_statement=sql_file, fetch=False)
