@@ -165,7 +165,7 @@ class ThreediDatabase(object):
         fd.close()
 
         self.free_form(sql_statement=sql_file, fetch=False)
-        logger.info("Execute sql file with function:" + filename)
+        logger.info("Executed sql file with function:" + filename)
 
     def execute_sql_dir(self, dirname):
         for root, subdirs, files in sorted(os.walk(dirname)):
