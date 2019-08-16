@@ -69,13 +69,11 @@ def load_dtm_values(settings, db):
 
     # load dtm value data
     ds = ogr.Open(settings.manhole_dtm_level_shape)
-    layer = ds.GetLayer()
-    print(ds[0].__dict__)
-    out_layer = db.conn.CopyLayer(layer, "manhole_maaiveld",
+    inlayer = ds.GetLayer()
+    out_layer = db.conn.CopyLayer(inlayer, "manhole_maaiveld",
             ["OVERWRITE=YES",
             "SCHEMA=src",
             "SPATIAL_INDEX=GIST"])
-    print("hoi", out_layer.__dict__)
     out_layer = None
 
 
