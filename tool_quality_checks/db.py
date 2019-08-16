@@ -20,9 +20,7 @@ class ThreediDatabase(object):
     """
 
     def __init__(self, settings):
-        """
-        Establishes the db connection.
-        """
+        """ Establishes the db connection. """
         # could be made variable
         self.schema = "public"
         credentials = {
@@ -38,11 +36,9 @@ class ThreediDatabase(object):
             raise
 
     def initialize_db(self):
-        """
-            initialize database for checks
-        """
+        """ Initialize database for checks """
         self.create_schema(schema_name="chk")
-        for view_table in [
+        for schema, table in [
             ["public", "v2_1d_boundary_conditions_view"],
             ["public", "v2_pumpstation_point_view"],
             ["public", "v2_1d_lateral_view"],
@@ -51,7 +47,7 @@ class ThreediDatabase(object):
             ["chk", "v2_orifice_view_left_join"],
             ["chk", "v2_weir_view_left_join"],
         ]:
-            self.create_view(view_table=view_table[1], view_schema=view_table[0])
+            self.create_view(view_table=table, view_schema=schema)
 
         # install all function out of folder "sql_functions"
         sql_reldir = "sql_functions"
@@ -69,7 +65,7 @@ class ThreediDatabase(object):
         result = self.free_form(statement, fetch=True)
         return result[0][0]
 
-    def _get_cursor(self, user_choise=""):
+    def _get_cursor(self):
         # if user_choise == 'dict':
         #    return self.db.cursor(cursor_factory=RealDictCursor)
         # else:
