@@ -160,7 +160,7 @@ class ThreediDatabase(object):
 
     def execute_sql_file(self, filename):
         # Open and read the file as a single buffer
-        fd = open(filename, "r")
+        sql_file = open(filename, "r")
         sql_file = fd.read()
         fd.close()
 
