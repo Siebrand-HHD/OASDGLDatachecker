@@ -36,12 +36,12 @@ class TestDB(TestCase):
         with pytest.raises(Exception):
             self.db.get_count("unknown")
 
-    def test_free_form(self):
-        self.db.free_form("SELECT * FROM v2_manhole")
+    def test_execute_sql_statement(self):
+        self.db.execute_sql_statement("SELECT * FROM v2_manhole")
 
-    def test_free_form_raise(self):
+    def test_execute_sql_statement_raise(self):
         with pytest.raises(Exception):
-            self.db.free_form("SELECT * FROM unknown")
+            self.db.execute_sql_statement("SELECT * FROM unknown")
 
     def test_select_table_names(self):
         result = self.db.select_table_names("v2%")

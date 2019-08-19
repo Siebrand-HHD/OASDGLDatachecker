@@ -11,8 +11,6 @@ import os
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_FETCH = "default"
-
 
 class ThreediDatabase(object):
     """
@@ -62,38 +60,24 @@ class ThreediDatabase(object):
         statement = "SELECT COUNT(*) from {schema}.{table_name:s}".format(
             table_name=table_name, schema=self.schema
         )
-        result = self.free_form(statement, fetch=True)
+        result = self.execute_sql_statement(statement, fetch=True)
         return result[0][0]
 
-    def _get_cursor(self):
-        # if user_choise == 'dict':
-        #    return self.db.cursor(cursor_factory=RealDictCursor)
-        # else:
-        return self.db.cursor()
-
-    def _raise(self, _exception):
-        if self.db:
-            self.db.rollback()
-        logger.error("Error %s" % _exception)
-        raise
-
-    def free_form(self, sql_statement, fetch=True, fetch_as=DEFAULT_FETCH):
+    def execute_sql_statement(self, sql_statement, fetch=True):
         """
         :param sql_statement: custom sql statement
 
         makes use of the existing database connection to run a custom query
         """
-
-        try:
-            cur = self._get_cursor(fetch_as)
-            cur.execute(sql_statement)
-            self.db.commit()
-            logger.debug("[+] Successfully executed statement {}".format(sql_statement))
-            if fetch is True:
-                return cur.fetchall()
-
-        except psycopg2.DatabaseError as e:
-            self._raise(e)
+        with self.db:
+            with self.db.cursor() as cur:
+                cur.execute(sql_statement)
+                if fetch is True:
+                    return cur.fetchall()
+                self.db.commit()
+                logger.debug(
+                    "[+] Successfully executed statement {}".format(sql_statement)
+                )
 
     def select_table_names(self, search_table_name, schema=None):
         schema = schema or self.schema
@@ -107,7 +91,7 @@ class ThreediDatabase(object):
         """.format(
             schema=schema, search_table_name=search_table_name
         )
-        return [i[0] for i in self.free_form(statement, fetch=True)]
+        return [i[0] for i in self.execute_sql_statement(statement, fetch=True)]
 
     def create_schema(self, schema_name, drop_schema=False):
         """create a schema"""
@@ -115,19 +99,21 @@ class ThreediDatabase(object):
             drop_schema = """DROP SCHEMA IF EXISTS {schema_name} CASCADE;""".format(
                 schema_name=schema_name
             )
-            self.free_form(drop_schema, fetch=False)
+            self.execute_sql_statement(drop_schema, fetch=False)
         create_schema_statement = """
         CREATE SCHEMA IF NOT EXISTS {schema_name}
         ;""".format(
             schema_name=schema_name
         )
-        self.free_form(sql_statement=create_schema_statement, fetch=False)
+        self.execute_sql_statement(sql_statement=create_schema_statement, fetch=False)
 
     def populate_geometry_columns(self):
         """Populate geometry columns"""
         populate_geometry_columns_statement = """
         SELECT Populate_Geometry_Columns();"""
-        self.free_form(sql_statement=populate_geometry_columns_statement, fetch=False)
+        self.execute_sql_statement(
+            sql_statement=populate_geometry_columns_statement, fetch=False
+        )
 
     def perform_checks_with_sql(self, settings, check_table, check_type):
         """
@@ -142,7 +128,7 @@ class ThreediDatabase(object):
             statement = sql_checks.sql_checks[sql_template_name].format(
                 **settings.__dict__
             )
-            self.free_form(sql_statement=statement, fetch=False)
+            self.execute_sql_statement(sql_statement=statement, fetch=False)
 
     def create_view(self, view_table, view_schema, drop_view=True):
         """
@@ -154,18 +140,18 @@ class ThreediDatabase(object):
             drop_statement = """DROP VIEW IF EXISTS {view_table};""".format(
                 view_table=view_table
             )
-            self.free_form(drop_statement, fetch=False)
+            self.execute_sql_statement(drop_statement, fetch=False)
         create_statement = sql_views.sql_views[view_table].format(schema=view_schema)
-        self.free_form(sql_statement=create_statement, fetch=False)
+        self.execute_sql_statement(sql_statement=create_statement, fetch=False)
 
     def execute_sql_file(self, filename):
         # Open and read the file as a single buffer
-        sql_file = open(filename, "r")
-        sql = sql_file.read()
+        fd = open(filename, "r")
+        sql_file = fd.read()
         fd.close()
 
-        self.free_form(sql_statement=sql_file, fetch=False)
-        logger.info("Executed sql file with function:" + filename)
+        self.execute_sql_statement(sql_statement=sql_file, fetch=False)
+        logger.info("Execute sql file with function:" + filename)
 
     def execute_sql_dir(self, dirname):
         for root, subdirs, files in sorted(os.walk(dirname)):
