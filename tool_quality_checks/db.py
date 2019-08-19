@@ -19,8 +19,6 @@ class ThreediDatabase(object):
 
     def __init__(self, settings):
         """ Establishes the db connection. """
-        # could be made variable
-        self.schema = "public"
         credentials = {
             "dbname": settings.database,
             "host": settings.host,
@@ -52,13 +50,13 @@ class ThreediDatabase(object):
         sql_absdir = os.path.join(os.path.dirname(__file__), sql_reldir)
         self.execute_sql_dir(sql_absdir)
 
-    def get_count(self, table_name):
+    def get_count(self, table_name, schema="public"):
         """
         :param table:
         :return:
         """
         statement = "SELECT COUNT(*) from {schema}.{table_name:s}".format(
-            table_name=table_name, schema=self.schema
+            table_name=table_name, schema=schema
         )
         result = self.execute_sql_statement(statement, fetch=True)
         return result[0][0]
@@ -79,8 +77,7 @@ class ThreediDatabase(object):
                     "[+] Successfully executed statement {}".format(sql_statement)
                 )
 
-    def select_table_names(self, search_table_name, schema=None):
-        schema = schema or self.schema
+    def select_table_names(self, search_table_name, schema="public"):
 
         statement = """
         SELECT table_name
@@ -146,16 +143,13 @@ class ThreediDatabase(object):
 
     def execute_sql_file(self, filename):
         # Open and read the file as a single buffer
-        fd = open(filename, "r")
-        sql_file = fd.read()
-        fd.close()
-
+        sql_file = open(filename, "r").read()
         self.execute_sql_statement(sql_statement=sql_file, fetch=False)
         logger.info("Execute sql file with function:" + filename)
 
     def execute_sql_dir(self, dirname):
         for root, subdirs, files in sorted(os.walk(dirname)):
             for f in sorted(files):
-                file_path = root + "/" + f
+                file_path = os.path.join(root, f)
                 if file_path.endswith(".sql"):
                     self.execute_sql_file(file_path)
