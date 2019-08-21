@@ -6,8 +6,8 @@ import logging
 import ogr
 
 from configparser import RawConfigParser
-from db import ThreediDatabase
-from data_import_export import import_ogrdatasource_to_postgres
+from OASDGLDatachecker.tool_quality_checks.db import ThreediDatabase
+from OASDGLDatachecker.tool_quality_checks.data_import_export import import_ogrdatasource_to_postgres
 
 logger = logging.getLogger(__name__)
 
@@ -40,7 +40,7 @@ def resolve_ini(custom_ini_file):
     decide which ini file to use
     """
     # get default ini for testing purposes
-    default_ini_relpath = "test\\data\\instellingen_test.ini"
+    default_ini_relpath = os.path.join("test", "data", "instellingen_test.ini")
     default_ini_relpath = os.path.join(os.path.dirname(__file__), default_ini_relpath)
     if custom_ini_file is None:
         logger.info(
@@ -49,13 +49,13 @@ def resolve_ini(custom_ini_file):
             )
         )
         return default_ini_relpath
-    if all((os.path.exists(custom_ini_file), os.path.isfile(custom_ini_file))):
+    elif all((os.path.exists(custom_ini_file), os.path.isfile(custom_ini_file))):
         logger.info(
             "[*] Using custom ini file {}".format(os.path.basename(custom_ini_file))
         )
         return custom_ini_file
     else:
-        raise ("Error: Could not find the ini file {}".format(custom_ini_file))
+        raise ("Error: Could not find the custom ini file {}".format(custom_ini_file))
 
 
 def load_dtm_values(settings, db):
@@ -99,6 +99,12 @@ class settingsObject(object):
         for section in config.sections():
             for key, value in config.items(section):
                 setattr(self, key, value)
+
+    def __getattribute__(self, name):
+        try:
+            return super().__getattribute__(name)
+        except AttributeError:
+            raise AttributeError("Setting '%s' is missing in the ini-file" % name)
 
 
 def get_parser():

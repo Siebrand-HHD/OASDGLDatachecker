@@ -336,16 +336,16 @@ DROP TABLE IF EXISTS chk.put_buiten_dem;
 CREATE TABLE chk.put_buiten_dem AS
 SELECT *
 FROM src.manhole_maaiveld
-WHERE dem IS NULL or dem = -9999;
+WHERE maaiveld IS NULL or maaiveld = -9999;
 
 -- AHN2 Check - hoogte verschil
 -- betrouwbaarheid putten tov AHN2
 DROP TABLE IF EXISTS chk.put_maaiveld_check;
 CREATE TABLE chk.put_maaiveld_check AS
 WITH calc_hoogte_verschil AS (
-	SELECT round((dem - surface_level)::numeric,2) as hoogte_verschil, round(manh_surface_level::numeric,2) as model_maaiveld, dem as dem_maaiveld, a.*
+	SELECT round((maaiveld - surface_level)::numeric,2) as hoogte_verschil, round(surface_level::numeric,2) as model_maaiveld, maaiveld as dem_maaiveld, a.*
 	FROM v2_manhole JOIN src.manhole_maaiveld a ON manh_id = id
-	WHERE dem != -9999
+	WHERE maaiveld != -9999
 )
 SELECT *
 FROM calc_hoogte_verschil
@@ -560,14 +560,14 @@ WHERE pipe_invert_level_start_point != pipe_invert_level_end_point
 -- Dekking minder dan een bepaalde dekking voor start_node
 DROP TABLE IF EXISTS chk.leiding_check_dekking_start;
 CREATE TABLE chk.leiding_check_dekking_start AS
-SELECT round((manh_surface_level - pipe_invert_level_start_point -
+SELECT round((surface_level - pipe_invert_level_start_point -
 		(	CASE WHEN def_shape = 2 THEN def_width::double precision
 			WHEN def_shape = 3 THEN def_height::double precision
 			WHEN def_shape > 4 THEN array_greatest(string_to_array(def_height,' '))::double precision
 			ELSE 0
 			END
 		))::numeric,3)  as dekking,
-		round((dem - pipe_invert_level_start_point -
+		round((maaiveld - pipe_invert_level_start_point -
 		(	CASE WHEN def_shape = 2 THEN def_width::double precision
 			WHEN def_shape = 3 THEN def_height::double precision
 			WHEN def_shape > 4 THEN array_greatest(string_to_array(def_height,' '))::double precision
@@ -581,7 +581,7 @@ SELECT round((manh_surface_level - pipe_invert_level_start_point -
 			ELSE 0
 			END
 		))::numeric,3) as bob_plus_hoogte,
-		round(manh_surface_level::numeric,3) as model_maaiveld, dem as dem_maaiveld,
+		round(surface_level::numeric,3) as model_maaiveld, maaiveld as dem_maaiveld,
 		(	CASE WHEN def_shape = 2 THEN def_width::double precision
 			WHEN def_shape = 3 THEN def_height::double precision
 			WHEN def_shape > 4 THEN array_greatest(string_to_array(def_height,' '))::double precision
@@ -589,8 +589,8 @@ SELECT round((manh_surface_level - pipe_invert_level_start_point -
 			END
 		) as profiel_hoogte,
 		v2_pipe_view.*
-FROM v2_pipe_view, src.manhole_maaiveld sm
-WHERE round((manh_surface_level - pipe_invert_level_start_point -
+FROM v2_pipe_view, src.manhole_maaiveld sm JOIN v2_manhole vm ON vm.id = sm.manh_id
+WHERE round((surface_level - pipe_invert_level_start_point -
 		(	CASE WHEN def_shape = 2 THEN def_width::double precision
 			WHEN def_shape = 3 THEN def_height::double precision
 			WHEN def_shape > 4 THEN array_greatest(string_to_array(def_height,' '))::double precision
@@ -598,22 +598,22 @@ WHERE round((manh_surface_level - pipe_invert_level_start_point -
 			END
 		))::numeric,3)
 		< {min_dekking}
-	AND (sm.manh_connection_node_id = pipe_connection_node_start_id
+	AND (sm.manh_id = pipe_connection_node_start_id
 	AND pipe_invert_level_start_point IS NOT NULL
-	AND sm.manh_surface_level IS NOT NULL);
+	AND vm.surface_level IS NOT NULL);
 
 
 -- Dekking minder dan een bepaalde dekking voor end_node
 DROP TABLE IF EXISTS chk.leiding_check_dekking_end;
 CREATE TABLE chk.leiding_check_dekking_end AS
-SELECT round((manh_surface_level - pipe_invert_level_end_point -
+SELECT round((surface_level - pipe_invert_level_end_point -
 		(	CASE WHEN def_shape = 2 THEN def_width::double precision
 			WHEN def_shape = 3 THEN def_height::double precision
 			WHEN def_shape > 4 THEN array_greatest(string_to_array(def_height,' '))::double precision
 			ELSE 0
 			END
 		))::numeric,3)  as dekking,
-		round((dem - pipe_invert_level_end_point -
+		round((maaiveld - pipe_invert_level_end_point -
 		(	CASE WHEN def_shape = 2 THEN def_width::double precision
 			WHEN def_shape = 3 THEN def_height::double precision
 			WHEN def_shape > 4 THEN array_greatest(string_to_array(def_height,' '))::double precision
@@ -626,7 +626,7 @@ SELECT round((manh_surface_level - pipe_invert_level_end_point -
 			WHEN def_shape > 4 THEN array_greatest(string_to_array(def_height,' '))::double precision
 			ELSE 0
 			END
-		))::numeric,3) as bob_plus_hoogte, round(manh_surface_level::numeric,3) as model_maaiveld, dem as dem_maaiveld,
+		))::numeric,3) as bob_plus_hoogte, round(surface_level::numeric,3) as model_maaiveld, maaiveld as dem_maaiveld,
 		(	CASE WHEN def_shape = 2 THEN def_width::double precision
 			WHEN def_shape = 3 THEN def_height::double precision
 			WHEN def_shape > 4 THEN array_greatest(string_to_array(def_height,' '))::double precision
@@ -634,8 +634,8 @@ SELECT round((manh_surface_level - pipe_invert_level_end_point -
 			END
 		) as profiel_hoogte,
 		v2_pipe_view.*
-FROM v2_pipe_view, src.manhole_maaiveld sm
-WHERE round((manh_surface_level - pipe_invert_level_end_point -
+FROM v2_pipe_view, src.manhole_maaiveld sm JOIN v2_manhole vm ON vm.id = sm.manh_id
+WHERE round((surface_level - pipe_invert_level_end_point -
 		(	CASE WHEN def_shape = 2 THEN def_width::double precision
 			WHEN def_shape = 3 THEN def_height::double precision
 			WHEN def_shape > 4 THEN array_greatest(string_to_array(def_height,' '))::double precision
@@ -643,9 +643,9 @@ WHERE round((manh_surface_level - pipe_invert_level_end_point -
 			END
 		))::numeric,3)
 		< {min_dekking}
-	AND (sm.manh_connection_node_id = pipe_connection_node_end_id
+	AND (sm.manh_id = pipe_connection_node_end_id
 	AND pipe_invert_level_end_point IS NOT NULL
-	AND sm.manh_surface_level IS NOT NULL);
+	AND vm.surface_level IS NOT NULL);
 
 """,
     "sql_quality_pumpstation": """
@@ -664,7 +664,7 @@ SELECT lower_stop_level as afslagpeil, bottom_level, v2_pumpstation_point_view.*
 -- Aanslagpeil > maaiveld
 DROP TABLE IF EXISTS chk.pomp_aan_vs_maaiveld;
 CREATE TABLE chk.pomp_aan_vs_maaiveld AS
-SELECT start_level as aanslagpeil, round(manh_surface_level::numeric,3) as model_maaiveld, dem as dem_maaiveld, v2_pumpstation_point_view.* FROM v2_pumpstation_point_view, src.manhole_maaiveld sm WHERE (start_level > sm.manh_surface_level AND sm.manh_connection_node_id = connection_node_start_id);
+SELECT start_level as aanslagpeil, round(vm.surface_level::numeric,3) as model_maaiveld, maaiveld as dem_maaiveld, v2_pumpstation_point_view.* FROM v2_pumpstation_point_view, src.manhole_maaiveld sm JOIN v2_manhole vm ON vm.id = sm.manh_id WHERE (start_level > vm.surface_level AND sm.manh_id = connection_node_start_id);
 
 """,
     "sql_quality_weir": """
@@ -674,17 +674,17 @@ SELECT start_level as aanslagpeil, round(manh_surface_level::numeric,3) as model
 -- Vrije overstorthoogte; drempelhoogte boven maaiveld
 drop table if exists chk.overstort_drempel_boven_maaiveld;
 CREATE table chk.overstort_drempel_boven_maaiveld as
-SELECT wr.weir_display_name, wr.weir_crest_level, vm.surface_level as model_maaiveld, dem as dem_maaiveld, vm.drain_level as original_maaiveld,
- CASE WHEN wr.weir_connection_node_start_id = sm.manh_connection_node_id THEN 'start'
-	WHEN wr.weir_connection_node_end_id = sm.manh_connection_node_id THEN 'end'
+SELECT wr.weir_display_name, wr.weir_crest_level, vm.surface_level as model_maaiveld, maaiveld as dem_maaiveld, vm.drain_level as original_maaiveld,
+ CASE WHEN wr.weir_connection_node_start_id = sm.manh_id THEN 'start'
+	WHEN wr.weir_connection_node_end_id = sm.manh_id THEN 'end'
  END as start_or_end,
- CASE WHEN (wr.weir_crest_level > vm.surface_level AND wr.weir_crest_level > dem) THEN 'both'
+ CASE WHEN (wr.weir_crest_level > vm.surface_level AND wr.weir_crest_level > maaiveld) THEN 'both'
 	WHEN wr.weir_crest_level > vm.surface_level THEN 'model'
-	WHEN wr.weir_crest_level > dem THEN 'dem'
+	WHEN wr.weir_crest_level > maaiveld THEN 'dem'
  END as maaiveld_type, wr.the_geom
-FROM v2_weir_view wr JOIN src.manhole_maaiveld sm ON (wr.weir_connection_node_start_id = sm.manh_connection_node_id OR wr.weir_connection_node_end_id = sm.manh_connection_node_id )
-JOIN v2_manhole vm ON sm.manh_connection_node_id = vm.connection_node_id
-WHERE wr.weir_crest_level > vm.surface_level OR (wr.weir_crest_level > dem AND round((dem - surface_level)::numeric,2)> {hoogte_verschil}) AND manhole_indicator != 1
+FROM v2_weir_view wr JOIN src.manhole_maaiveld sm ON (wr.weir_connection_node_start_id = sm.manh_id OR wr.weir_connection_node_end_id = sm.manh_id )
+JOIN v2_manhole vm ON sm.manh_id = vm.connection_node_id
+WHERE wr.weir_crest_level > vm.surface_level OR (wr.weir_crest_level > maaiveld AND round((maaiveld - surface_level)::numeric,2)> {hoogte_verschil}) AND manhole_indicator != 1
 ORDER BY start_or_end DESC;
 
 -- Overstorthoogte < bok
@@ -713,17 +713,17 @@ SELECT ST_Length(the_geom), * FROM v2_weir_view WHERE ST_Length(the_geom) = 1;
 -- openingshoogte boven maaiveld
 drop table if exists chk.doorlaat_drempel_boven_maaiveld;
 CREATE table chk.doorlaat_drempel_boven_maaiveld as
-SELECT ori.orf_display_name, ori.orf_crest_level, vm.connection_node_id, vm.surface_level as model_maaiveld, dem as dem_maaiveld,
- CASE WHEN ori.orf_connection_node_start_id = sm.manh_connection_node_id THEN 'start'
-	WHEN ori.orf_connection_node_end_id = sm.manh_connection_node_id THEN 'end'
+SELECT ori.orf_display_name, ori.orf_crest_level, vm.connection_node_id, vm.surface_level as model_maaiveld, maaiveld as dem_maaiveld,
+ CASE WHEN ori.orf_connection_node_start_id = sm.manh_id THEN 'start'
+	WHEN ori.orf_connection_node_end_id = sm.manh_id THEN 'end'
  END as start_or_end,
- CASE WHEN (ori.orf_crest_level > vm.surface_level AND ori.orf_crest_level > dem) THEN 'both'
+ CASE WHEN (ori.orf_crest_level > vm.surface_level AND ori.orf_crest_level > maaiveld) THEN 'both'
 	WHEN ori.orf_crest_level > vm.surface_level THEN 'model'
-	WHEN ori.orf_crest_level > dem THEN 'dem'
+	WHEN ori.orf_crest_level > maaiveld THEN 'dem'
  END as maaiveld_type, ori.the_geom
-FROM v2_orifice_view ori JOIN src.manhole_maaiveld sm ON (ori.orf_connection_node_start_id = sm.manh_connection_node_id OR ori.orf_connection_node_end_id = sm.manh_connection_node_id)
-JOIN v2_manhole vm ON sm.manh_connection_node_id = vm.connection_node_id
-WHERE ori.orf_crest_level > vm.surface_level OR (ori.orf_crest_level > dem AND round((dem - surface_level)::numeric,2)> {hoogte_verschil});
+FROM v2_orifice_view ori JOIN src.manhole_maaiveld sm ON (ori.orf_connection_node_start_id = sm.manh_id OR ori.orf_connection_node_end_id = sm.manh_id)
+JOIN v2_manhole_view vm ON sm.manh_connection_node_id = vm.connection_node_id
+WHERE ori.orf_crest_level > vm.surface_level OR (ori.orf_crest_level > maaiveld AND round((maaiveld - surface_level)::numeric,2)> {hoogte_verschil});
 
 drop table if exists chk.doorlaat_drempel_boven_maaiveld;
 CREATE table chk.doorlaat_drempel_boven_maaiveld as

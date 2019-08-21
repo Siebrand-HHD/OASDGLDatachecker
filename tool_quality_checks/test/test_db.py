@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 """Tests for db.py"""
 import os
-import sys
 import pytest
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from quality_checks import settingsObject
-from db import ThreediDatabase
+
+from OASDGLDatachecker.tool_quality_checks.quality_checks import settingsObject
+from OASDGLDatachecker.tool_quality_checks.db import ThreediDatabase
 
 from unittest import TestCase
 
@@ -36,12 +35,12 @@ class TestDB(TestCase):
         with pytest.raises(Exception):
             self.db.get_count("unknown")
 
-    def test_free_form(self):
-        self.db.free_form("SELECT * FROM v2_manhole")
+    def test_execute_sql_statement(self):
+        self.db.execute_sql_statement("SELECT * FROM v2_manhole")
 
-    def test_free_form_raise(self):
+    def test_execute_sql_statement_raise(self):
         with pytest.raises(Exception):
-            self.db.free_form("SELECT * FROM unknown")
+            self.db.execute_sql_statement("SELECT * FROM unknown")
 
     def test_select_table_names(self):
         result = self.db.select_table_names("v2%")
@@ -66,7 +65,9 @@ class TestDB(TestCase):
     # TODO: add checks for all types in sql.py
 
     def test_execute_sql_file(self):
-        sql_relpath = "sql_functions\\function_array_greatest_or_smallest.sql"
+        sql_relpath = os.path.join(
+            "sql_functions", "function_array_greatest_or_smallest.sql"
+        )
         sql_abspath = os.path.join(
             os.path.abspath(os.path.join(os.path.dirname(__file__), "..")), sql_relpath
         )
