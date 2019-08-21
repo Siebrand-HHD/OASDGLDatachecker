@@ -65,11 +65,11 @@ class settingsObject(object):
         for section in config.sections():
             for key, value in config.items(section):
                 setattr(self, key, value)
-    
+
     def __getattribute__(self, name):
         try:
             return super().__getattribute__(name)
-        except AttributeError as e:
+        except AttributeError:
             raise AttributeError("Setting '%s' is missing in the ini-file" % name)
 
 
