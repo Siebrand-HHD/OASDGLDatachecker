@@ -5,7 +5,7 @@ import argparse
 import logging
 
 from configparser import RawConfigParser
-from db import ThreediDatabase
+from OASDGLDatachecker.tool_quality_checks.db import ThreediDatabase
 
 logger = logging.getLogger(__name__)
 
@@ -65,6 +65,12 @@ class settingsObject(object):
         for section in config.sections():
             for key, value in config.items(section):
                 setattr(self, key, value)
+    
+    def __getattribute__(self, name):
+        try:
+            return super().__getattribute__(name)
+        except AttributeError as e:
+            raise AttributeError("Setting '%s' is missing in the ini-file" % name)
 
 
 def get_parser():

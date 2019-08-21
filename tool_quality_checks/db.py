@@ -5,8 +5,8 @@ import psycopg2
 
 # from psycopg2.extras import RealDictCursor
 import logging
-import sql_checks
-import sql_views
+from OASDGLDatachecker.tool_quality_checks import sql_checks
+from OASDGLDatachecker.tool_quality_checks import sql_views
 import os
 
 logger = logging.getLogger(__name__)
@@ -26,7 +26,7 @@ class ThreediDatabase(object):
             "password": settings.password,
         }
         try:
-            self.db = psycopg2.connect(**credentials)
+            self.conn = psycopg2.connect(**credentials)
         except psycopg2.Error as e:
             logger.exception(e)
             raise
@@ -67,15 +67,14 @@ class ThreediDatabase(object):
 
         makes use of the existing database connection to run a custom query
         """
-        with self.db:
-            with self.db.cursor() as cur:
+        with self.conn:
+            with self.conn.cursor() as cur:
                 cur.execute(sql_statement)
-                if fetch is True:
-                    return cur.fetchall()
-                self.db.commit()
                 logger.debug(
                     "[+] Successfully executed statement {}".format(sql_statement)
                 )
+                if fetch is True:
+                    return cur.fetchall()
 
     def select_table_names(self, search_table_name, schema="public"):
 
@@ -122,9 +121,12 @@ class ThreediDatabase(object):
         check_table = check_table.replace("v2_", "")
         sql_template_name = "sql_" + check_type + "_" + check_table
         if sql_template_name in sql_checks.sql_checks:
-            statement = sql_checks.sql_checks[sql_template_name].format(
-                **settings.__dict__
-            )
+            try:
+                statement = sql_checks.sql_checks[sql_template_name].format(
+                    **settings.__dict__
+                )
+            except KeyError as e:
+                raise KeyError("Setting %s is missing in the ini-file" % e)
             self.execute_sql_statement(sql_statement=statement, fetch=False)
 
     def create_view(self, view_table, view_schema, drop_view=True):
