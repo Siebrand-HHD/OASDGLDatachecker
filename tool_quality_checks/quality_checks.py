@@ -43,13 +43,13 @@ def resolve_ini(custom_ini_file):
             )
         )
         return default_ini_relpath
-    if all((os.path.exists(custom_ini_file), os.path.isfile(custom_ini_file))):
+    elif all((os.path.exists(custom_ini_file), os.path.isfile(custom_ini_file))):
         logger.info(
             "[*] Using custom ini file {}".format(os.path.basename(custom_ini_file))
         )
         return custom_ini_file
     else:
-        raise ("Error: Could not find the ini file {}".format(custom_ini_file))
+        raise ("Error: Could not find the custom ini file {}".format(custom_ini_file))
 
 
 class settingsObject(object):

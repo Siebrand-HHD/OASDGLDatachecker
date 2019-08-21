@@ -3,6 +3,7 @@
 import os
 import sys
 import mock
+import pytest
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import quality_checks
@@ -25,6 +26,14 @@ def test_settingsobject():
     assert settings.__dict__["hoogte_verschil"] == "0.2"
 
 
+def test_settingsobject_raise():
+    ini_path = "data//instellingen_test_missing_db.ini"
+    ini_path = os.path.join(os.path.dirname(__file__), ini_path)
+    settings = settingsObject(ini_path)
+    with pytest.raises(Exception):
+        settings.database
+
+
 def test_resolve_ini_custom():
     ini_path = "data\\dummy.ini"
     ini_path = os.path.join(os.path.dirname(__file__), ini_path)
@@ -35,3 +44,8 @@ def test_resolve_ini_custom():
 def test_resolve_ini_default():
     ini_path = resolve_ini(None)
     assert "\\test\\data\\instellingen_test.ini" in ini_path
+
+
+def test_resolve_ini_error():
+    with pytest.raises(Exception):
+        resolve_ini("instellingen_test_error.ini")
