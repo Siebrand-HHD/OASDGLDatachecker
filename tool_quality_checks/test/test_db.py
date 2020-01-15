@@ -10,11 +10,30 @@ from OASDGLDatachecker.tool_quality_checks.db import ThreediDatabase
 from unittest import TestCase
 
 
+class TestCreateDB(TestCase):
+    def setUp(self):
+        ini_relpath = "data//instellingen_test.ini"
+        ini_abspath = os.path.join(os.path.dirname(__file__), ini_relpath)
+        self.settings = settingsObject(ini_abspath)
+        self.settings.install = False
+        self.db = ThreediDatabase(self.settings)
+
+    def test_create_database(self):
+        self.db.create_database(self.settings, drop_database=True)
+
+    def test_create_extension(self):
+        self.db.create_extension(extension_name="postgis")
+
+    def test_initialize_db_threedi(self):
+        self.db.initialize_db_threedi()
+
+
 class TestDB(TestCase):
     def setUp(self):
         ini_relpath = "data//instellingen_test.ini"
         ini_abspath = os.path.join(os.path.dirname(__file__), ini_relpath)
         self.settings = settingsObject(ini_abspath)
+        self.settings.install = False
         self.db = ThreediDatabase(self.settings)
 
     def test_init_threedidatabase(self):
@@ -25,8 +44,8 @@ class TestDB(TestCase):
         with pytest.raises(Exception):
             ThreediDatabase(self.settings)
 
-    def test_initialize_db(self):
-        self.db.initialize_db()
+    def test_initialize_db_checks(self):
+        self.db.initialize_db_checks()
 
     def test_get_count(self):
         assert self.db.get_count("v2_manhole") >= 0

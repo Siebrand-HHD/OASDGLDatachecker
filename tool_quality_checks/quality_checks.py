@@ -85,6 +85,13 @@ def get_parser():
         help="Verbose output",
     )
     parser.add_argument(
+        "--install",
+        default=False,
+        help="Install CityBuilder into database",
+        dest="install",
+        action="store_true",
+    )
+    parser.add_argument(
         "-i",
         "--inifile",
         metavar="INIFILE",
@@ -106,6 +113,7 @@ def main():
     ini_relpath = resolve_ini(kwargs["inifile"])
     print(ini_relpath)
     settings = settingsObject(ini_relpath)
+    settings.install = kwargs["install"]
     quality_checks(settings)
 
 
