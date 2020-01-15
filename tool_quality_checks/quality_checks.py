@@ -16,7 +16,7 @@ def quality_checks(settings):
     # get database connection
     db = ThreediDatabase(settings)
     # TODO: Make it only if install is on.
-    db.initialize_db()
+    db.initialize_db_checks()
 
     # get v2_table_names
     v2_table_names = db.select_table_names("v2%")
