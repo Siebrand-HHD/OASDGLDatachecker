@@ -31,8 +31,9 @@ from .resources import *
 
 # Import the code for the dialog
 from .Datachecker_dialog import OASdglDatacheckerDialog
-import os.path
+import os
 
+#Debugging in vs : https://gist.github.com/AsgerPetersen/9ea79ae4139f4977c31dd6ede2297f90
 
 class OASdglDatachecker:
     """QGIS Plugin Implementation."""
@@ -177,6 +178,23 @@ class OASdglDatachecker:
             self.dlg, "Select   output file ","", '*.csv')
           self.dlg.lineEdit.setText(filename)
 
+    def pb_select_dc_bestand(self):
+        filename2 = QFileDialog.getExistingDirectory(caption="Open Directory",directory=getcwd(),options=QFileDialog.ShowDirsOnly)
+        filename, _filter = QFileDialog.getOpenFileName(
+            self.dlg, "Select   input file ","", '*.qgs; *.gpkg')
+        self.dlg.lineEdit.setText(filename)
+    
+    def pb_select_dc_folder(self):
+        filename, _filter = QFileDialog.getOpenFileName(
+            self.dlg, "Select   input file ","", '*.qgs; *.gpkg')
+        self.dlg.lineEdit.setText(filename)
+        #filename = QFileDialog.getExistingDirectory(self.dlg, "Open Directory","",QFileDialog.ShowDirsOnly)
+        #print(filename)
+         #filename =  QFileDialog.getExistingDirectory( 
+           #getExistingDirectory(parent: QWidget = None, caption: str = '', directory: str = '', options: Union[QFileDialog.Options, QFileDialog.Option] = QFileDialog.ShowDirsOnly): 
+            #self.dlg, "Select input file " , "", '*.qgs; *.gpkg')
+        # self.dlg.lineEdit.setText(filename)
+
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
         for action in self.actions:
@@ -191,7 +209,9 @@ class OASdglDatachecker:
         if self.first_start == True:
             self.first_start = False
             self.dlg = OASdglDatacheckerDialog()
-            self.dlg.pushButton.clicked.connect(self.select_output_file)
+            #self.dlg.pushButton.clicked.connect(self.select_output_file)
+            self.dlg.pushButton.clicked.connect(self.pb_select_dc_folder)
+            self.dlg.button_box.accepted.connect(self.pb_select_dc_bestand)
 
            # Fetch the currently loaded layers
         layers = QgsProject.instance().layerTreeRoot().children()
@@ -224,3 +244,8 @@ class OASdglDatachecker:
             self.iface.messageBar().pushMessage(
                 "Success", "Output file written at " + filename,
                 level=Qgis.Success, duration=3)
+
+
+ 
+
+
