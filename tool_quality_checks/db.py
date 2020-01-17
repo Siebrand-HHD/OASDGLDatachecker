@@ -10,6 +10,44 @@ import os
 logger = logging.getLogger(__name__)
 
 
+def _connect_to_server(settings, sql_statement):
+    """ Establishes the db connection. """
+    credentials = {
+        "host": settings.host,
+        "user": settings.username,
+        "password": settings.password,
+    }
+    database_name = settings.database
+
+    try:
+        conn = psycopg2.connect(**credentials)
+        conn.autocommit = True
+        cursor = conn.cursor()
+        cursor.execute(sql_statement)
+        conn.close()
+    except psycopg2.Error as e:
+        logger.exception(e)
+        raise
+
+
+def drop_database(settings):
+    """drops a database"""
+    drop_database_statement = """DROP DATABASE {database_name};""".format(
+        database_name=settings.database
+    )
+    _connect_to_server(settings, drop_database_statement)
+
+
+def create_database(settings):
+    """create a database"""
+    create_database_statement = """
+    CREATE DATABASE {database_name}
+    ;""".format(
+        database_name=settings.database
+    )
+    _connect_to_server(settings, create_database_statement)
+
+
 class ThreediDatabase(object):
     """
     Connects to a database using python's psycopg2 module.
@@ -17,9 +55,6 @@ class ThreediDatabase(object):
 
     def __init__(self, settings):
         """ Establishes the db connection. """
-        if settings.install is True:
-            self.create_database(settings)
-
         credentials = {
             "dbname": settings.database,
             "host": settings.host,
@@ -31,35 +66,6 @@ class ThreediDatabase(object):
         except psycopg2.Error as e:
             logger.exception(e)
             raise
-
-    def create_database(self, settings, drop_database=False):
-        """create a database"""
-        credentials = {
-            "host": settings.host,
-            "user": settings.username,
-            "password": settings.password,
-        }
-        database_name = settings.database
-
-        try:
-            self.conn = psycopg2.connect(**credentials)
-            self.conn.autocommit = True
-            self.cursor = self.conn.cursor()
-        except psycopg2.Error as e:
-            logger.exception(e)
-            raise
-
-        if drop_database == True:
-            drop_database = """DROP DATABASE {database_name};""".format(
-                database_name=database_name
-            )
-            self.cursor.execute(drop_database)
-        create_database_statement = """
-        CREATE DATABASE {database_name}
-        ;""".format(
-            database_name=database_name
-        )
-        self.cursor.execute(create_database_statement)
 
     def create_extension(self, extension_name):
         """create a extension"""

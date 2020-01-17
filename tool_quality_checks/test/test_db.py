@@ -3,49 +3,84 @@
 import os
 import pytest
 
-
 from OASDGLDatachecker.tool_quality_checks.quality_checks import settingsObject
-from OASDGLDatachecker.tool_quality_checks.db import ThreediDatabase
+from OASDGLDatachecker.tool_quality_checks.db import (
+    ThreediDatabase,
+    create_database,
+    drop_database,
+)
 
 from unittest import TestCase
 
 
+_ini_relpath = "data/instellingen_test.ini"
+INI_ABSPATH = os.path.join(os.path.dirname(__file__), _ini_relpath)
+
+
+def test_create_database():
+    settings = settingsObject(INI_ABSPATH)
+    try:
+        drop_database(settings)
+    except Exception:
+        pass
+    create_database(settings)
+
+
+def test_drop_database():
+    settings = settingsObject(INI_ABSPATH)
+    drop_database(settings)
+
+
+def test_init_threedidatabase():
+    settings = settingsObject(INI_ABSPATH)
+    create_database(settings)
+    ThreediDatabase(settings)
+    drop_database(settings)
+
+
+def test_init_threedidatabase_raise():
+    settings = settingsObject(INI_ABSPATH)
+    settings.database = "unkown"
+    with pytest.raises(Exception):
+        ThreediDatabase(settings)
+
+
 class TestCreateDB(TestCase):
-    def setUp(self):
-        ini_relpath = "data//instellingen_test.ini"
-        ini_abspath = os.path.join(os.path.dirname(__file__), ini_relpath)
-        self.settings = settingsObject(ini_abspath)
-        self.settings.install = False
-        self.db = ThreediDatabase(self.settings)
+    @classmethod
+    def setUpClass(cls):
+        cls.settings = settingsObject(INI_ABSPATH)
+        create_database(cls.settings)
+        cls.db = ThreediDatabase(cls.settings)
 
-    def test_create_database(self):
-        self.db.create_database(self.settings, drop_database=True)
+    @classmethod
+    def tearDownClass(cls):
+        cls.db.conn.close()
+        drop_database(cls.settings)
 
-    def test_create_extension(self):
+    def test_01_create_extension(self):
         self.db.create_extension(extension_name="postgis")
 
-    def test_initialize_db_threedi(self):
+    def test_02_initialize_db_threedi(self):
         self.db.initialize_db_threedi()
+
+    def test_03_initialize_db_checks(self):
+        self.db.initialize_db_checks()
 
 
 class TestDB(TestCase):
-    def setUp(self):
-        ini_relpath = "data//instellingen_test.ini"
-        ini_abspath = os.path.join(os.path.dirname(__file__), ini_relpath)
-        self.settings = settingsObject(ini_abspath)
-        self.settings.install = False
-        self.db = ThreediDatabase(self.settings)
+    @classmethod
+    def setUpClass(cls):
+        cls.settings = settingsObject(INI_ABSPATH)
+        create_database(cls.settings)
+        cls.db = ThreediDatabase(cls.settings)
+        cls.db.create_extension(extension_name="postgis")
+        cls.db.initialize_db_threedi()
+        cls.db.initialize_db_checks()
 
-    def test_init_threedidatabase(self):
-        ThreediDatabase(self.settings)
-
-    def test_init_threedidatabase_raise(self):
-        self.settings.database = "unkown"
-        with pytest.raises(Exception):
-            ThreediDatabase(self.settings)
-
-    def test_initialize_db_checks(self):
-        self.db.initialize_db_checks()
+    @classmethod
+    def tearDownClass(cls):
+        cls.db.conn.close()
+        drop_database(cls.settings)
 
     def test_get_count(self):
         assert self.db.get_count("v2_manhole") >= 0
@@ -73,6 +108,15 @@ class TestDB(TestCase):
 
     def test_perform_checks_with_sql(self):
         self.db.perform_checks_with_sql(self.settings, "v2_manhole", "completeness")
+
+    def test_perform_checks_with_sql_raise(self):
+        ini_relpath_key_missing = "data/instellingen_test_missing_key.ini"
+        ini_abspath_key_missing = os.path.join(
+            os.path.dirname(__file__), ini_relpath_key_missing
+        )
+        test_settings = settingsObject(ini_abspath_key_missing)
+        with pytest.raises(Exception):
+            self.db.perform_checks_with_sql(test_settings, "v2_manhole", "completeness")
 
     # TODO: add checks for all types in sql.py
 
