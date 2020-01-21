@@ -6,8 +6,39 @@ import logging
 
 from configparser import RawConfigParser
 from OASDGLDatachecker.tool_quality_checks.quality_checks import quality_checks
+from OASDGLDatachecker.tool_quality_checks.db import (
+    ThreediDatabase,
+    create_database,
+    drop_database,
+)
 
 logger = logging.getLogger(__name__)
+
+
+def run_scripts(settings):
+    """
+    background program for running all functionalities
+    """
+
+    # block with only server connection
+    if settings.dropdb:
+        logger.info("Drop the Citybuilder database")
+        drop_database(settings)
+
+    if settings.createdb:
+        logger.info("Create the Citybuilder database")
+        create_database(settings)
+
+    # block with database connection
+    db = ThreediDatabase(settings)
+
+    if settings.createdb:
+        logger.info("Initialize the Citybuilder database")
+        db.initialize_db_threedi()
+
+    if settings.checks:
+        logger.info("Check your sewerage system")
+        quality_checks(settings)
 
 
 def resolve_ini(custom_ini_file):
@@ -66,10 +97,24 @@ def get_parser():
         help="Verbose output",
     )
     parser.add_argument(
-        "--install",
+        "--createdb",
         default=False,
-        help="Install CityBuilder into database",
-        dest="install",
+        help="Create CityBuilder database",
+        dest="createdb",
+        action="store_true",
+    )
+    parser.add_argument(
+        "--dropdb",
+        default=False,
+        help="Drop CityBuilder database",
+        dest="dropdb",
+        action="store_true",
+    )
+    parser.add_argument(
+        "--checks",
+        default=False,
+        help="Run quality checks for sewerage system",
+        dest="checks",
         action="store_true",
     )
     parser.add_argument(
@@ -93,8 +138,9 @@ def main():
     logging.basicConfig(level=log_level, format="%(levelname)s: %(message)s")
     ini_relpath = resolve_ini(kwargs["inifile"])
     settings = SettingsObject(ini_relpath)
-    settings.install = kwargs["install"]
-    quality_checks(settings)
+    for key, value in kwargs.items():
+        setattr(settings, key, value)
+    run_scripts(settings)
 
 
 if __name__ == "__main__":

@@ -7,8 +7,7 @@ import pytest
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import scripts
-from scripts import SettingsObject
-from scripts import resolve_ini
+from scripts import SettingsObject, resolve_ini, main
 
 
 @mock.patch("sys.argv", ["program", "-i", "test.ini"])
@@ -49,3 +48,18 @@ def test_resolve_ini_default():
 def test_resolve_ini_error():
     with pytest.raises(Exception):
         resolve_ini("instellingen_test_error.ini")
+
+
+"LARGE TESTS"
+# create absolute path to ini
+_ini_relpath = "data/instellingen_mini_schiedam.ini"
+ini_abspath_full_check = os.path.join(os.path.dirname(__file__), _ini_relpath)
+
+
+@mock.patch(
+    "sys.argv",
+    ["program", "-i", ini_abspath_full_check, "--createdb", "--dropdb", "--checks"],
+)
+def test_main_run_scripts_full():
+    main()
+    # TODO Add asserts to check all elements

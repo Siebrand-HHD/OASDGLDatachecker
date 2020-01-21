@@ -205,7 +205,7 @@ class ThreediDatabase(object):
         # Open and read the file as a single buffer
         sql_file = open(filename, "r").read()
         self.execute_sql_statement(sql_statement=sql_file, fetch=False)
-        logger.info("Execute sql file with function:" + filename)
+        logger.debug("Execute sql file with function:" + filename)
 
     def execute_sql_dir(self, dirname):
         for root, subdirs, files in sorted(os.walk(dirname)):

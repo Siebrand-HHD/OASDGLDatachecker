@@ -19,7 +19,6 @@ def quality_checks(settings):
     v2_table_names = db.select_table_names("v2%")
     for table_name in v2_table_names:
         if db.get_count(table_name) > 0:
-            print(table_name, db.get_count(table_name))
             db.perform_checks_with_sql(settings, table_name, check_type="completeness")
             db.perform_checks_with_sql(settings, table_name, check_type="quality")
 
