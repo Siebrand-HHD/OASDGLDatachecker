@@ -3,7 +3,7 @@
 import os
 import pytest
 
-from OASDGLDatachecker.tool_quality_checks.quality_checks import SettingsObject
+from OASDGLDatachecker.tool_quality_checks.scripts import SettingsObject
 from OASDGLDatachecker.tool_quality_checks.db import (
     ThreediDatabase,
     create_database,
