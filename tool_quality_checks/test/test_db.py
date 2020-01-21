@@ -16,6 +16,12 @@ from unittest import TestCase
 _ini_relpath = "data/instellingen_test.ini"
 INI_ABSPATH = os.path.join(os.path.dirname(__file__), _ini_relpath)
 
+"""
+This test file assumes that the checks will be run in particular order.
+This because a database needs to be installed with schemas.
+After execution the changes will not be rolled back.
+"""
+
 
 def test_create_database():
     settings = SettingsObject(INI_ABSPATH)
@@ -82,6 +88,9 @@ class TestDB(TestCase):
         cls.db.conn.close()
         drop_database(cls.settings)
 
+    def test_01_create_schema(self):
+        self.db.create_schema(schema_name="chk", drop_schema=True)
+
     def test_get_count(self):
         assert self.db.get_count("v2_manhole") >= 0
 
@@ -99,9 +108,6 @@ class TestDB(TestCase):
     def test_select_table_names(self):
         result = self.db.select_table_names("v2%")
         assert "v2_manhole" in result
-
-    def test_create_schema(self):
-        self.db.create_schema(schema_name="chk", drop_schema=True)
 
     def test_populate_geometry_columns(self):
         self.db.populate_geometry_columns()
