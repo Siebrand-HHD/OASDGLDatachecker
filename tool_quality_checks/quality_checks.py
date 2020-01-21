@@ -16,7 +16,7 @@ def quality_checks(settings):
     # get database connection
     db = ThreediDatabase(settings)
     # TODO: Make it only if install is on.
-    db.initialize_db()
+    db.initialize_db_checks()
 
     # get v2_table_names
     v2_table_names = db.select_table_names("v2%")
@@ -52,7 +52,7 @@ def resolve_ini(custom_ini_file):
         raise ("Error: Could not find the custom ini file {}".format(custom_ini_file))
 
 
-class settingsObject(object):
+class SettingsObject(object):
     """Contains the settings from the ini file"""
 
     def __init__(self, inifile):
@@ -85,6 +85,13 @@ def get_parser():
         help="Verbose output",
     )
     parser.add_argument(
+        "--install",
+        default=False,
+        help="Install CityBuilder into database",
+        dest="install",
+        action="store_true",
+    )
+    parser.add_argument(
         "-i",
         "--inifile",
         metavar="INIFILE",
@@ -105,7 +112,8 @@ def main():
     logging.basicConfig(level=log_level, format="%(levelname)s: %(message)s")
     ini_relpath = resolve_ini(kwargs["inifile"])
     print(ini_relpath)
-    settings = settingsObject(ini_relpath)
+    settings = SettingsObject(ini_relpath)
+    settings.install = kwargs["install"]
     quality_checks(settings)
 
 

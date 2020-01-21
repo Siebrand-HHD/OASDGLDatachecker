@@ -2,14 +2,49 @@
 # -*- coding: utf-8 -*-
 
 import psycopg2
-
-# from psycopg2.extras import RealDictCursor
 import logging
 from OASDGLDatachecker.tool_quality_checks import sql_checks
 from OASDGLDatachecker.tool_quality_checks import sql_views
 import os
 
 logger = logging.getLogger(__name__)
+
+
+def _connect_to_server(settings, sql_statement):
+    """ Establishes the db connection. """
+    credentials = {
+        "host": settings.host,
+        "user": settings.username,
+        "password": settings.password,
+    }
+
+    try:
+        conn = psycopg2.connect(**credentials)
+        conn.autocommit = True
+        cursor = conn.cursor()
+        cursor.execute(sql_statement)
+        conn.close()
+    except psycopg2.Error as e:
+        logger.exception(e)
+        raise
+
+
+def drop_database(settings):
+    """drops a database"""
+    drop_database_statement = """DROP DATABASE {database_name};""".format(
+        database_name=settings.database
+    )
+    _connect_to_server(settings, drop_database_statement)
+
+
+def create_database(settings):
+    """create a database"""
+    create_database_statement = """
+    CREATE DATABASE {database_name}
+    ;""".format(
+        database_name=settings.database
+    )
+    _connect_to_server(settings, create_database_statement)
 
 
 class ThreediDatabase(object):
@@ -31,8 +66,31 @@ class ThreediDatabase(object):
             logger.exception(e)
             raise
 
-    def initialize_db(self):
+    def create_extension(self, extension_name):
+        """create a extension"""
+        create_extension_statement = """
+        CREATE EXTENSION IF NOT EXISTS {extension_name}
+        ;""".format(
+            extension_name=extension_name
+        )
+        self.execute_sql_statement(
+            sql_statement=create_extension_statement, fetch=False
+        )
+
+    def initialize_db_threedi(self):
+        """ Initialize database for threedi """
+        self.create_extension(extension_name="postgis")
+        sql_relpath = os.path.join(
+            "threedi_database_schema", "work_empty_schema_2020-01-15.sql"
+        )
+        sql_abspath = os.path.join(
+            os.path.abspath(os.path.dirname(__file__)), sql_relpath
+        )
+        self.execute_sql_file(sql_abspath)
+
+    def initialize_db_checks(self):
         """ Initialize database for checks """
+
         self.create_schema(schema_name="chk")
         for schema, table in [
             ["public", "v2_1d_boundary_conditions_view"],
