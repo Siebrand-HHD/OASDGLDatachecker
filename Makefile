@@ -1,12 +1,12 @@
 #/***************************************************************************
-# OASdglDatachecker
+# Datachecker
 #
-# This plugin checks data of sewersystems for local goverment
+# riool datachecker
 #							 -------------------
-#		begin				: 2019-06-24
+#		begin				: 2020-01-21
 #		git sha				: $Format:%H$
-#		copyright			: (C) 2019 by OAS De Grote Lucht
-#		email				: svanderhoeven@hhdelfland.nl
+#		copyright			: (C) 2020 by OAS-De Groote Lucht
+#		email				: o.claassen@schiedam.nl
 # ***************************************************************************/
 #
 #/***************************************************************************
@@ -38,15 +38,15 @@ LOCALES =
 # translation
 SOURCES = \
 	__init__.py \
-	Datachecker.py Datachecker_dialog.py
+	Datachecker.py Datachecker_dockwidget.py
 
 PLUGINNAME = Datachecker
 
 PY_FILES = \
 	__init__.py \
-	Datachecker.py Datachecker_dialog.py
+	Datachecker.py Datachecker_dockwidget.py
 
-UI_FILES = Datachecker_dialog_base.ui
+UI_FILES = Datachecker_dockwidget_base.ui
 
 EXTRAS = metadata.txt icon.png
 
