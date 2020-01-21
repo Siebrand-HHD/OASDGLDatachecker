@@ -36,6 +36,9 @@ def run_scripts(settings):
         logger.info("Initialize the Citybuilder database")
         db.initialize_db_threedi()
 
+    if settings.import_type:
+        logger.info("Import your sewerage data of %s" % settings.import_type)
+
     if settings.checks:
         logger.info("Check your sewerage system")
         quality_checks(settings)
@@ -109,6 +112,13 @@ def get_parser():
         help="Drop CityBuilder database",
         dest="dropdb",
         action="store_true",
+    )
+    parser.add_argument(
+        "--import",
+        dest="import_type",
+        default=False,
+        choices=["gbi"],
+        help="Import your sewerage data",
     )
     parser.add_argument(
         "--checks",

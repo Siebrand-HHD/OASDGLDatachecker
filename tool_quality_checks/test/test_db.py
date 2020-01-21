@@ -141,3 +141,23 @@ class TestDB(TestCase):
             os.path.abspath(os.path.join(os.path.dirname(__file__), "..")), sql_reldir
         )
         self.db.execute_sql_dir(sql_absdir)
+
+    def test_01_create_table(self):
+        self.db.create_table(
+            "test_create_table", ["test_id", "name"], ["Integer", "Varchar"]
+        )
+
+    def test_01_create_table_raise(self):
+        with pytest.raises(Exception):
+            self.db.create_table(None, ["test_id"], ["Integer"])
+
+    def test_02_commit_values(self):
+        self.db.commit_values(
+            "test_create_table", "test_id, name", [(1, "test"), (2, "hoi")]
+        )
+        assert (
+            self.db.execute_sql_statement(
+                "SELECT name FROM test_create_table WHERE test_id = 1"
+            )[0][0]
+            == "test"
+        )

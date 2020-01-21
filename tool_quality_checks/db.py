@@ -187,6 +187,41 @@ class ThreediDatabase(object):
                 raise KeyError("Setting %s is missing in the ini-file" % e)
             self.execute_sql_statement(sql_statement=statement, fetch=False)
 
+    def create_table(self, table_name, field_names, field_types, schema="public"):
+        """
+        :param table_name: string that will be used as a name in the database.
+        :param field_names: list of field names to add to the tables
+        :param field_types: list of field types
+        example::
+            create_table(
+                "my_table", ["foo", "bar", "my_double"],
+                ["serial", "smallint", "double precision"]
+            )
+        """
+
+        if not table_name:
+            raise ValueError("[E] table_name {} is not defined".format(table_name))
+
+        row_def_raw = []
+        for e, ee in zip(field_names, field_types):
+            s = "%s %s" % (e, ee)
+            row_def_raw.append(s)
+
+        row_def = ",".join(row_def_raw)
+        create_str = """
+            CREATE TABLE
+                {schema}.{table_name}
+            (id serial PRIMARY KEY,{row_definition})
+            ;
+            """.format(
+            schema=schema, table_name=table_name, row_definition=row_def
+        )
+
+        del_str = "DROP TABLE IF EXISTS %s.%s;" % (schema, table_name)
+        self.execute_sql_statement(del_str, fetch=False)
+        self.execute_sql_statement(create_str, fetch=False)
+        logger.info("[+] Successfully created table {}.{}".format(schema, table_name))
+
     def create_view(self, view_table, view_schema, drop_view=True):
         """
         Creates a view with a join to v2_connection_nodes table
@@ -213,3 +248,26 @@ class ThreediDatabase(object):
                 file_path = os.path.join(root, f)
                 if file_path.endswith(".sql"):
                     self.execute_sql_file(file_path)
+
+    def commit_values(self, table_name, field_names, data, schema="public"):
+        """
+        :param table_name: destination table
+        :param field_names: field names that correspond with the
+            data array
+        :param data: array of tuples with data to insert
+        """
+
+        records_list_template = ",".join(["%s"] * len(data))
+        insert_query = """
+        INSERT INTO
+            {schema}.{table_name}({field_names})
+        VALUES
+            {template}""".format(
+            schema=schema,
+            table_name=table_name,
+            field_names=field_names,
+            template=records_list_template,
+        )
+        with self.conn:
+            with self.conn.cursor() as cur:
+                cur.execute(insert_query, data)

@@ -7,7 +7,11 @@ import pytest
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import scripts
-from scripts import SettingsObject, resolve_ini, main
+from OASDGLDatachecker.tool_quality_checks.scripts import (
+    SettingsObject,
+    resolve_ini,
+    main,
+)
 
 
 @mock.patch("sys.argv", ["program", "-i", "test.ini"])
