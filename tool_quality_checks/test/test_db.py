@@ -3,7 +3,7 @@
 import os
 import pytest
 
-from OASDGLDatachecker.tool_quality_checks.quality_checks import settingsObject
+from OASDGLDatachecker.tool_quality_checks.quality_checks import SettingsObject
 from OASDGLDatachecker.tool_quality_checks.db import (
     ThreediDatabase,
     create_database,
@@ -18,7 +18,7 @@ INI_ABSPATH = os.path.join(os.path.dirname(__file__), _ini_relpath)
 
 
 def test_create_database():
-    settings = settingsObject(INI_ABSPATH)
+    settings = SettingsObject(INI_ABSPATH)
     try:
         drop_database(settings)
     except Exception:
@@ -27,19 +27,19 @@ def test_create_database():
 
 
 def test_drop_database():
-    settings = settingsObject(INI_ABSPATH)
+    settings = SettingsObject(INI_ABSPATH)
     drop_database(settings)
 
 
 def test_init_threedidatabase():
-    settings = settingsObject(INI_ABSPATH)
+    settings = SettingsObject(INI_ABSPATH)
     create_database(settings)
     ThreediDatabase(settings)
     drop_database(settings)
 
 
 def test_init_threedidatabase_raise():
-    settings = settingsObject(INI_ABSPATH)
+    settings = SettingsObject(INI_ABSPATH)
     settings.database = "unkown"
     with pytest.raises(Exception):
         ThreediDatabase(settings)
@@ -48,7 +48,7 @@ def test_init_threedidatabase_raise():
 class TestCreateDB(TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.settings = settingsObject(INI_ABSPATH)
+        cls.settings = SettingsObject(INI_ABSPATH)
         create_database(cls.settings)
         cls.db = ThreediDatabase(cls.settings)
 
@@ -70,7 +70,7 @@ class TestCreateDB(TestCase):
 class TestDB(TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.settings = settingsObject(INI_ABSPATH)
+        cls.settings = SettingsObject(INI_ABSPATH)
         create_database(cls.settings)
         cls.db = ThreediDatabase(cls.settings)
         cls.db.create_extension(extension_name="postgis")
@@ -114,7 +114,7 @@ class TestDB(TestCase):
         ini_abspath_key_missing = os.path.join(
             os.path.dirname(__file__), ini_relpath_key_missing
         )
-        test_settings = settingsObject(ini_abspath_key_missing)
+        test_settings = SettingsObject(ini_abspath_key_missing)
         with pytest.raises(Exception):
             self.db.perform_checks_with_sql(test_settings, "v2_manhole", "completeness")
 

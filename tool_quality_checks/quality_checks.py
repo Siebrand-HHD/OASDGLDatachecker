@@ -52,7 +52,7 @@ def resolve_ini(custom_ini_file):
         raise ("Error: Could not find the custom ini file {}".format(custom_ini_file))
 
 
-class settingsObject(object):
+class SettingsObject(object):
     """Contains the settings from the ini file"""
 
     def __init__(self, inifile):
@@ -112,7 +112,7 @@ def main():
     logging.basicConfig(level=log_level, format="%(levelname)s: %(message)s")
     ini_relpath = resolve_ini(kwargs["inifile"])
     print(ini_relpath)
-    settings = settingsObject(ini_relpath)
+    settings = SettingsObject(ini_relpath)
     settings.install = kwargs["install"]
     quality_checks(settings)
 

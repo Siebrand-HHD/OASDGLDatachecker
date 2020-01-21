@@ -7,7 +7,7 @@ import pytest
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import quality_checks
-from quality_checks import settingsObject
+from quality_checks import SettingsObject
 from quality_checks import resolve_ini
 
 
@@ -22,14 +22,14 @@ def test_get_parser():
 def test_settingsobject():
     ini_path = "data//instellingen_test.ini"
     ini_path = os.path.join(os.path.dirname(__file__), ini_path)
-    settings = settingsObject(ini_path)
+    settings = SettingsObject(ini_path)
     assert settings.__dict__["hoogte_verschil"] == "0.2"
 
 
 def test_settingsobject_raise():
     ini_path = "data//instellingen_test_missing_db.ini"
     ini_path = os.path.join(os.path.dirname(__file__), ini_path)
-    settings = settingsObject(ini_path)
+    settings = SettingsObject(ini_path)
     with pytest.raises(Exception):
         settings.database
 

@@ -17,7 +17,6 @@ def _connect_to_server(settings, sql_statement):
         "user": settings.username,
         "password": settings.password,
     }
-    database_name = settings.database
 
     try:
         conn = psycopg2.connect(**credentials)
