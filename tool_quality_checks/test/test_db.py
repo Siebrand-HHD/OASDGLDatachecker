@@ -153,11 +153,11 @@ class TestDB(TestCase):
 
     def test_02_commit_values(self):
         self.db.commit_values(
-            "test_create_table", "test_id, name", [(1, "test"), (2, "hoi")]
+            "test_create_table", "test_id, name", [(1, "test"), (2, "tested")]
         )
         assert (
             self.db.execute_sql_statement(
-                "SELECT name FROM test_create_table WHERE test_id = 1"
+                "SELECT name FROM test_create_table WHERE test_id = 2"
             )[0][0]
-            == "test"
+            == "tested"
         )

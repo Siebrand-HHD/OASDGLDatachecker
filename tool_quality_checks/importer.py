@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 """ 
 Purpose to load OGR data like shapefiles into postgres
-
-original code from: 
-https://github.com/francot/python-ogr-postgis-tools/blob/master/export_import_postgis_shp.py
 """
 
 
@@ -94,13 +91,7 @@ def import_ogrdatasource_to_postgres(
             "None", "Null"
         )  #### repr solve the string cast -- http://initd.org/psycopg/docs/usage.html#adapt-string
         print(value)
-        sql = "INSERT INTO %s.%s (%s)" % (
-            schema,
-            table_name,
-            field_name,
-        ) + " VALUES (%s)" % (value)
-        print(sql)
-        db.execute_sql_statement(sql)
+        db.commit_values(sql)
         print(i)
     #     # TODO pass srid as function output and Srid Transform
     #     sql = 'UPDATE %s.%s SET geom=ST_SetSrid(geom,%s)'%(schema,table,srid)
