@@ -1,112 +1,108 @@
 # -*- coding: utf-8 -*-
 """ 
 Purpose to load OGR data like shapefiles into postgres
-
-original code from: 
-https://github.com/francot/python-ogr-postgis-tools/blob/master/export_import_postgis_shp.py
 """
-
-
 import os
 import logging
-from osgeo import ogr
+from osgeo import ogr, osr
+from os.path import basename
 
 logger = logging.getLogger(__name__)
-
-###################### import from shp to pg ################################
-#############################################################################
+ogr.UseExceptions()
 
 
-def get_field_value_as_dict_from_ogr_datasource(path):
-    # return a Dictionary with shp field and values
-    ds = ogr.Open(path)
-    layer = ds.GetLayer(0)
-    lyrDefn = layer.GetLayerDefn()
-    # this Dictionary store field name as keys and field type
-    ds_field = {}
-    # get table names except for geometry
-    for i in range(lyrDefn.GetFieldCount()):
-        fieldname = lyrDefn.GetFieldDefn(i).GetName()
-        fieldtypecode = lyrDefn.GetFieldDefn(i).GetType()
-        fieldtype = lyrDefn.GetFieldDefn(i).GetFieldTypeName(fieldtypecode)
-        if fieldtype == "String":
-            fieldtype = "Varchar"
-        fieldtype
-        ds_field[fieldname] = fieldtype
-    ds_field["geom"] = "geometry"
-    # get geometry type and srid
-    ds_records = []
-    for i in range(layer.GetFeatureCount()):
-        if os.path.splitext(path)[1] == ".gpkg":
-            i = i + 1
-        elif os.path.splitext(path)[1] == ".shp":
-            pass
-        else:
-            logger.warning("This file might not be supported: %s" % path)
+def copy2pg_database(settings, in_filepath, layer_name, schema="public"):
+    datasource = set_ogr_connection_pg_database(settings)
+    in_source = set_ogr_connection(in_filepath)
+    in_name = os.path.splitext(basename(in_filepath))[0]
+    in_layer = in_source.GetLayerByName(in_name)
+    in_srid = in_layer.GetSpatialRef()
 
-        ds_values = {}
-        for j in range(lyrDefn.GetFieldCount()):
-            fieldname = lyrDefn.GetFieldDefn(j).GetName()
-            feature = layer.GetFeature(i)
-            value = feature.GetField(fieldname)
-            wkt = feature.GetGeometryRef().ExportToWkt()
-            ds_values[fieldname] = value
-            ds_values["geom"] = wkt
-        # append in the vector all the ds records stored as Dictionary
-        ds_records.append(ds_values)
-    # insert in the first position of the vector the Dictionary with field type
-    ds_records.insert(0, ds_field)
-    return ds_records
+    # check projection of input file
+    check_sr = get_projection(in_srid)
+    if check_sr is None:
+        logger.exception("[!] ERROR : EPSG projection code missing from shape.")
+        hint = "[*] INFO  : Use this command: gdalsrsinfo -o wkt EPSG:28992 > "
+        logger.info(hint, in_filepath.replace(".shp", ".prj"))
+        raise
+
+    options = [
+        "OVERWRITE=YES",
+        "SCHEMA={}".format(schema),
+        "SPATIAL_INDEX=GIST",
+        "FID=id",
+        "PRECISION=NO",
+        "GEOMETRY_NAME=geom",
+        "DIM=2",
+    ]
+    try:
+        ogr.RegisterAll()
+        new_layer = datasource.CreateLayer(
+            layer_name, in_layer.GetSpatialRef(), in_layer.GetGeomType(), options
+        )
+        for x in range(in_layer.GetLayerDefn().GetFieldCount()):
+            new_layer.CreateField(in_layer.GetLayerDefn().GetFieldDefn(x))
+
+        new_layer.StartTransaction()
+        for x in range(in_layer.GetFeatureCount()):
+            new_feature = in_layer.GetFeature(x)
+            new_feature.SetFID(-1)
+            new_layer.CreateFeature(new_feature)
+            if x % 128 == 0:
+                new_layer.CommitTransaction()
+                new_layer.StartTransaction()
+        new_layer.CommitTransaction()
+
+    except Exception as e:
+        logger.warning(e)
+        logger.info("Trying to copy layer %s with another method" % in_name)
+        try:
+            new_layer = datasource.CopyLayer(in_layer, layer_name, options)
+        except Exception as e:
+            logger.exception(e)
+            raise
+
+    finally:
+        if new_layer.GetFeatureCount() == 0:
+            raise ValueError("Postgres vector feature count is 0")
+
+        new_layer = None
+    datasource.Destroy()
+    in_source.Destroy()
 
 
-def import_ogrdatasource_to_postgres(
-    db, input_path, table_name, schema="public"
-):  # , schema,table, srid):
-    """
-    Import OgrDatasource to pg
-    Currently supported geopackage and shapefile
-    """
+def get_projection(sr):
+    """ Return simple userinput string for spatial reference, if any. """
+    key = str("GEOGCS") if sr.IsGeographic() else str("PROJCS")
+    name, code = sr.GetAuthorityName(key), sr.GetAuthorityCode(key)
+    if name is None or code is None:
+        return None
+    return "{name}:{code}".format(name=name, code=code)
 
-    # Create Table using field type from the Dictionary
-    ds_records = get_field_value_as_dict_from_ogr_datasource(input_path)
 
-    # get table
-    table_info = ds_records[0]
-    # table_info["geom"] = "Geometry"
-    db.create_table(
-        table_name=table_name,
-        field_names=list(table_info.keys()),
-        field_types=list(table_info.values()),
-        schema=schema,
+def set_ogr_connection_pg_database(settings):
+    """ Establishes the db connection. """
+    db_conn = (
+        "PG: dbname={dbname_value} user={user_value} "
+        "host={host_value} password={password_value}".format(
+            dbname_value=settings.database,
+            user_value=settings.username,
+            host_value=settings.host,
+            password_value=settings.password,
+        )
     )
+    return set_ogr_connection(db_conn)
 
-    # # TODO append or insert choice
-    # sql_parameter = 'CREATE TABLE IF NOT EXISTS __s__.__t__ \n(' + ',\n '.join([str(i)+' '+str(v)  for i,v in fieldtype.iteritems()]) + ',\n geom Geometry' + ')'
-    #     sql = sql_parameter.replace('__s__',schema).replace('__t__',table)
-    #     cur.execute("DROP TABLE test")
-    #     cur.execute (sql)
-    # #Insert in the Table all the record from the Dictionary
-    for i in range(1, len(ds_records)):
-        d = ds_records[i]
-        field_name = ", ".join([str(i) for i in d.keys()])
-        print(field_name)
-        value = ", ".join([str(repr(i)) for i in d.values()]).replace(
-            "None", "Null"
-        )  #### repr solve the string cast -- http://initd.org/psycopg/docs/usage.html#adapt-string
-        print(value)
-        sql = "INSERT INTO %s.%s (%s)" % (
-            schema,
-            table_name,
-            field_name,
-        ) + " VALUES (%s)" % (value)
-        print(sql)
-        db.execute_sql_statement(sql)
-        print(i)
-    #     # TODO pass srid as function output and Srid Transform
-    #     sql = 'UPDATE %s.%s SET geom=ST_SetSrid(geom,%s)'%(schema,table,srid)
-    #     cur.execute(sql)
-    print(
-        "Import Ok\n for shapefile: %s \n in table: %s.%s" % os.path.basename(path),
-        schema,
-        table,
-    )
+
+def set_ogr_connection(connection_path):
+    """ Establishes the db connection. """
+    # Connect met de database
+    try:
+        ogr_conn = ogr.Open(connection_path)
+        if ogr_conn is None:
+            raise ConnectionError("I am unable to read the file: %s" % connection_path)
+    except Exception as e:
+        logger.exception(e)
+        raise
+
+    return ogr_conn
