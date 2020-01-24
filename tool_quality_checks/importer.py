@@ -21,10 +21,9 @@ def copy2pg_database(settings, in_filepath, layer_name, schema="public"):
     # check projection of input file
     check_sr = get_projection(in_srid)
     if check_sr is None:
-        logger.exception("[!] ERROR : EPSG projection code missing from shape.")
-        hint = "[*] INFO  : Use this command: gdalsrsinfo -o wkt EPSG:28992 > "
-        logger.info(hint, in_filepath.replace(".shp", ".prj"))
-        raise
+        logger.warning(
+            "[!] Warning : Projection is not complete EPSG projection code missing in shapefile."
+        )
 
     options = [
         "OVERWRITE=YES",
@@ -37,6 +36,8 @@ def copy2pg_database(settings, in_filepath, layer_name, schema="public"):
     ]
     try:
         ogr.RegisterAll()
+        # TODO srid is now based on in_layer, which could be a strange spatial reference
+        # TODO findout how to make the target ref 28992 by default
         new_layer = datasource.CreateLayer(
             layer_name, in_layer.GetSpatialRef(), in_layer.GetGeomType(), options
         )
@@ -53,6 +54,7 @@ def copy2pg_database(settings, in_filepath, layer_name, schema="public"):
                 new_layer.StartTransaction()
         new_layer.CommitTransaction()
 
+    # TODO Do I really want this exception with a new trial?
     except Exception as e:
         logger.warning(e)
         logger.info("Trying to copy layer %s with another method" % in_name)
