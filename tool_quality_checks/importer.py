@@ -4,7 +4,7 @@ Purpose to load OGR data like shapefiles into postgres
 """
 import os
 import logging
-from osgeo import ogr, osr
+from osgeo import ogr
 from os.path import basename
 
 logger = logging.getLogger(__name__)
