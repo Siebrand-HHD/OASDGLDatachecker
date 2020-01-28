@@ -54,15 +54,10 @@ def copy2pg_database(settings, in_filepath, layer_name, schema="public"):
                 new_layer.StartTransaction()
         new_layer.CommitTransaction()
 
-    # TODO Do I really want this exception with a new trial?
     except Exception as e:
         logger.warning(e)
         logger.info("Trying to copy layer %s with another method" % in_name)
-        try:
-            new_layer = datasource.CopyLayer(in_layer, layer_name, options)
-        except Exception as e:
-            logger.exception(e)
-            raise
+        raise
 
     finally:
         if new_layer.GetFeatureCount() == 0:
