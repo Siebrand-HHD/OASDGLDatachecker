@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """#
 Created on Tue Aug 13 08:14:18 2019
-@main author: chris.kerklaan - N&S
+@author: chris.kerklaan - N&S
 """
 
 # system imports
@@ -82,31 +82,35 @@ def addPolygon(simple_polygon, content, out_lyr):
 
 
 def fix_geometry(geometry):
-    geom_type = geometry.GetGeometryType()
     geom_name = geometry.GetGeometryName()
     # check pointcount if linestring
     if "LINESTRING" in geom_name:
         if geometry.GetPointCount() == 1:
-            print("Geometry point count of linestring = 1")
+            logger.warning("Geometry point count of linestring = 1")
             return geometry, False
         else:
             pass
 
     # solve self intersections
-    # TODO @Chris als de polygon invalid is dan kan je hem soms toch niet bufferen?
-    if geom_type == ogr.wkbPolygon:
-        geometry = geometry.Buffer(0)
+    if "POLYGON" in geom_name:
+        try:
+            geometry = geometry.Buffer(0)
+        except Exception as e:
+            # RuntimeError: IllegalArgumentException: Points of LinearRing do not form a closed linestring
+            logger.warning(e)
+            return geometry, False
 
-    # check slivers
-    if not geometry.IsValid():
-        perimeter = geometry.Boundary().Length()
-        area = geometry.GetArea()
+    # We think this part is not used or creates an error. So just leave it out for a while
+    # # check slivers
+    # if not geometry.IsValid():
+    #     perimeter = geometry.Boundary().Length()
+    #     area = geometry.GetArea()
 
-        sliver = float(perimeter / area)
+    #     sliver = float(perimeter / area)
 
-        if sliver < 1:
-            wkt = geometry.ExportToWkt()
-            geometry = ogr.CreateGeometryFromWkt(wkt)
+    #     if sliver < 1:
+    #         wkt = geometry.ExportToWkt()
+    #         geometry = ogr.CreateGeometryFromWkt(wkt)
 
     return geometry, geometry.IsValid()
 
@@ -178,13 +182,13 @@ def correct(in_layer, layer_name="", epsg=28992):
         raise ImportError()
 
     # Create output dataset and force dataset to multiparts
-    if geom_type == 6:
+    if "polygon" in geom_name.lower():
         geom_type = 3  # polygon
 
-    elif geom_type == 5:
+    elif "line" in geom_name.lower():
         geom_type = 2  # linestring
 
-    elif geom_type == 4:
+    elif "point" in geom_name.lower():
         geom_type = 1  # point
 
     # Copy fields from memory layer to output dataset
@@ -196,11 +200,9 @@ def correct(in_layer, layer_name="", epsg=28992):
     for out_feat in mem_layer:
         out_geom = out_feat.GetGeometryRef()
 
-        try:
-            out_geom, valid = fix_geometry(out_geom)
-        except Exception as e:
-            print(e)
-            print(out_feat.GetFID())
+        # removed try except
+        out_geom, valid = fix_geometry(out_geom)
+
         if not valid:
             logger.warning("geometry invalid even with buffer, skipping")
             lost_features.append(out_feat.GetFID())
@@ -228,11 +230,10 @@ def correct(in_layer, layer_name="", epsg=28992):
 
     logger.info("check  - Features count")
     out_feature_count = out_layer.GetFeatureCount()
-
+    print(lost_features, in_feature_count, out_feature_count)
     if len(lost_features) > 0:
         logger.warning("Lost {} features during corrections".format(len(lost_features)))
         logger.warning("FIDS: {}".format(lost_features))
-
     elif in_feature_count > out_feature_count:
         logger.warning("In feature count greater than out feature count")
 
@@ -241,13 +242,3 @@ def correct(in_layer, layer_name="", epsg=28992):
     out_layer = None
 
     return out_datasource, layer_name
-
-
-if __name__ == "__main__":
-    in_datasource = ogr.Open(
-        "C:/Users/chris.kerklaan/Documents\Projecten/HHNK_klimaatatlas/temp/nwm_mediaan_peilgebied_ghg_2050.gpkg"
-    )
-    in_layer = in_datasource[0]
-    layer_name = "beweegbare_bruggen"
-    out_datasource, out_layer = correct(in_layer, layer_name)
-    out_layer.GetFeatureCount()

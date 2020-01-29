@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for correct_import_file.py"""
 import os
-import ogr
+import ogr, osr
 import pytest
 
 from OASDGLDatachecker.tool_quality_checks.correct_import_file import (
@@ -25,18 +25,13 @@ GPKG_IN_DS = set_ogr_connection(_gpkg_abspath)
 
 
 def test_create_mem_ds():
-    create_mem_ds()
+    ds = create_mem_ds()
+    assert isinstance(ds, ogr.DataSource)
 
 
 def test_geom_transform():
-    create_geom_transform(SHP_IN_LAYER.GetSpatialRef(), 28992)
-
-
-# def test_multipoly2poly():
-#     multipoly2poly(SHP_IN_LAYER)
-
-# def test_addPolygon():
-#     pass
+    transform = create_geom_transform(SHP_IN_LAYER.GetSpatialRef(), 28992)
+    assert isinstance(transform, osr.CoordinateTransformation)
 
 
 def test_fix_geometry_valid():
@@ -71,33 +66,26 @@ def test_fix_geometry_polygon_self_intersect():
     assert valid is True
 
 
-# def test_fix_geometry_polygon_sliver_not_valid():
-#     # TODO
-#     # Create ring
-#     ring = ogr.Geometry(ogr.wkbLinearRing)
-#     ring.AddPoint_2D(1000, 1)
-#     ring.AddPoint_2D(1000, -1)
-#     ring.AddPoint_2D(-1, 1)
-#     ring.AddPoint_2D(-1, -1)
-#     ring.AddPoint_2D(1000, 1)
+def test_fix_geometry_polygon_sliver_not_valid():
+    # Create ring
+    wkt = "POLYGON ((0 0 0, 1000 0 0, 1000 0.001 0))"
+    poly = ogr.CreateGeometryFromWkt(wkt)
 
-#     # Create polygon
-#     poly = ogr.Geometry(ogr.wkbPolygon)
-#     poly.AddGeometry(ring)
-#     print(
-#         poly,
-#         poly.GetPointCount(),
-#         poly.GetGeometryType(),
-#         poly.GetGeometryName(),
-#         ogr.wkbPolygon,
-#         poly.IsValid(),
-#         poly.GetArea()
-#     )
-#     out_geom, valid = fix_geometry(poly)
-#     print(out_geom, valid)
-#     assert valid is False
-#     # polygon
-#     # geometry not valid
+    print(
+        poly,
+        poly.GetPointCount(),
+        poly.GetGeometryType(),
+        poly.GetGeometryName(),
+        ogr.GeometryTypeToName(poly.GetGeometryType()),
+        ogr.wkbPolygon,
+        # poly.IsValid(),
+        poly.GetArea(),
+    )
+    out_geom, valid = fix_geometry(poly)
+    print(out_geom, valid)
+    assert valid is False
+    # polygon
+    # geometry not valid
 
 
 def test_addpolygon():
@@ -168,7 +156,6 @@ def test_correct_multipoly(caplog):
         .ExportToJson()
     )
     assert '"type": "Polygon", "coordinates": [[[84' in test_dump
-    assert "Lost 1 features during corrections" in caplog.text
 
 
 def test_correct_empty_result(caplog):
@@ -177,21 +164,37 @@ def test_correct_empty_result(caplog):
         correct(multipoly_in_layer, "test_empty", epsg=28992)
 
 
-def test_correct_points(caplog):
+def test_correct_unknown_geom_type(caplog):
     multipoly_in_layer = GPKG_IN_DS["multipoint_in_geometrycollection"]
     with pytest.raises(ImportError):
         correct(multipoly_in_layer, "multipoint_in_geometrycollection", epsg=28992)
 
 
-# def test_correct_points(caplog):
-#     # this test has a z-dimension
-#     multipoly_in_layer = GPKG_IN_DS["multipoint_in_geometrycollection"]
-#     out_datasource, layer_name = correct(
-#         multipoly_in_layer, "test_multipoint_in_geometrycollection", epsg=28992
-#     )
-#     test_dump = (
-#         out_datasource["test_multipoint_in_geometrycollection"]
-#         .GetFeature(1)
-#         .ExportToJson()
-#     )
-#     assert "x" in test_dump
+def test_correct_multipoints(caplog):
+    # this test has a z-dimension
+    multipoly_in_layer = GPKG_IN_DS["multipoint_28992"]
+    out_datasource, layer_name = correct(
+        multipoly_in_layer, "test_multipoint_28992", epsg=28992
+    )
+    test_dump = out_datasource["test_multipoint_28992"].GetFeature(1).ExportToJson()
+    assert '{"type": "Point", "coordinates": [842' in test_dump
+
+
+def test_correct_multilinestring(caplog):
+    # this test has a z- and m-dimension and to be removed column name ogc_fid
+    multipoly_in_layer = GPKG_IN_DS["multilinestring_zm_4326"]
+    out_datasource, layer_name = correct(
+        multipoly_in_layer, "test_multilinestring_zm_4326", epsg=28992
+    )
+    test_dump = (
+        out_datasource["test_multilinestring_zm_4326"].GetFeature(1).ExportToJson()
+    )
+    assert '"type": "LineString", "coordinates": [[84' in test_dump
+
+
+def test_correct_more_in_than_out(caplog):
+    multipoly_in_layer = GPKG_IN_DS["more_in_than_out_polygon"]
+    out_datasource, layer_name = correct(
+        multipoly_in_layer, "more_in_than_out_polygon", epsg=28992
+    )
+    assert "In feature count greater than out" in caplog.text
