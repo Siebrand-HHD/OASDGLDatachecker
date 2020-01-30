@@ -69,9 +69,6 @@ class TestCreateDB(TestCase):
     def test_02_initialize_db_threedi(self):
         self.db.initialize_db_threedi()
 
-    def test_03_initialize_db_checks(self):
-        self.db.initialize_db_checks()
-
 
 class TestDB(TestCase):
     @classmethod
@@ -81,7 +78,6 @@ class TestDB(TestCase):
         cls.db = ThreediDatabase(cls.settings)
         cls.db.create_extension(extension_name="postgis")
         cls.db.initialize_db_threedi()
-        cls.db.initialize_db_checks()
 
     @classmethod
     def tearDownClass(cls):
@@ -111,18 +107,6 @@ class TestDB(TestCase):
 
     def test_populate_geometry_columns(self):
         self.db.populate_geometry_columns()
-
-    def test_perform_checks_with_sql(self):
-        self.db.perform_checks_with_sql(self.settings, "v2_manhole", "completeness")
-
-    def test_perform_checks_with_sql_raise(self):
-        ini_relpath_key_missing = "data/instellingen_test_missing_key.ini"
-        ini_abspath_key_missing = os.path.join(
-            os.path.dirname(__file__), ini_relpath_key_missing
-        )
-        test_settings = SettingsObject(ini_abspath_key_missing)
-        with pytest.raises(Exception):
-            self.db.perform_checks_with_sql(test_settings, "v2_manhole", "completeness")
 
     # TODO: add checks for all types in sql.py
 
