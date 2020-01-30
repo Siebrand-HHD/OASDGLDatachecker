@@ -1,10 +1,11 @@
 # (c) Nelen & Schuurmans.  GPL licensed, see LICENSE.rst.
 # -*- coding: utf-8 -*-
-
+import os
 import psycopg2
 import logging
+
 from OASDGLDatachecker.tool_quality_checks import sql_views
-import os
+
 
 logger = logging.getLogger(__name__)
 

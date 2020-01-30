@@ -3,18 +3,15 @@
 import os
 import logging
 
-from OASDGLDatachecker.tool_quality_checks.db import ThreediDatabase
 from OASDGLDatachecker.tool_quality_checks import sql_checks
 
 logger = logging.getLogger(__name__)
 
 
-def quality_checks(settings):
+def quality_checks(db, settings):
     """Overall function for checking our model data"""
 
-    # get database connection
-    db = ThreediDatabase(settings)
-    # TODO: Make it only if install is on.
+    # TODO always run this settings?
     initialize_db_checks(db)
 
     # get v2_table_names

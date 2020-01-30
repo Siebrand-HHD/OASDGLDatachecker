@@ -59,3 +59,5 @@ class TestDB(TestCase):
             self.db.perform_checks_with_sql(
                 self.db, test_settings, "v2_manhole", "completeness"
             )
+
+    # TODO add quality checks test

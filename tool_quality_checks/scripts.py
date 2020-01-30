@@ -41,7 +41,7 @@ def run_scripts(settings):
 
     if settings.checks:
         logger.info("Check your sewerage system")
-        quality_checks(settings)
+        quality_checks(db, settings)
 
 
 def resolve_ini(custom_ini_file):
