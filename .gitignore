@@ -5,4 +5,4 @@
 *.pyc
 __pycache__
 *-shm
-tool_quality_checks/test/data/fix_geometries.gpkg-wal
+*.gpkg-wal
