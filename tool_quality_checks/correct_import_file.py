@@ -1,22 +1,16 @@
 # -*- coding: utf-8 -*-
-"""#
-Created on Tue Aug 13 08:14:18 2019
-@author: chris.kerklaan - N&S
+"""
+Import OGR Datasource into the database
 """
 
-# system imports
-
-# Third-party imports
 import ogr
 import osr
 import logging
 
-# Globals
 DRIVER_OGR_MEM = ogr.GetDriverByName("Memory")
 DRIVER_OGR_SHP = ogr.GetDriverByName("ESRI Shapefile")
 MEM_NUM = 0
 
-# Exceptions
 logger = logging.getLogger(__name__)
 ogr.UseExceptions()
 
@@ -200,7 +194,6 @@ def correct(in_layer, layer_name="", epsg=28992):
     for out_feat in mem_layer:
         out_geom = out_feat.GetGeometryRef()
 
-        # removed try except
         out_geom, valid = fix_geometry(out_geom)
 
         if not valid:
