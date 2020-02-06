@@ -9,7 +9,7 @@ import logging
 
 DRIVER_OGR_MEM = ogr.GetDriverByName("Memory")
 DRIVER_OGR_SHP = ogr.GetDriverByName("ESRI Shapefile")
-MEM_NUM = 0
+_mem_num = 0
 
 logger = logging.getLogger(__name__)
 ogr.UseExceptions()
@@ -17,9 +17,9 @@ ogr.UseExceptions()
 
 def create_mem_ds():
     """ Creating an ogr datasource in memory"""
-    global MEM_NUM
-    mem_datasource = DRIVER_OGR_MEM.CreateDataSource("mem{}".format(MEM_NUM))
-    MEM_NUM = MEM_NUM + 1
+    global _mem_num
+    mem_datasource = DRIVER_OGR_SHP.CreateDataSource("/vsimem/mem{}".format(_mem_num))
+    _mem_num = _mem_num + 1
     return mem_datasource
 
 
@@ -58,6 +58,7 @@ def transform_multipart_to_singlepart(in_layer, out_layer):
         if (
             geom.GetGeometryName() == "MULTIPOLYGON"
             or geom.GetGeometryName() == "MULTILINESTRING"
+            or geom.GetGeometryName() == "MULTIPOINT"
         ):
             for geom_part in geom:
                 add_singlepart_geometry(geom_part.ExportToWkb(), content, out_layer)
@@ -67,16 +68,16 @@ def transform_multipart_to_singlepart(in_layer, out_layer):
     return out_layer, lost_features
 
 
-def add_singlepart_geometry(geometry, content, out_lyr):
+def add_singlepart_geometry(in_geometry, content, out_lyr):
     """
     Add a new geometry with content to your out layer
     """
     featureDefn = out_lyr.GetLayerDefn()
 
-    polygon = ogr.CreateGeometryFromWkb(geometry)
+    geometry = ogr.CreateGeometryFromWkb(in_geometry)
     out_feat = ogr.Feature(featureDefn)
-    out_feat.SetGeometry(polygon)
-
+    out_feat.SetGeometry(geometry)
+    print(geometry)
     for key, value in content.items():
         out_feat.SetField(key, value)
 
@@ -145,15 +146,30 @@ def correct(in_layer, layer_name="", epsg=3857):
         logger.warning("formatting naar 50 met deze naam: %s" % layer_name[:50])
         layer_name = layer_name[:50]
 
+    # Create output dataset and force dataset to multiparts
+    # variable output_geom_type, does it always work? if not add check
+    geom_name = ogr.GeometryTypeToName(geom_type)
+    if "polygon" in geom_name.lower():
+        output_geom_type = 3  # polygon
+    elif "line" in geom_name.lower():
+        output_geom_type = 2  # linestring
+    elif "point" in geom_name.lower():
+        output_geom_type = 1  # point
+    else:
+        logger.error("Geometry could not be translated to singlepart %s" % geom_name)
+        raise TypeError()
+    print(geom_name, output_geom_type)
+    # create memory datasource for
+    mem_datasource = create_mem_ds()
+    mem_layer = mem_datasource.CreateLayer(layer_name, in_spatial_ref, output_geom_type)
+
     # create datasource output
     out_datasource = create_mem_ds()
     spatial_ref_out = osr.SpatialReference()
     spatial_ref_out.ImportFromEPSG(int(epsg))
-    out_layer = out_datasource.CreateLayer(layer_name, spatial_ref_out, geom_type)
-
-    # create memory datasource for
-    mem_datasource = create_mem_ds()
-    mem_layer = mem_datasource.CreateLayer(layer_name, in_spatial_ref, geom_type)
+    out_layer = out_datasource.CreateLayer(
+        layer_name, spatial_ref_out, output_geom_type
+    )
 
     layer_defn = in_layer.GetLayerDefn()
     for i in range(layer_defn.GetFieldCount()):
@@ -171,7 +187,6 @@ def correct(in_layer, layer_name="", epsg=3857):
         raise TypeError()
 
     flatten = False
-    geom_name = ogr.GeometryTypeToName(geom_type)
     if "3D" in geom_name:
         logger.warning("geom type: " + geom_name)
         logger.info("Flattening to 2D")
@@ -179,16 +194,7 @@ def correct(in_layer, layer_name="", epsg=3857):
 
     elif geom_type <= 0:
         logger.error("Geometry invalid, please fix it first, type is: %s" % geom_name)
-        raise ImportError()
-
-    # Create output dataset and force dataset to multiparts
-    # variable output_geom_type, does it always work? if not add check
-    if "polygon" in geom_name.lower():
-        output_geom_type = 3  # polygon
-    elif "line" in geom_name.lower():
-        output_geom_type = 2  # linestring
-    elif "point" in geom_name.lower():
-        output_geom_type = 1  # point
+        raise TypeError()
 
     # Copy fields from memory layer to output dataset
     layer_defn = in_layer.GetLayerDefn()
@@ -207,8 +213,7 @@ def correct(in_layer, layer_name="", epsg=3857):
             lost_features.append(out_feat.GetFID())
             continue
 
-        # Force and transform geometry
-        out_geom = ogr.ForceTo(out_geom, output_geom_type)
+        # Transform geometry
         out_geom.Transform(reproject)
 
         # flattening to 2d
@@ -218,6 +223,7 @@ def correct(in_layer, layer_name="", epsg=3857):
         # Set geometry and create feature
         out_feat.SetGeometry(out_geom)
         out_layer.CreateFeature(out_feat)
+
 
     logger.info("check  - delete ogc_fid if exists")
     out_layer_defn = out_layer.GetLayerDefn()

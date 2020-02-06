@@ -76,12 +76,12 @@ def test_fix_geometry_polygon_sliver_not_valid():
 
 def test_add_singlepart_geometry():
     # get random geom_typ and spatial ref
-    geom_type = SHP_IN_LAYER.GetGeomType()
+    output_geom_type = 3
     in_spatial_ref = SHP_IN_LAYER.GetSpatialRef()
 
     # create memory layer
     mem_datasource = create_mem_ds()
-    mem_layer = mem_datasource.CreateLayer("test", in_spatial_ref, geom_type)
+    mem_layer = mem_datasource.CreateLayer("test", in_spatial_ref, output_geom_type)
     layer_field = ogr.FieldDefn("name", ogr.OFTString)
     mem_layer.CreateField(layer_field)
 
@@ -153,7 +153,7 @@ def test_correct_empty_result(caplog):
 
 def test_correct_unknown_geom_type(caplog):
     multipoly_in_layer = GPKG_IN_DS["multipoint_in_geometrycollection"]
-    with pytest.raises(ImportError):
+    with pytest.raises(TypeError):
         correct(multipoly_in_layer, "multipoint_in_geometrycollection", epsg=28992)
 
 
