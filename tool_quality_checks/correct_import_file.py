@@ -31,7 +31,7 @@ def create_geom_transform(in_spatial_ref, out_epsg):
     return coordTrans
 
 
-def multipoly2poly(in_layer, out_layer):
+def transform_polygon_multipart_to_singlepart(in_layer, out_layer):
 
     lost_features = []
     layer_defn = in_layer.GetLayerDefn()
@@ -55,11 +55,11 @@ def multipoly2poly(in_layer, out_layer):
             or geom.GetGeometryName() == "MULTILINESTRING"
         ):
             for geom_part in geom:
-                addPolygon(geom_part.ExportToWkb(), content, out_layer)
+                add_polygon(geom_part.ExportToWkb(), content, out_layer)
         else:
-            addPolygon(geom.ExportToWkb(), content, out_layer)
+            add_polygon(geom.ExportToWkb(), content, out_layer)
 
-    return lost_features
+    return out_layer, lost_features
 
 
 def add_polygon(simple_polygon, content, out_lyr):
@@ -109,7 +109,7 @@ def fix_geometry(geometry):
     return geometry, geometry.IsValid()
 
 
-def correct(in_layer, layer_name="", epsg=28992):
+def correct(in_layer, layer_name="", epsg=3857):
     """
         This function standardizes a vector layer:
             1. Multipart to singleparts
@@ -130,13 +130,12 @@ def correct(in_layer, layer_name="", epsg=28992):
     in_spatial_ref = in_layer.GetSpatialRef()
     in_layer.ResetReading()
 
-    if layer_name != "":  # lower layer_name
-        layer_name = layer_name.lower()
-        logger.info("check - Name length")
-        if len(layer_name) + 10 > 64:
-            logger.warning("laagnaam te lang, 50 characters max.")
-            logger.warning("formatting naar 50 met deze naam: %s" % layer_name[:50])
-            layer_name = layer_name[:50]
+    layer_name = layer_name.lower()
+    logger.info("check - Name length")
+    if len(layer_name) + 10 > 64:
+        logger.warning("laagnaam te lang, 50 characters max.")
+        logger.warning("formatting naar 50 met deze naam: %s" % layer_name[:50])
+        layer_name = layer_name[:50]
 
     # create datasource output
     out_datasource = create_mem_ds()
@@ -154,12 +153,14 @@ def correct(in_layer, layer_name="", epsg=28992):
         mem_layer.CreateField(field_defn)
 
     logger.info("check - Multipart to singlepart")
-    lost_feat = multipoly2poly(in_layer, mem_layer)
+    mem_layer, lost_feat = transform_polygon_multipart_to_singlepart(
+        in_layer, mem_layer
+    )
     lost_features = lost_features + lost_feat
 
     if mem_layer.GetFeatureCount() == 0:
         logger.warning("Multipart to singlepart failed")
-        raise ImportError()
+        raise TypeError()
 
     # TODO use function!
     reproject = osr.CoordinateTransformation(in_spatial_ref, spatial_ref_out)
@@ -176,14 +177,13 @@ def correct(in_layer, layer_name="", epsg=28992):
         raise ImportError()
 
     # Create output dataset and force dataset to multiparts
+    # variable output_geom_type, does it always work? if not add check
     if "polygon" in geom_name.lower():
-        geom_type = 3  # polygon
-
+        output_geom_type = 3  # polygon
     elif "line" in geom_name.lower():
-        geom_type = 2  # linestring
-
+        output_geom_type = 2  # linestring
     elif "point" in geom_name.lower():
-        geom_type = 1  # point
+        output_geom_type = 1  # point
 
     # Copy fields from memory layer to output dataset
     layer_defn = in_layer.GetLayerDefn()
@@ -202,7 +202,7 @@ def correct(in_layer, layer_name="", epsg=28992):
             continue
 
         # Force and transform geometry
-        out_geom = ogr.ForceTo(out_geom, geom_type)
+        out_geom = ogr.ForceTo(out_geom, output_geom_type)
         out_geom.Transform(reproject)
 
         # flattening to 2d
@@ -223,7 +223,7 @@ def correct(in_layer, layer_name="", epsg=28992):
 
     logger.info("check  - Features count")
     out_feature_count = out_layer.GetFeatureCount()
-    print(lost_features, in_feature_count, out_feature_count)
+
     if len(lost_features) > 0:
         logger.warning("Lost {} features during corrections".format(len(lost_features)))
         logger.warning("FIDS: {}".format(lost_features))

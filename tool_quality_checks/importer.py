@@ -56,14 +56,13 @@ def copy2pg_database(settings, in_filepath, layer_name, schema="public"):
 
     except Exception as e:
         logger.warning(e)
-        logger.info("Trying to copy layer %s with another method" % in_name)
         raise
 
-    finally:
-        if new_layer.GetFeatureCount() == 0:
-            raise ValueError("Postgres vector feature count is 0")
+    if new_layer.GetFeatureCount() == 0:
+        raise ValueError("Postgres vector feature count is 0")
 
-        new_layer = None
+    new_layer = None
+
     datasource.Destroy()
     in_source.Destroy()
 
@@ -94,12 +93,8 @@ def set_ogr_connection_pg_database(settings):
 def set_ogr_connection(connection_path):
     """ Establishes the db connection. """
     # Connect met de database
-    try:
-        ogr_conn = ogr.Open(connection_path)
-        if ogr_conn is None:
-            raise ConnectionError("I am unable to read the file: %s" % connection_path)
-    except Exception as e:
-        logger.exception(e)
-        raise
 
+    ogr_conn = ogr.Open(connection_path)
+    if ogr_conn is None:
+        raise ConnectionError("I am unable to read the file: %s" % connection_path)
     return ogr_conn

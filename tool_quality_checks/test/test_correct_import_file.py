@@ -8,8 +8,8 @@ from OASDGLDatachecker.tool_quality_checks.correct_import_file import (
     create_mem_ds,
     create_geom_transform,
     fix_geometry,
-    addPolygon,
-    multipoly2poly,
+    add_polygon,
+    transform_polygon_multipart_to_singlepart,
     correct,
 )
 from OASDGLDatachecker.tool_quality_checks.importer import set_ogr_connection
@@ -88,7 +88,7 @@ def test_fix_geometry_polygon_sliver_not_valid():
     # geometry not valid
 
 
-def test_addpolygon():
+def test_add_polygon():
     # get random geom_typ and spatial ref
     geom_type = SHP_IN_LAYER.GetGeomType()
     in_spatial_ref = SHP_IN_LAYER.GetSpatialRef()
@@ -111,13 +111,13 @@ def test_addpolygon():
     poly = ogr.Geometry(ogr.wkbPolygon)
     poly.AddGeometry(ring)
     content = {"name": "my_polygon"}
-    addPolygon(poly.ExportToWkb(), content, mem_layer)
+    add_polygon(poly.ExportToWkb(), content, mem_layer)
     test_dump = mem_layer.GetFeature(0).ExportToJson()
     assert "my_polygon" in test_dump
     assert "[[[1.0, 1.0], [1.0, -1.0]," in test_dump
 
 
-def test_multipoly2poly():
+def test_transform_polygon_multipart_to_singlepart():
     multipoly_in_layer = GPKG_IN_DS["multipolygon_4326"]
     # get random geom_typ and spatial ref
     geom_type = multipoly_in_layer.GetGeomType()
@@ -131,7 +131,9 @@ def test_multipoly2poly():
         field_defn = layer_defn.GetFieldDefn(i)
         mem_layer.CreateField(field_defn)
 
-    lost_feat = multipoly2poly(multipoly_in_layer, mem_layer)
+    mem_layer, lost_feat = transform_polygon_multipart_to_singlepart(
+        multipoly_in_layer, mem_layer
+    )
     test_dump = mem_layer.GetFeature(1).ExportToJson()
     assert '"coordinates": [[[4.358551040042' in test_dump
     assert lost_feat == [2]
@@ -148,19 +150,18 @@ def test_correct_multipoly(caplog):
     out_datasource, layer_name = correct(
         multipoly_in_layer,
         "test_multi_met_veel_te_veel_tekens_in_de_naam_namelijk_meer_dan_vijftig_enzost_multi",
-        epsg=28992,
     )
     test_dump = (
         out_datasource["test_multi_met_veel_te_veel_tekens_in_de_naam_name"]
         .GetFeature(1)
         .ExportToJson()
     )
-    assert '"type": "Polygon", "coordinates": [[[84' in test_dump
+    assert '{"type": "Polygon", "coordinates": [[[485' in test_dump
 
 
 def test_correct_empty_result(caplog):
     multipoly_in_layer = GPKG_IN_DS["no_geom_layer"]
-    with pytest.raises(ImportError):
+    with pytest.raises(TypeError):
         correct(multipoly_in_layer, "test_empty", epsg=28992)
 
 
