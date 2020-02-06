@@ -139,6 +139,20 @@ class ThreediDatabase(object):
         )
         self.execute_sql_statement(sql_statement=create_schema_statement, fetch=False)
 
+    def create_preset_view_from_dictionary(
+        self, view_dictionary, view_table, view_schema, drop_view=True
+    ):
+        """
+        Drops and Creates a view from a dictionary
+        """
+        if drop_view == True:
+            drop_statement = """DROP VIEW IF EXISTS {view_table};""".format(
+                view_table=view_table
+            )
+            self.execute_sql_statement(drop_statement, fetch=False)
+        create_statement = view_dictionary[view_table].format(schema=view_schema)
+        self.execute_sql_statement(sql_statement=create_statement, fetch=False)
+
     def populate_geometry_columns(self):
         """Populate geometry columns"""
         populate_geometry_columns_statement = """
