@@ -31,8 +31,13 @@ def create_geom_transform(in_spatial_ref, out_epsg):
     return coordTrans
 
 
-def transform_polygon_multipart_to_singlepart(in_layer, out_layer):
-
+def transform_multipart_to_singlepart(in_layer, out_layer):
+    """
+    Load the current geometries and write them to singleparts in a new layer
+            
+        INPUT: in_layer, out_layer
+        OUTPUT: out_layer, lost_features
+    """
     lost_features = []
     layer_defn = in_layer.GetLayerDefn()
     field_names = []
@@ -55,17 +60,20 @@ def transform_polygon_multipart_to_singlepart(in_layer, out_layer):
             or geom.GetGeometryName() == "MULTILINESTRING"
         ):
             for geom_part in geom:
-                add_polygon(geom_part.ExportToWkb(), content, out_layer)
+                add_singlepart_geometry(geom_part.ExportToWkb(), content, out_layer)
         else:
-            add_polygon(geom.ExportToWkb(), content, out_layer)
+            add_singlepart_geometry(geom.ExportToWkb(), content, out_layer)
 
     return out_layer, lost_features
 
 
-def add_polygon(simple_polygon, content, out_lyr):
+def add_singlepart_geometry(geometry, content, out_lyr):
+    """
+    Add a new geometry with content to your out layer
+    """
     featureDefn = out_lyr.GetLayerDefn()
 
-    polygon = ogr.CreateGeometryFromWkb(simple_polygon)
+    polygon = ogr.CreateGeometryFromWkb(geometry)
     out_feat = ogr.Feature(featureDefn)
     out_feat.SetGeometry(polygon)
 
@@ -153,7 +161,7 @@ def correct(in_layer, layer_name="", epsg=3857):
         mem_layer.CreateField(field_defn)
 
     logger.info("check - Multipart to singlepart")
-    mem_layer, additional_lost_features = transform_polygon_multipart_to_singlepart(
+    mem_layer, additional_lost_features = transform_multipart_to_singlepart(
         in_layer, mem_layer
     )
     lost_features = lost_features + additional_lost_features
@@ -161,9 +169,6 @@ def correct(in_layer, layer_name="", epsg=3857):
     if mem_layer.GetFeatureCount() == 0:
         logger.warning("Multipart to singlepart failed")
         raise TypeError()
-
-    # TODO use function!
-    reproject = osr.CoordinateTransformation(in_spatial_ref, spatial_ref_out)
 
     flatten = False
     geom_name = ogr.GeometryTypeToName(geom_type)
@@ -191,6 +196,7 @@ def correct(in_layer, layer_name="", epsg=3857):
         out_layer.CreateField(layer_defn.GetFieldDefn(i))
 
     logger.info("check - Reproject layer to {}".format(str(epsg)))
+    reproject = osr.CoordinateTransformation(in_spatial_ref, spatial_ref_out)
     for out_feat in mem_layer:
         out_geom = out_feat.GetGeometryRef()
 

@@ -8,8 +8,8 @@ from OASDGLDatachecker.tool_quality_checks.correct_import_file import (
     create_mem_ds,
     create_geom_transform,
     fix_geometry,
-    add_polygon,
-    transform_polygon_multipart_to_singlepart,
+    add_singlepart_geometry,
+    transform_multipart_to_singlepart,
     correct,
 )
 from OASDGLDatachecker.tool_quality_checks.importer import set_ogr_connection
@@ -70,25 +70,11 @@ def test_fix_geometry_polygon_sliver_not_valid():
     # Create ring
     wkt = "POLYGON ((0 0 0, 1000 0 0, 1000 0.001 0))"
     poly = ogr.CreateGeometryFromWkt(wkt)
-
-    print(
-        poly,
-        poly.GetPointCount(),
-        poly.GetGeometryType(),
-        poly.GetGeometryName(),
-        ogr.GeometryTypeToName(poly.GetGeometryType()),
-        ogr.wkbPolygon,
-        # poly.IsValid(),
-        poly.GetArea(),
-    )
     out_geom, valid = fix_geometry(poly)
-    print(out_geom, valid)
     assert valid is False
-    # polygon
-    # geometry not valid
 
 
-def test_add_polygon():
+def test_add_singlepart_geometry():
     # get random geom_typ and spatial ref
     geom_type = SHP_IN_LAYER.GetGeomType()
     in_spatial_ref = SHP_IN_LAYER.GetSpatialRef()
@@ -111,13 +97,13 @@ def test_add_polygon():
     poly = ogr.Geometry(ogr.wkbPolygon)
     poly.AddGeometry(ring)
     content = {"name": "my_polygon"}
-    add_polygon(poly.ExportToWkb(), content, mem_layer)
+    add_singlepart_geometry(poly.ExportToWkb(), content, mem_layer)
     test_dump = mem_layer.GetFeature(0).ExportToJson()
     assert "my_polygon" in test_dump
     assert "[[[1.0, 1.0], [1.0, -1.0]," in test_dump
 
 
-def test_transform_polygon_multipart_to_singlepart():
+def test_transform_multipart_to_singlepart():
     multipoly_in_layer = GPKG_IN_DS["multipolygon_4326"]
     # get random geom_typ and spatial ref
     geom_type = multipoly_in_layer.GetGeomType()
@@ -131,7 +117,7 @@ def test_transform_polygon_multipart_to_singlepart():
         field_defn = layer_defn.GetFieldDefn(i)
         mem_layer.CreateField(field_defn)
 
-    mem_layer, lost_feat = transform_polygon_multipart_to_singlepart(
+    mem_layer, lost_feat = transform_multipart_to_singlepart(
         multipoly_in_layer, mem_layer
     )
     test_dump = mem_layer.GetFeature(1).ExportToJson()
