@@ -154,7 +154,7 @@ def correct(in_layer, layer_name="", epsg=28992):
         mem_layer.CreateField(field_defn)
 
     logger.info("check - Multipart to singlepart")
-    lost_feat = multipoly2poly(in_layer, mem_layer)
+    additional_lost_features = multipoly2poly(in_layer, mem_layer)
     lost_features = lost_features + lost_feat
 
     if mem_layer.GetFeatureCount() == 0:
