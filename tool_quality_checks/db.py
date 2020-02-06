@@ -165,8 +165,8 @@ class ThreediDatabase(object):
             raise ValueError("[E] table_name {} is not defined".format(table_name))
 
         row_def_raw = []
-        for e, ee in zip(field_names, field_types):
-            s = "%s %s" % (e, ee)
+        for field_name, field_type in zip(field_names, field_types):
+            s = "%s %s" % (field_name, field_type)
             row_def_raw.append(s)
 
         row_def = ",".join(row_def_raw)

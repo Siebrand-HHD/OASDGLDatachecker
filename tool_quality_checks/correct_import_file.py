@@ -199,7 +199,6 @@ def correct_vector_layer(in_layer, layer_name="", epsg=3857):
         logger.warning("geom type: " + geom_name)
         logger.info("Flattening to 2D")
         flatten = True
-
     elif geom_type <= 0:
         logger.error("Geometry invalid, please fix it first, type is: %s" % geom_name)
         raise TypeError()
