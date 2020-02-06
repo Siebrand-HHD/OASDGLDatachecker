@@ -3,7 +3,7 @@
 import os
 import pytest
 
-from OASDGLDatachecker.tool_quality_checks.quality_checks import SettingsObject
+from OASDGLDatachecker.tool_quality_checks.scripts import SettingsObject
 from OASDGLDatachecker.tool_quality_checks.db import (
     ThreediDatabase,
     create_database,
@@ -69,9 +69,6 @@ class TestCreateDB(TestCase):
     def test_02_initialize_db_threedi(self):
         self.db.initialize_db_threedi()
 
-    def test_03_initialize_db_checks(self):
-        self.db.initialize_db_checks()
-
 
 class TestDB(TestCase):
     @classmethod
@@ -81,7 +78,6 @@ class TestDB(TestCase):
         cls.db = ThreediDatabase(cls.settings)
         cls.db.create_extension(extension_name="postgis")
         cls.db.initialize_db_threedi()
-        cls.db.initialize_db_checks()
 
     @classmethod
     def tearDownClass(cls):
@@ -112,18 +108,6 @@ class TestDB(TestCase):
     def test_populate_geometry_columns(self):
         self.db.populate_geometry_columns()
 
-    def test_perform_checks_with_sql(self):
-        self.db.perform_checks_with_sql(self.settings, "v2_manhole", "completeness")
-
-    def test_perform_checks_with_sql_raise(self):
-        ini_relpath_key_missing = "data/instellingen_test_missing_key.ini"
-        ini_abspath_key_missing = os.path.join(
-            os.path.dirname(__file__), ini_relpath_key_missing
-        )
-        test_settings = SettingsObject(ini_abspath_key_missing)
-        with pytest.raises(Exception):
-            self.db.perform_checks_with_sql(test_settings, "v2_manhole", "completeness")
-
     # TODO: add checks for all types in sql.py
 
     def test_execute_sql_file(self):
@@ -141,3 +125,23 @@ class TestDB(TestCase):
             os.path.abspath(os.path.join(os.path.dirname(__file__), "..")), sql_reldir
         )
         self.db.execute_sql_dir(sql_absdir)
+
+    def test_01_create_table(self):
+        self.db.create_table(
+            "test_create_table", ["test_id", "name"], ["Integer", "Varchar"]
+        )
+
+    def test_01_create_table_raise(self):
+        with pytest.raises(Exception):
+            self.db.create_table(None, ["test_id"], ["Integer"])
+
+    def test_02_commit_values(self):
+        self.db.commit_values(
+            "test_create_table", "test_id, name", [(1, "test"), (2, "hoi")]
+        )
+        assert (
+            self.db.execute_sql_statement(
+                "SELECT name FROM test_create_table WHERE test_id = 1"
+            )[0][0]
+            == "test"
+        )

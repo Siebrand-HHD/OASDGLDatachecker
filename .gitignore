@@ -4,3 +4,5 @@
 .coverage
 *.pyc
 __pycache__
+*-shm
+*.gpkg-wal

@@ -9,12 +9,12 @@ sql_views = {
         FROM v2_pumpstation a JOIN v2_connection_nodes b ON a.connection_node_start_id = b.id;       
         """,
     "v2_1d_lateral_view": """
-        CREATE VIEW {schema}.v2_1d_lateral_view AS
+        CREATE OR REPLACE VIEW {schema}.v2_1d_lateral_view AS
         SELECT a.*, b.the_geom 
         FROM v2_1d_lateral a 
         JOIN v2_connection_nodes b ON a.connection_node_id = b.id;""",
     "v2_1d_boundary_conditions_view": """
-        CREATE VIEW {schema}.v2_1d_boundary_conditions_view AS
+        CREATE OR REPLACE VIEW {schema}.v2_1d_boundary_conditions_view AS
         SELECT a.*, b.the_geom 
         FROM v2_1d_boundary_conditions a 
         JOIN v2_connection_nodes b ON a.connection_node_id = b.id;""",
