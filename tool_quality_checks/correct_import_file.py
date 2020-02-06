@@ -153,10 +153,10 @@ def correct(in_layer, layer_name="", epsg=3857):
         mem_layer.CreateField(field_defn)
 
     logger.info("check - Multipart to singlepart")
-    mem_layer, lost_feat = transform_polygon_multipart_to_singlepart(
+    mem_layer, additional_lost_features = transform_polygon_multipart_to_singlepart(
         in_layer, mem_layer
     )
-    lost_features = lost_features + lost_feat
+    lost_features = lost_features + additional_lost_features
 
     if mem_layer.GetFeatureCount() == 0:
         logger.warning("Multipart to singlepart failed")
