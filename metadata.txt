@@ -10,11 +10,11 @@
 name=Riooldatachecker
 qgisMinimumVersion=3.0
 description=riool datachecker
-version=0.1
+version=0.2
 author=OAS-De Groote Lucht
 email=o.claassen@schiedam.nl
 
-about=The datachecker is ment to check data of the sewer on logical checks. It give a result in wich allaw the user to improve their data.
+about=The datachecker is ment to check sewer data on logical checks. It give a result in wich allow the user to improve their data.
 
 tracker=http://bugs
 repository=http://repo

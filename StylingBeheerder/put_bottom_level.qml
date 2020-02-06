@@ -1,94 +1,37 @@
 <!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
-<qgis readOnly="0" maxScale="0" hasScaleBasedVisibilityFlag="0" labelsEnabled="0" simplifyDrawingTol="1" simplifyMaxScale="1" simplifyAlgorithm="0" simplifyLocal="1" styleCategories="AllStyleCategories" minScale="1e+08" simplifyDrawingHints="0" version="3.8.0-Zanzibar">
+<qgis simplifyLocal="1" readOnly="0" hasScaleBasedVisibilityFlag="0" simplifyDrawingHints="0" version="3.8.0-Zanzibar" styleCategories="AllStyleCategories" maxScale="0" labelsEnabled="0" simplifyDrawingTol="1" minScale="1e+08" simplifyAlgorithm="0" simplifyMaxScale="1">
   <flags>
     <Identifiable>1</Identifiable>
     <Removable>1</Removable>
     <Searchable>1</Searchable>
   </flags>
-  <renderer-v2 symbollevels="0" forceraster="0" enableorderby="0" type="singleSymbol">
+  <renderer-v2 type="singleSymbol" enableorderby="0" symbollevels="0" forceraster="0">
     <symbols>
-      <symbol clip_to_extent="1" name="0" alpha="1" type="marker" force_rhr="0">
-        <layer pass="0" enabled="1" locked="0" class="SimpleMarker">
-          <prop v="0" k="angle"/>
-          <prop v="184,8,8,255" k="color"/>
-          <prop v="1" k="horizontal_anchor_point"/>
-          <prop v="bevel" k="joinstyle"/>
-          <prop v="star" k="name"/>
-          <prop v="0,0" k="offset"/>
-          <prop v="3x:0,0,0,0,0,0" k="offset_map_unit_scale"/>
-          <prop v="MM" k="offset_unit"/>
-          <prop v="184,8,8,255" k="outline_color"/>
-          <prop v="solid" k="outline_style"/>
-          <prop v="0.2" k="outline_width"/>
-          <prop v="3x:0,0,0,0,0,0" k="outline_width_map_unit_scale"/>
-          <prop v="MM" k="outline_width_unit"/>
-          <prop v="area" k="scale_method"/>
-          <prop v="6.6" k="size"/>
-          <prop v="3x:0,0,0,0,0,0" k="size_map_unit_scale"/>
-          <prop v="MM" k="size_unit"/>
-          <prop v="1" k="vertical_anchor_point"/>
-          <effect enabled="1" type="effectStack">
-            <effect type="dropShadow">
-              <prop v="0" k="blend_mode"/>
-              <prop v="2.645" k="blur_level"/>
-              <prop v="MM" k="blur_unit"/>
-              <prop v="3x:0,0,0,0,0,0" k="blur_unit_scale"/>
-              <prop v="0,0,0,255" k="color"/>
-              <prop v="2" k="draw_mode"/>
-              <prop v="1" k="enabled"/>
-              <prop v="135" k="offset_angle"/>
-              <prop v="2" k="offset_distance"/>
-              <prop v="MM" k="offset_unit"/>
-              <prop v="3x:0,0,0,0,0,0" k="offset_unit_scale"/>
-              <prop v="1" k="opacity"/>
-            </effect>
-            <effect type="drawSource">
-              <prop v="0" k="blend_mode"/>
-              <prop v="2" k="draw_mode"/>
-              <prop v="1" k="enabled"/>
-              <prop v="1" k="opacity"/>
-            </effect>
-          </effect>
+      <symbol type="marker" alpha="1" clip_to_extent="1" force_rhr="0" name="0">
+        <layer locked="0" pass="0" class="SimpleMarker" enabled="1">
+          <prop k="angle" v="0"/>
+          <prop k="color" v="255,255,255,255"/>
+          <prop k="horizontal_anchor_point" v="1"/>
+          <prop k="joinstyle" v="bevel"/>
+          <prop k="name" v="circle"/>
+          <prop k="offset" v="0,0"/>
+          <prop k="offset_map_unit_scale" v="3x:0,0,0,0,0,0"/>
+          <prop k="offset_unit" v="MM"/>
+          <prop k="outline_color" v="0,0,0,255"/>
+          <prop k="outline_style" v="solid"/>
+          <prop k="outline_width" v="0.4"/>
+          <prop k="outline_width_map_unit_scale" v="3x:0,0,0,0,0,0"/>
+          <prop k="outline_width_unit" v="MM"/>
+          <prop k="scale_method" v="diameter"/>
+          <prop k="size" v="4"/>
+          <prop k="size_map_unit_scale" v="3x:0,0,0,0,0,0"/>
+          <prop k="size_unit" v="MM"/>
+          <prop k="vertical_anchor_point" v="1"/>
           <data_defined_properties>
             <Option type="Map">
-              <Option value="" name="name" type="QString"/>
+              <Option type="QString" value="" name="name"/>
               <Option name="properties"/>
-              <Option value="collection" name="type" type="QString"/>
-            </Option>
-          </data_defined_properties>
-        </layer>
-        <layer pass="0" enabled="1" locked="0" class="SimpleMarker">
-          <prop v="34" k="angle"/>
-          <prop v="255,0,0,255" k="color"/>
-          <prop v="1" k="horizontal_anchor_point"/>
-          <prop v="bevel" k="joinstyle"/>
-          <prop v="star" k="name"/>
-          <prop v="0,0" k="offset"/>
-          <prop v="3x:0,0,0,0,0,0" k="offset_map_unit_scale"/>
-          <prop v="MM" k="offset_unit"/>
-          <prop v="255,0,0,255" k="outline_color"/>
-          <prop v="solid" k="outline_style"/>
-          <prop v="0.2" k="outline_width"/>
-          <prop v="3x:0,0,0,0,0,0" k="outline_width_map_unit_scale"/>
-          <prop v="MM" k="outline_width_unit"/>
-          <prop v="area" k="scale_method"/>
-          <prop v="7.2" k="size"/>
-          <prop v="3x:0,0,0,0,0,0" k="size_map_unit_scale"/>
-          <prop v="MM" k="size_unit"/>
-          <prop v="1" k="vertical_anchor_point"/>
-          <effect enabled="0" type="effectStack">
-            <effect type="drawSource">
-              <prop v="0" k="blend_mode"/>
-              <prop v="2" k="draw_mode"/>
-              <prop v="1" k="enabled"/>
-              <prop v="1" k="opacity"/>
-            </effect>
-          </effect>
-          <data_defined_properties>
-            <Option type="Map">
-              <Option value="" name="name" type="QString"/>
-              <Option name="properties"/>
-              <Option value="collection" name="type" type="QString"/>
+              <Option type="QString" value="collection" name="type"/>
             </Option>
           </data_defined_properties>
         </layer>
@@ -105,17 +48,18 @@
   <blendMode>0</blendMode>
   <featureBlendMode>0</featureBlendMode>
   <layerOpacity>1</layerOpacity>
-  <SingleCategoryDiagramRenderer attributeLegend="1" diagramType="Histogram">
-    <DiagramCategory penWidth="0" maxScaleDenominator="1e+08" sizeType="MM" rotationOffset="270" enabled="0" sizeScale="3x:0,0,0,0,0,0" backgroundAlpha="255" penAlpha="255" penColor="#000000" opacity="1" width="15" minScaleDenominator="0" minimumSize="0" scaleDependency="Area" lineSizeScale="3x:0,0,0,0,0,0" diagramOrientation="Up" labelPlacementMethod="XHeight" backgroundColor="#ffffff" barWidth="5" height="15" lineSizeType="MM" scaleBasedVisibility="0">
+  <SingleCategoryDiagramRenderer diagramType="Histogram" attributeLegend="1">
+    <DiagramCategory height="15" penColor="#000000" enabled="0" sizeScale="3x:0,0,0,0,0,0" lineSizeType="MM" backgroundAlpha="255" scaleDependency="Area" lineSizeScale="3x:0,0,0,0,0,0" minScaleDenominator="0" penAlpha="255" diagramOrientation="Up" rotationOffset="270" width="15" penWidth="0" maxScaleDenominator="1e+08" minimumSize="0" scaleBasedVisibility="0" opacity="1" backgroundColor="#ffffff" labelPlacementMethod="XHeight" sizeType="MM" barWidth="5">
       <fontProperties style="" description="MS Shell Dlg 2,7.875,-1,5,50,0,0,0,0,0"/>
+      <attribute color="#000000" field="" label=""/>
     </DiagramCategory>
   </SingleCategoryDiagramRenderer>
-  <DiagramLayerSettings priority="0" placement="0" linePlacementFlags="18" dist="0" showAll="1" obstacle="0" zIndex="0">
+  <DiagramLayerSettings priority="0" placement="0" linePlacementFlags="18" zIndex="0" showAll="1" obstacle="0" dist="0">
     <properties>
       <Option type="Map">
-        <Option value="" name="name" type="QString"/>
+        <Option type="QString" value="" name="name"/>
         <Option name="properties"/>
-        <Option value="collection" name="type" type="QString"/>
+        <Option type="QString" value="collection" name="type"/>
       </Option>
     </properties>
   </DiagramLayerSettings>
@@ -282,94 +226,94 @@
   <excludeAttributesWMS/>
   <excludeAttributesWFS/>
   <defaults>
-    <default field="id" expression="" applyOnUpdate="0"/>
-    <default field="manh_bottom_level" expression="" applyOnUpdate="0"/>
-    <default field="manh_surface_level" expression="" applyOnUpdate="0"/>
-    <default field="manh_display_name" expression="" applyOnUpdate="0"/>
-    <default field="manh_shape" expression="" applyOnUpdate="0"/>
-    <default field="manh_width" expression="" applyOnUpdate="0"/>
-    <default field="manh_length" expression="" applyOnUpdate="0"/>
-    <default field="manh_manhole_indicator" expression="" applyOnUpdate="0"/>
-    <default field="manh_calculation_type" expression="" applyOnUpdate="0"/>
-    <default field="manh_drain_level" expression="" applyOnUpdate="0"/>
-    <default field="manh_zoom_category" expression="" applyOnUpdate="0"/>
-    <default field="node_initial_waterlevel" expression="" applyOnUpdate="0"/>
-    <default field="manh_id" expression="" applyOnUpdate="0"/>
-    <default field="manh_connection_node_id" expression="" applyOnUpdate="0"/>
-    <default field="node_id" expression="" applyOnUpdate="0"/>
-    <default field="node_storage_area" expression="" applyOnUpdate="0"/>
-    <default field="manh_code" expression="" applyOnUpdate="0"/>
-    <default field="node_code" expression="" applyOnUpdate="0"/>
-    <default field="manh_sediment_level" expression="" applyOnUpdate="0"/>
+    <default expression="" applyOnUpdate="0" field="id"/>
+    <default expression="" applyOnUpdate="0" field="manh_bottom_level"/>
+    <default expression="" applyOnUpdate="0" field="manh_surface_level"/>
+    <default expression="" applyOnUpdate="0" field="manh_display_name"/>
+    <default expression="" applyOnUpdate="0" field="manh_shape"/>
+    <default expression="" applyOnUpdate="0" field="manh_width"/>
+    <default expression="" applyOnUpdate="0" field="manh_length"/>
+    <default expression="" applyOnUpdate="0" field="manh_manhole_indicator"/>
+    <default expression="" applyOnUpdate="0" field="manh_calculation_type"/>
+    <default expression="" applyOnUpdate="0" field="manh_drain_level"/>
+    <default expression="" applyOnUpdate="0" field="manh_zoom_category"/>
+    <default expression="" applyOnUpdate="0" field="node_initial_waterlevel"/>
+    <default expression="" applyOnUpdate="0" field="manh_id"/>
+    <default expression="" applyOnUpdate="0" field="manh_connection_node_id"/>
+    <default expression="" applyOnUpdate="0" field="node_id"/>
+    <default expression="" applyOnUpdate="0" field="node_storage_area"/>
+    <default expression="" applyOnUpdate="0" field="manh_code"/>
+    <default expression="" applyOnUpdate="0" field="node_code"/>
+    <default expression="" applyOnUpdate="0" field="manh_sediment_level"/>
   </defaults>
   <constraints>
-    <constraint field="id" unique_strength="1" constraints="3" notnull_strength="1" exp_strength="0"/>
-    <constraint field="manh_bottom_level" unique_strength="0" constraints="0" notnull_strength="0" exp_strength="0"/>
-    <constraint field="manh_surface_level" unique_strength="0" constraints="0" notnull_strength="0" exp_strength="0"/>
-    <constraint field="manh_display_name" unique_strength="0" constraints="0" notnull_strength="0" exp_strength="0"/>
-    <constraint field="manh_shape" unique_strength="0" constraints="0" notnull_strength="0" exp_strength="0"/>
-    <constraint field="manh_width" unique_strength="0" constraints="0" notnull_strength="0" exp_strength="0"/>
-    <constraint field="manh_length" unique_strength="0" constraints="0" notnull_strength="0" exp_strength="0"/>
-    <constraint field="manh_manhole_indicator" unique_strength="0" constraints="0" notnull_strength="0" exp_strength="0"/>
-    <constraint field="manh_calculation_type" unique_strength="0" constraints="0" notnull_strength="0" exp_strength="0"/>
-    <constraint field="manh_drain_level" unique_strength="0" constraints="0" notnull_strength="0" exp_strength="0"/>
-    <constraint field="manh_zoom_category" unique_strength="0" constraints="0" notnull_strength="0" exp_strength="0"/>
-    <constraint field="node_initial_waterlevel" unique_strength="0" constraints="0" notnull_strength="0" exp_strength="0"/>
-    <constraint field="manh_id" unique_strength="0" constraints="0" notnull_strength="0" exp_strength="0"/>
-    <constraint field="manh_connection_node_id" unique_strength="0" constraints="0" notnull_strength="0" exp_strength="0"/>
-    <constraint field="node_id" unique_strength="0" constraints="0" notnull_strength="0" exp_strength="0"/>
-    <constraint field="node_storage_area" unique_strength="0" constraints="0" notnull_strength="0" exp_strength="0"/>
-    <constraint field="manh_code" unique_strength="0" constraints="0" notnull_strength="0" exp_strength="0"/>
-    <constraint field="node_code" unique_strength="0" constraints="0" notnull_strength="0" exp_strength="0"/>
-    <constraint field="manh_sediment_level" unique_strength="0" constraints="0" notnull_strength="0" exp_strength="0"/>
+    <constraint constraints="3" exp_strength="0" field="id" unique_strength="1" notnull_strength="1"/>
+    <constraint constraints="0" exp_strength="0" field="manh_bottom_level" unique_strength="0" notnull_strength="0"/>
+    <constraint constraints="0" exp_strength="0" field="manh_surface_level" unique_strength="0" notnull_strength="0"/>
+    <constraint constraints="0" exp_strength="0" field="manh_display_name" unique_strength="0" notnull_strength="0"/>
+    <constraint constraints="0" exp_strength="0" field="manh_shape" unique_strength="0" notnull_strength="0"/>
+    <constraint constraints="0" exp_strength="0" field="manh_width" unique_strength="0" notnull_strength="0"/>
+    <constraint constraints="0" exp_strength="0" field="manh_length" unique_strength="0" notnull_strength="0"/>
+    <constraint constraints="0" exp_strength="0" field="manh_manhole_indicator" unique_strength="0" notnull_strength="0"/>
+    <constraint constraints="0" exp_strength="0" field="manh_calculation_type" unique_strength="0" notnull_strength="0"/>
+    <constraint constraints="0" exp_strength="0" field="manh_drain_level" unique_strength="0" notnull_strength="0"/>
+    <constraint constraints="0" exp_strength="0" field="manh_zoom_category" unique_strength="0" notnull_strength="0"/>
+    <constraint constraints="0" exp_strength="0" field="node_initial_waterlevel" unique_strength="0" notnull_strength="0"/>
+    <constraint constraints="0" exp_strength="0" field="manh_id" unique_strength="0" notnull_strength="0"/>
+    <constraint constraints="0" exp_strength="0" field="manh_connection_node_id" unique_strength="0" notnull_strength="0"/>
+    <constraint constraints="0" exp_strength="0" field="node_id" unique_strength="0" notnull_strength="0"/>
+    <constraint constraints="0" exp_strength="0" field="node_storage_area" unique_strength="0" notnull_strength="0"/>
+    <constraint constraints="0" exp_strength="0" field="manh_code" unique_strength="0" notnull_strength="0"/>
+    <constraint constraints="0" exp_strength="0" field="node_code" unique_strength="0" notnull_strength="0"/>
+    <constraint constraints="0" exp_strength="0" field="manh_sediment_level" unique_strength="0" notnull_strength="0"/>
   </constraints>
   <constraintExpressions>
-    <constraint field="id" exp="" desc=""/>
-    <constraint field="manh_bottom_level" exp="" desc=""/>
-    <constraint field="manh_surface_level" exp="" desc=""/>
-    <constraint field="manh_display_name" exp="" desc=""/>
-    <constraint field="manh_shape" exp="" desc=""/>
-    <constraint field="manh_width" exp="" desc=""/>
-    <constraint field="manh_length" exp="" desc=""/>
-    <constraint field="manh_manhole_indicator" exp="" desc=""/>
-    <constraint field="manh_calculation_type" exp="" desc=""/>
-    <constraint field="manh_drain_level" exp="" desc=""/>
-    <constraint field="manh_zoom_category" exp="" desc=""/>
-    <constraint field="node_initial_waterlevel" exp="" desc=""/>
-    <constraint field="manh_id" exp="" desc=""/>
-    <constraint field="manh_connection_node_id" exp="" desc=""/>
-    <constraint field="node_id" exp="" desc=""/>
-    <constraint field="node_storage_area" exp="" desc=""/>
-    <constraint field="manh_code" exp="" desc=""/>
-    <constraint field="node_code" exp="" desc=""/>
-    <constraint field="manh_sediment_level" exp="" desc=""/>
+    <constraint desc="" exp="" field="id"/>
+    <constraint desc="" exp="" field="manh_bottom_level"/>
+    <constraint desc="" exp="" field="manh_surface_level"/>
+    <constraint desc="" exp="" field="manh_display_name"/>
+    <constraint desc="" exp="" field="manh_shape"/>
+    <constraint desc="" exp="" field="manh_width"/>
+    <constraint desc="" exp="" field="manh_length"/>
+    <constraint desc="" exp="" field="manh_manhole_indicator"/>
+    <constraint desc="" exp="" field="manh_calculation_type"/>
+    <constraint desc="" exp="" field="manh_drain_level"/>
+    <constraint desc="" exp="" field="manh_zoom_category"/>
+    <constraint desc="" exp="" field="node_initial_waterlevel"/>
+    <constraint desc="" exp="" field="manh_id"/>
+    <constraint desc="" exp="" field="manh_connection_node_id"/>
+    <constraint desc="" exp="" field="node_id"/>
+    <constraint desc="" exp="" field="node_storage_area"/>
+    <constraint desc="" exp="" field="manh_code"/>
+    <constraint desc="" exp="" field="node_code"/>
+    <constraint desc="" exp="" field="manh_sediment_level"/>
   </constraintExpressions>
   <expressionfields/>
   <attributeactions>
     <defaultAction value="{00000000-0000-0000-0000-000000000000}" key="Canvas"/>
   </attributeactions>
-  <attributetableconfig sortOrder="0" sortExpression="" actionWidgetStyle="dropDown">
+  <attributetableconfig sortExpression="" sortOrder="0" actionWidgetStyle="dropDown">
     <columns>
-      <column width="-1" name="id" type="field" hidden="0"/>
-      <column width="-1" name="manh_bottom_level" type="field" hidden="0"/>
-      <column width="-1" name="manh_surface_level" type="field" hidden="0"/>
-      <column width="-1" name="manh_display_name" type="field" hidden="0"/>
-      <column width="-1" name="manh_shape" type="field" hidden="0"/>
-      <column width="-1" name="manh_width" type="field" hidden="0"/>
-      <column width="-1" name="manh_length" type="field" hidden="0"/>
-      <column width="-1" name="manh_manhole_indicator" type="field" hidden="0"/>
-      <column width="-1" name="manh_calculation_type" type="field" hidden="0"/>
-      <column width="-1" name="manh_drain_level" type="field" hidden="0"/>
-      <column width="-1" name="manh_zoom_category" type="field" hidden="0"/>
-      <column width="-1" name="node_initial_waterlevel" type="field" hidden="0"/>
-      <column width="-1" name="manh_id" type="field" hidden="0"/>
-      <column width="-1" name="manh_connection_node_id" type="field" hidden="0"/>
-      <column width="-1" name="node_id" type="field" hidden="0"/>
-      <column width="-1" name="node_storage_area" type="field" hidden="0"/>
-      <column width="-1" name="manh_code" type="field" hidden="0"/>
-      <column width="-1" name="node_code" type="field" hidden="0"/>
-      <column width="-1" name="manh_sediment_level" type="field" hidden="0"/>
-      <column width="-1" type="actions" hidden="1"/>
+      <column type="field" width="-1" hidden="0" name="id"/>
+      <column type="field" width="-1" hidden="0" name="manh_bottom_level"/>
+      <column type="field" width="-1" hidden="0" name="manh_surface_level"/>
+      <column type="field" width="-1" hidden="0" name="manh_display_name"/>
+      <column type="field" width="-1" hidden="0" name="manh_shape"/>
+      <column type="field" width="-1" hidden="0" name="manh_width"/>
+      <column type="field" width="-1" hidden="0" name="manh_length"/>
+      <column type="field" width="-1" hidden="0" name="manh_manhole_indicator"/>
+      <column type="field" width="-1" hidden="0" name="manh_calculation_type"/>
+      <column type="field" width="-1" hidden="0" name="manh_drain_level"/>
+      <column type="field" width="-1" hidden="0" name="manh_zoom_category"/>
+      <column type="field" width="-1" hidden="0" name="node_initial_waterlevel"/>
+      <column type="field" width="-1" hidden="0" name="manh_id"/>
+      <column type="field" width="-1" hidden="0" name="manh_connection_node_id"/>
+      <column type="field" width="-1" hidden="0" name="node_id"/>
+      <column type="field" width="-1" hidden="0" name="node_storage_area"/>
+      <column type="field" width="-1" hidden="0" name="manh_code"/>
+      <column type="field" width="-1" hidden="0" name="node_code"/>
+      <column type="field" width="-1" hidden="0" name="manh_sediment_level"/>
+      <column type="actions" width="-1" hidden="1"/>
     </columns>
   </attributetableconfig>
   <conditionalstyles>

@@ -33,6 +33,7 @@ from osgeo import ogr
 from .Datachecker_dockwidget import DatacheckerDockWidget
 import os.path
 
+#Debugging in vs : https://gist.github.com/AsgerPetersen/9ea79ae4139f4977c31dd6ede2297f90
 
 class Datachecker:
     """QGIS Plugin Implementation."""
@@ -56,7 +57,8 @@ class Datachecker:
         locale_path = os.path.join(
             self.plugin_dir,
             'i18n',
-            'Datachecker_{}.qm'.format(locale))
+            'datachecker_{}.qm'.format(locale))
+        #print(locale_path)
 
         if os.path.exists(locale_path):
             self.translator = QTranslator()
@@ -171,10 +173,10 @@ class Datachecker:
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
 
-        icon_path = ':/plugins/Datachecker/icon.png'
+        icon_path = ':/plugins/oas-dgl-datachecker/icon.png'
         self.add_action(
             icon_path,
-            text=self.tr(u'Datachecker'),
+            text=self.tr(u'Riooldatachecker'),
             callback=self.run,
             parent=self.iface.mainWindow())
 
@@ -215,6 +217,7 @@ class Datachecker:
         foldername = QFileDialog.getExistingDirectory()
         self.dockwidget.folderNaam.setText(foldername)
         if foldername:
+            self.dockwidget.listChecks.clear()
             self.fill_checks_list()
     
     def fill_checks_list(self):
@@ -261,6 +264,7 @@ class Datachecker:
             scriptLocatie =os.path.dirname(os.path.realpath(__file__))
             qmlpad = os.path.join(scriptLocatie, folder, layer.name())+'.qml'
             layer.loadNamedStyle(qmlpad)
+            layer.triggerRepaint()
             
     def slider_function(self,value):
         layer = self.iface.mapCanvas().currentLayer()
