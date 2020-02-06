@@ -1,51 +1,63 @@
 # -*- coding: utf-8 -*-
 """Tests for quality_checks.py"""
 import os
-import sys
-import mock
+from unittest import TestCase
 import pytest
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-import quality_checks
-from quality_checks import SettingsObject
-from quality_checks import resolve_ini
+from OASDGLDatachecker.tool_quality_checks.scripts import SettingsObject
+from OASDGLDatachecker.tool_quality_checks.db import (
+    ThreediDatabase,
+    create_database,
+    drop_database,
+)
+from OASDGLDatachecker.tool_quality_checks.quality_checks import (
+    initialize_db_checks,
+    perform_checks_with_sql,
+)
+
+_ini_relpath = "data/instellingen_test.ini"
+INI_ABSPATH = os.path.join(os.path.dirname(__file__), _ini_relpath)
+
+"""
+This test file assumes that the checks will be run in particular order.
+This because a database needs to be installed with schemas.
+After execution the changes will not be rolled back.
+"""
 
 
-@mock.patch("sys.argv", ["program", "-i", "test.ini"])
-def test_get_parser():
-    parser = quality_checks.get_parser()
-    # As a test, we just check one option. That's enough.
-    options = parser.parse_args()
-    assert options.inifile == "test.ini"
+class TestDB(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.settings = SettingsObject(INI_ABSPATH)
+        try:
+            drop_database(cls.settings)
+        except Exception:
+            pass
+        create_database(cls.settings)
+        cls.db = ThreediDatabase(cls.settings)
+        cls.db.create_extension(extension_name="postgis")
+        cls.db.initialize_db_threedi()
 
+    @classmethod
+    def tearDownClass(cls):
+        cls.db.conn.close()
+        drop_database(cls.settings)
 
-def test_settingsobject():
-    ini_path = "data//instellingen_test.ini"
-    ini_path = os.path.join(os.path.dirname(__file__), ini_path)
-    settings = SettingsObject(ini_path)
-    assert settings.__dict__["hoogte_verschil"] == "0.2"
+    def test_initialize_db_checks(self):
+        initialize_db_checks(self.db)
 
+    def test_perform_checks_with_sql(self):
+        perform_checks_with_sql(self.db, self.settings, "v2_manhole", "completeness")
 
-def test_settingsobject_raise():
-    ini_path = "data//instellingen_test_missing_db.ini"
-    ini_path = os.path.join(os.path.dirname(__file__), ini_path)
-    settings = SettingsObject(ini_path)
-    with pytest.raises(Exception):
-        settings.database
+    def test_perform_checks_with_sql_raise(self):
+        ini_relpath_key_missing = "data/instellingen_test_missing_key.ini"
+        ini_abspath_key_missing = os.path.join(
+            os.path.dirname(__file__), ini_relpath_key_missing
+        )
+        test_settings = SettingsObject(ini_abspath_key_missing)
+        with pytest.raises(Exception):
+            self.db.perform_checks_with_sql(
+                self.db, test_settings, "v2_manhole", "completeness"
+            )
 
-
-def test_resolve_ini_custom():
-    ini_path = "data\\dummy.ini"
-    ini_path = os.path.join(os.path.dirname(__file__), ini_path)
-    ini_path = resolve_ini(ini_path)
-    assert "\\test\\data\\dummy.ini" in ini_path
-
-
-def test_resolve_ini_default():
-    ini_path = resolve_ini(None)
-    assert "\\test\\data\\instellingen_test.ini" in ini_path
-
-
-def test_resolve_ini_error():
-    with pytest.raises(Exception):
-        resolve_ini("instellingen_test_error.ini")
+    # TODO add quality checks test
