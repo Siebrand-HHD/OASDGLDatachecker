@@ -77,7 +77,7 @@ def add_singlepart_geometry(in_geometry, content, out_lyr):
     geometry = ogr.CreateGeometryFromWkb(in_geometry)
     out_feat = ogr.Feature(featureDefn)
     out_feat.SetGeometry(geometry)
-    print(geometry)
+
     for key, value in content.items():
         out_feat.SetField(key, value)
 
@@ -166,7 +166,7 @@ def correct_vector_layer(in_layer, layer_name="", epsg=3857):
     else:
         logger.error("Geometry could not be translated to singlepart %s" % geom_name)
         raise TypeError()
-    print(geom_name, output_geom_type)
+
     # create memory datasource for
     mem_datasource = create_mem_ds()
     mem_layer = mem_datasource.CreateLayer(layer_name, in_spatial_ref, output_geom_type)
