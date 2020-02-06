@@ -84,7 +84,15 @@ def add_singlepart_geometry(in_geometry, content, out_lyr):
     out_lyr.CreateFeature(out_feat)
 
 
-def fix_geometry(geometry):
+def try_fix_geometry(geometry):
+    """
+    Tries to fix a geometry.
+    If it does not work, give it back with False
+    If it works give it back with True
+
+    Input: geometry
+    Output: fixed geometry with true or original geometry with false
+    """
     geom_name = geometry.GetGeometryName()
     # check pointcount if linestring
     if "LINESTRING" in geom_name:
@@ -118,7 +126,7 @@ def fix_geometry(geometry):
     return geometry, geometry.IsValid()
 
 
-def correct(in_layer, layer_name="", epsg=3857):
+def correct_vector_layer(in_layer, layer_name="", epsg=3857):
     """
         This function standardizes a vector layer:
             1. Multipart to singleparts
@@ -206,7 +214,7 @@ def correct(in_layer, layer_name="", epsg=3857):
     for out_feat in mem_layer:
         out_geom = out_feat.GetGeometryRef()
 
-        out_geom, valid = fix_geometry(out_geom)
+        out_geom, valid = try_fix_geometry(out_geom)
 
         if not valid:
             logger.warning("geometry invalid even with buffer, skipping")
@@ -223,7 +231,6 @@ def correct(in_layer, layer_name="", epsg=3857):
         # Set geometry and create feature
         out_feat.SetGeometry(out_geom)
         out_layer.CreateFeature(out_feat)
-
 
     logger.info("check  - delete ogc_fid if exists")
     out_layer_defn = out_layer.GetLayerDefn()

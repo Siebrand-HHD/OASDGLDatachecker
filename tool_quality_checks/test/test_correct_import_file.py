@@ -7,10 +7,10 @@ import pytest
 from OASDGLDatachecker.tool_quality_checks.correct_import_file import (
     create_mem_ds,
     create_geom_transform,
-    fix_geometry,
+    try_fix_geometry,
     add_singlepart_geometry,
     transform_multipart_to_singlepart,
-    correct,
+    correct_vector_layer,
 )
 from OASDGLDatachecker.tool_quality_checks.importer import set_ogr_connection
 
@@ -34,22 +34,22 @@ def test_geom_transform():
     assert isinstance(transform, osr.CoordinateTransformation)
 
 
-def test_fix_geometry_valid():
+def test_try_fix_geometry_valid():
     geom = ogr.Geometry(ogr.wkbLineString)
     geom.AddPoint(1116651.439379124, 637392.6969887456)
     geom.AddPoint(1188804.0108498496, 652655.7409537067)
-    out_geom, valid = fix_geometry(geom)
+    out_geom, valid = try_fix_geometry(geom)
     assert valid is True
 
 
-def test_fix_geometry_unvalid_line():
+def test_try_fix_geometry_unvalid_line():
     line = ogr.Geometry(ogr.wkbLineString)
     line.AddPoint(1116651.439379124, 637392.6969887456)
-    geom, valid = fix_geometry(line)
+    geom, valid = try_fix_geometry(line)
     assert valid is False
 
 
-def test_fix_geometry_polygon_self_intersect():
+def test_try_fix_geometry_polygon_self_intersect():
     # Create ring
     ring = ogr.Geometry(ogr.wkbLinearRing)
     ring.AddPoint_2D(1, 1)
@@ -62,15 +62,15 @@ def test_fix_geometry_polygon_self_intersect():
     poly = ogr.Geometry(ogr.wkbPolygon)
     poly.AddGeometry(ring)
 
-    out_geom, valid = fix_geometry(poly)
+    out_geom, valid = try_fix_geometry(poly)
     assert valid is True
 
 
-def test_fix_geometry_polygon_sliver_not_valid():
+def test_try_fix_geometry_polygon_sliver_not_valid():
     # Create ring
     wkt = "POLYGON ((0 0 0, 1000 0 0, 1000 0.001 0))"
     poly = ogr.CreateGeometryFromWkt(wkt)
-    out_geom, valid = fix_geometry(poly)
+    out_geom, valid = try_fix_geometry(poly)
     assert valid is False
 
 
@@ -125,15 +125,15 @@ def test_transform_multipart_to_singlepart():
     assert lost_feat == [2]
 
 
-def test_correct_manholes_3D_point(caplog):
-    out_datasource, layer_name = correct(SHP_IN_LAYER, "test", epsg=28992)
+def test_correct_vector_layer_manholes_3D_point(caplog):
+    out_datasource, layer_name = correct_vector_layer(SHP_IN_LAYER, "test", epsg=28992)
     assert "3D Point" in caplog.text
     assert out_datasource[layer_name].GetFeatureCount() == 78
 
 
-def test_correct_multipoly(caplog):
+def test_correct_vector_layer_multipoly(caplog):
     multipoly_in_layer = GPKG_IN_DS["multipolygon_4326"]
-    out_datasource, layer_name = correct(
+    out_datasource, layer_name = correct_vector_layer(
         multipoly_in_layer,
         "test_multi_met_veel_te_veel_tekens_in_de_naam_namelijk_meer_dan_vijftig_enzost_multi",
     )
@@ -145,32 +145,34 @@ def test_correct_multipoly(caplog):
     assert '{"type": "Polygon", "coordinates": [[[485' in test_dump
 
 
-def test_correct_empty_result(caplog):
+def test_correct_vector_layer_empty_result(caplog):
     multipoly_in_layer = GPKG_IN_DS["no_geom_layer"]
     with pytest.raises(TypeError):
-        correct(multipoly_in_layer, "test_empty", epsg=28992)
+        correct_vector_layer(multipoly_in_layer, "test_empty", epsg=28992)
 
 
-def test_correct_unknown_geom_type(caplog):
+def test_correct_vector_layer_unknown_geom_type(caplog):
     multipoly_in_layer = GPKG_IN_DS["multipoint_in_geometrycollection"]
     with pytest.raises(TypeError):
-        correct(multipoly_in_layer, "multipoint_in_geometrycollection", epsg=28992)
+        correct_vector_layer(
+            multipoly_in_layer, "multipoint_in_geometrycollection", epsg=28992
+        )
 
 
-def test_correct_multipoints(caplog):
+def test_correct_vector_layer_multipoints(caplog):
     # this test has a z-dimension
     multipoly_in_layer = GPKG_IN_DS["multipoint_28992"]
-    out_datasource, layer_name = correct(
+    out_datasource, layer_name = correct_vector_layer(
         multipoly_in_layer, "test_multipoint_28992", epsg=28992
     )
     test_dump = out_datasource["test_multipoint_28992"].GetFeature(1).ExportToJson()
     assert '{"type": "Point", "coordinates": [842' in test_dump
 
 
-def test_correct_multilinestring(caplog):
+def test_correct_vector_layer_multilinestring(caplog):
     # this test has a z- and m-dimension and to be removed column name ogc_fid
     multipoly_in_layer = GPKG_IN_DS["multilinestring_zm_4326"]
-    out_datasource, layer_name = correct(
+    out_datasource, layer_name = correct_vector_layer(
         multipoly_in_layer, "test_multilinestring_zm_4326", epsg=28992
     )
     test_dump = (
@@ -179,9 +181,9 @@ def test_correct_multilinestring(caplog):
     assert '"type": "LineString", "coordinates": [[84' in test_dump
 
 
-def test_correct_more_in_than_out(caplog):
+def test_correct_vector_layer_more_in_than_out(caplog):
     multipoly_in_layer = GPKG_IN_DS["more_in_than_out_polygon"]
-    out_datasource, layer_name = correct(
+    out_datasource, layer_name = correct_vector_layer(
         multipoly_in_layer, "more_in_than_out_polygon", epsg=28992
     )
     assert "In feature count greater than out" in caplog.text
