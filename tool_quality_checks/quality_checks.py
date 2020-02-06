@@ -4,6 +4,8 @@ import os
 import logging
 
 from OASDGLDatachecker.tool_quality_checks import sql_checks
+from OASDGLDatachecker.tool_quality_checks import sql_views
+from OASDGLDatachecker.tool_quality_checks import dc_input_create
 
 logger = logging.getLogger(__name__)
 
@@ -28,6 +30,7 @@ def initialize_db_checks(db):
     """ Initialize database for checks """
 
     db.create_schema(schema_name="chk")
+    db.create_schema(schema_name="back")
     for schema, table in [
         ["public", "v2_1d_boundary_conditions_view"],
         ["public", "v2_pumpstation_point_view"],
@@ -37,12 +40,55 @@ def initialize_db_checks(db):
         ["chk", "v2_orifice_view_left_join"],
         ["chk", "v2_weir_view_left_join"],
     ]:
-        db.create_preset_threedi_view(view_table=table, view_schema=schema)
+        create_preset_threedi_view(db, view_table=table, view_schema=schema)
+
+    for schema, table in [
+        ["back", "put"],
+        ["back", "leiding"],
+        ["back", "overstort"],
+        ["back", "doorlaat"],
+        ["back", "pomp"],
+    ]:
+        create_preset_siebrand_view(db, view_table=table, view_schema=schema)
 
     # install all functions out of folder "sql_functions"
     sql_reldir = "sql_functions"
     sql_absdir = os.path.join(os.path.dirname(__file__), sql_reldir)
     db.execute_sql_dir(sql_absdir)
+
+
+def create_preset_threedi_view(
+    db, view_table, view_schema, drop_view=True
+):
+    """
+    Creates a view with a join to v2_connection_nodes table
+    
+    :param view_table - table of which the view is created
+    """
+    if drop_view == True:
+        drop_statement = """DROP VIEW IF EXISTS {view_table};""".format(
+            view_table=view_table
+        )
+        db.execute_sql_statement(drop_statement, fetch=False)
+    create_statement = sql_views.sql_views[view_table].format(schema=view_schema)
+    db.execute_sql_statement(sql_statement=create_statement, fetch=False)
+
+#TODO Remove later!
+def create_preset_siebrand_view(
+    db, view_table, view_schema, drop_view=True
+):
+    """
+    Creates a view with a join to v2_connection_nodes table
+    
+    :param view_table - table of which the view is created
+    """
+    if drop_view == True:
+        drop_statement = """DROP VIEW IF EXISTS {view_table};""".format(
+            view_table=view_table
+        )
+        db.execute_sql_statement(drop_statement, fetch=False)
+    create_statement = dc_input_create.dc_input[view_table].format(schema=view_schema)
+    db.execute_sql_statement(sql_statement=create_statement, fetch=False)
 
 
 def perform_checks_with_sql(db, settings, check_table, check_type):

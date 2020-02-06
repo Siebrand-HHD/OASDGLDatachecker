@@ -4,8 +4,7 @@
 # TODO putmateriaal toevoegen      manh_material AS materiaalput,
 
 dc_input = {
-"put":
-    """CREATE OR REPLACE VIEW {schema}.put AS
+    "put": """CREATE OR REPLACE VIEW {schema}.put AS
     SELECT
         manh_code AS rioolput,
         CASE
@@ -24,12 +23,11 @@ dc_input = {
         manh_surface_level AS maaiveldhoogte,
         the_geom AS the_geom
     FROM v2_manhole_view;""",
-"leiding":
-    """CREATE OR REPLACE VIEW {schema}.leiding AS
+    "leiding": """CREATE OR REPLACE VIEW {schema}.leiding AS
     SELECT
         pipe_code AS leiding,
-        pipe_connection_node_start_code AS beginpuntleiding,
-        pipe_connection_node_end_code AS eindpuntleiding,
+        -- pipe_connection_node_start_code AS beginpuntleiding,
+        -- pipe_connection_node_end_code AS eindpuntleiding,
         CASE
  		WHEN pipe_sewerage_type = 0 THEN 'gemengd_afvalwater'
  		WHEN pipe_sewerage_type = 1 THEN 'afvloeiend_hemelwater'
@@ -59,8 +57,7 @@ dc_input = {
         def_height AS hoogteleiding,
         the_geom AS the_geom
     FROM v2_pipe_view;""",
-"overstort":
-    """CREATE OR REPLACE VIEW {schema}.overstort AS
+    "overstort": """CREATE OR REPLACE VIEW {schema}.overstort AS
     SELECT
         weir_connection_node_start_id AS beginpuntoverstort,
         weir_connection_node_end_id AS eindpuntoverstort,
@@ -70,12 +67,11 @@ dc_input = {
         def_height AS vrijeoverstorthoogte,
         the_geom AS the_geom
     FROM v2_weir_view;""",
-"doorlaat":
-    """CREATE OR REPLACE VIEW {schema}.doorlaat AS
+    "doorlaat": """CREATE OR REPLACE VIEW {schema}.doorlaat AS
     SELECT
         orf_connection_node_start_id AS beginpuntdoorlaat,
         orf_connection_node_end_id AS eindpuntdoorlaat,
-        orf_max_capacity AS maximalecapaciteitdoorlaat,
+        -- orf_max_capacity AS maximalecapaciteitdoorlaat,
         orf_discharge_coefficient_positive AS contractiecoefficientdoorlaatprofiel,
         orf_crest_level AS doorlaatniveau,
         CASE
@@ -89,8 +85,7 @@ dc_input = {
         def_height AS hoogteleiding,
         the_geom AS the_geom
     FROM v2_orifice_view;""",
-"pomp":
-    """CREATE OR REPLACE VIEW {schema}.pomp AS
+    "pomp": """CREATE OR REPLACE VIEW {schema}.pomp AS
     SELECT
         pump_connection_node_start_id AS beginpuntpomp,
         pump_connection_node_end_id AS eindpuntpomp,
@@ -112,5 +107,5 @@ dc_input = {
             WHEN pump_type = 2 THEN pump_lower_stop_level
  		END as afslagniveaubenedenstrooms,
         the_geom AS the_geom
-    FROM v2_pumpstation_view;"""
+    FROM v2_pumpstation_view;""",
 }
