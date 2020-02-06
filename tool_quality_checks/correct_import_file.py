@@ -68,7 +68,7 @@ def multipoly2poly(in_layer, out_layer):
     return lost_features
 
 
-def addPolygon(simple_polygon, content, out_lyr):
+def add_polygon(simple_polygon, content, out_lyr):
     featureDefn = out_lyr.GetLayerDefn()
 
     polygon = ogr.CreateGeometryFromWkb(simple_polygon)
