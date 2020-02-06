@@ -30,7 +30,7 @@ def create_mem_ds():
 
 
 def create_geom_transform(in_spatial_ref, out_epsg):
-    """ Creating a coordinate transformation based on two reference systems """
+    """Return coordinate transformation based on two reference systems"""
     out_spatial_ref = osr.SpatialReference()
     out_spatial_ref.ImportFromEPSG(out_epsg)
     coordTrans = osr.CoordinateTransformation(in_spatial_ref, out_spatial_ref)
