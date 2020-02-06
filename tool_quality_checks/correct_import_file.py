@@ -24,7 +24,7 @@ def create_mem_ds():
 
 
 def create_geom_transform(in_spatial_ref, out_epsg):
-    """ Creating a coordinate transformation based on two reference systems """
+    """Return coordinate transformation based on two reference systems"""
     out_spatial_ref = osr.SpatialReference()
     out_spatial_ref.ImportFromEPSG(out_epsg)
     coordTrans = osr.CoordinateTransformation(in_spatial_ref, out_spatial_ref)
@@ -62,7 +62,7 @@ def multipoly2poly(in_layer, out_layer):
     return lost_features
 
 
-def addPolygon(simple_polygon, content, out_lyr):
+def add_polygon(simple_polygon, content, out_lyr):
     featureDefn = out_lyr.GetLayerDefn()
 
     polygon = ogr.CreateGeometryFromWkb(simple_polygon)
