@@ -30,7 +30,8 @@ def run_scripts(settings):
         create_database(settings)
 
     # block with database connection
-    db = ThreediDatabase(settings)
+    if settings.createdb or settings.import_type or settings.checks:
+        db = ThreediDatabase(settings)
 
     if settings.createdb:
         logger.info("Initialize the Citybuilder database")
