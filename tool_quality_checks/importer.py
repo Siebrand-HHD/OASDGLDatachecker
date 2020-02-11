@@ -6,10 +6,15 @@ import os
 import logging
 from osgeo import ogr
 from os.path import basename
+from OASDGLDatachecker.tool_quality_checks.correct_import_file import correct_vector_layer
 
 logger = logging.getLogger(__name__)
 ogr.UseExceptions()
 
+
+# def importer(settings):
+
+#     copy2pg_database(settings, settings., "test")
 
 def copy2pg_database(settings, in_filepath, layer_name, schema="public"):
     datasource = set_ogr_connection_pg_database(settings)
@@ -18,6 +23,10 @@ def copy2pg_database(settings, in_filepath, layer_name, schema="public"):
     in_layer = in_source.GetLayerByName(in_name)
     in_srid = in_layer.GetSpatialRef()
 
+    # correct vector layer to solve issues and stuff
+    correct_in_source, correct_layer_name = correct_vector_layer(in_layer, layer_name, epsg=28992)
+    correct_in_layer = correct_in_source.GetLayerByName(correct_layer_name)
+    
     # check projection of input file
     check_sr = get_projection(in_srid)
     if check_sr is None:
@@ -39,14 +48,14 @@ def copy2pg_database(settings, in_filepath, layer_name, schema="public"):
         # TODO srid is now based on in_layer, which could be a strange spatial reference
         # TODO findout how to make the target ref 28992 by default
         new_layer = datasource.CreateLayer(
-            layer_name, in_layer.GetSpatialRef(), in_layer.GetGeomType(), options
+            layer_name, correct_in_layer.GetSpatialRef(), correct_in_layer.GetGeomType(), options
         )
-        for x in range(in_layer.GetLayerDefn().GetFieldCount()):
-            new_layer.CreateField(in_layer.GetLayerDefn().GetFieldDefn(x))
+        for x in range(correct_in_layer.GetLayerDefn().GetFieldCount()):
+            new_layer.CreateField(correct_in_layer.GetLayerDefn().GetFieldDefn(x))
 
         new_layer.StartTransaction()
-        for x in range(in_layer.GetFeatureCount()):
-            new_feature = in_layer.GetFeature(x)
+        for x in range(correct_in_layer.GetFeatureCount()):
+            new_feature = correct_in_layer.GetFeature(x)
             new_feature.SetFID(-1)
             new_layer.CreateFeature(new_feature)
             if x % 128 == 0:

@@ -39,6 +39,7 @@ def run_scripts(settings):
 
     if settings.import_type:
         logger.info("Import your sewerage data of %s" % settings.import_type)
+        importer(settings)
 
     if settings.checks:
         logger.info("Check your sewerage system")
