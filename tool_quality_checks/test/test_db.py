@@ -131,7 +131,7 @@ class TestDB(TestCase):
         self.db.create_preset_view_from_dictionary(
             view_dictionary=sql_views,
             view_table="v2_1d_boundary_conditions_view",
-            view_schema="public",
+            view_schema="chk",
         )
 
     def test_01_create_table(self):
