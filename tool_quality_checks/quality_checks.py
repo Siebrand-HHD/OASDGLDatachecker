@@ -5,7 +5,7 @@ import logging
 
 from OASDGLDatachecker.tool_quality_checks import sql_checks
 from OASDGLDatachecker.tool_quality_checks.sql_views import sql_views
-from OASDGLDatachecker.tool_quality_checks.dc_input_create import dc_input
+from OASDGLDatachecker.tool_quality_checks.sql_background_views import sql_background_views
 
 logger = logging.getLogger(__name__)
 
@@ -52,7 +52,7 @@ def initialize_db_checks(db):
         ["back", "pomp"],
     ]:
         db.create_preset_view_from_dictionary(
-            view_dictionary=dc_input, view_table=table, view_schema=schema
+            view_dictionary=sql_background_views, view_table=table, view_schema=schema
         )
 
     # install all functions out of folder "sql_functions"
