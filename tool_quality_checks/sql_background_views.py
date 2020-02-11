@@ -75,9 +75,9 @@ sql_background_views = {
         start_node.code AS beginpuntoverstort,
         end_node.code AS eindpuntoverstort,
         CASE
-            WHEN discharge_coefficient_positive = 0 AND discharge_coefficient_negative IS NOT 0 THEN 'stroming van eindpunt naar beginpunt'
-            WHEN discharge_coefficient_negative = 0 AND discharge_coefficient_positive IS NOT 0 THEN 'stroming van beginpunt naar eindpunt'
-            WHEN discharge_coefficient_positive IS NOT 0 AND discharge_coefficient_negative IS NOT 0 THEN 'stroming in beide richtingen'
+            WHEN discharge_coefficient_positive = 0 AND discharge_coefficient_negative != 0 THEN 'stroming van eindpunt naar beginpunt'
+            WHEN discharge_coefficient_negative = 0 AND discharge_coefficient_positive != 0 THEN 'stroming van beginpunt naar eindpunt'
+            WHEN discharge_coefficient_positive != 0 AND discharge_coefficient_negative != 0 THEN 'stroming in beide richtingen'
             WHEN discharge_coefficient_positive = 0 AND discharge_coefficient_negative = 0 THEN 'geen stroming'
             ELSE NULL
         END AS afstromingsrichting,
@@ -105,12 +105,12 @@ sql_background_views = {
         start_node.code AS beginpuntdoorlaat,
         end_node.code AS eindpuntdoorlaat,
         CASE
-            WHEN discharge_coefficient_positive = 0 AND discharge_coefficient_negative IS NOT 0 THEN 'stroming van eindpunt naar beginpunt'
-            WHEN discharge_coefficient_negative = 0 AND discharge_coefficient_positive IS NOT 0 THEN 'stroming van beginpunt naar eindpunt'
-            WHEN discharge_coefficient_positive IS NOT 0 AND discharge_coefficient_negative IS NOT 0 THEN 'stroming in beide richtingen'
+            WHEN discharge_coefficient_positive = 0 AND discharge_coefficient_negative != 0 THEN 'stroming van eindpunt naar beginpunt'
+            WHEN discharge_coefficient_negative = 0 AND discharge_coefficient_positive != 0 THEN 'stroming van beginpunt naar eindpunt'
+            WHEN discharge_coefficient_positive != 0 AND discharge_coefficient_negative != 0 THEN 'stroming in beide richtingen'
             WHEN discharge_coefficient_positive = 0 AND discharge_coefficient_negative = 0 THEN 'geen stroming'
             ELSE NULL
-        END AS afstromingsrichting,
+        END AS stromingsrichting,
         CASE
             WHEN discharge_coefficient_positive > discharge_coefficient_negative THEN discharge_coefficient_positive
             WHEN discharge_coefficient_positive < discharge_coefficient_negative THEN discharge_coefficient_negative
