@@ -5,7 +5,7 @@
 sql_background_views = {
 "put": """CREATE OR REPLACE VIEW {schema}.put AS
     SELECT
-        b.code AS rioolput,
+        a.code AS rioolput,
         a.id AS threedi_id,
         CASE
             WHEN shape = '00' or shape = '02' THEN 'rechthoekig'
