@@ -93,6 +93,10 @@ def try_fix_geometry(geometry):
     Input: geometry
     Output: fixed geometry with true or original geometry with false
     """
+    # if a statement is used for dissolving or clipping, none geometry could be entered
+    if geometry is None:
+        return None, False
+
     geom_name = geometry.GetGeometryName()
     # check pointcount if linestring
     if "LINESTRING" in geom_name:
