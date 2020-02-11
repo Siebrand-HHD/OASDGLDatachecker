@@ -80,7 +80,7 @@ sql_background_views = {
             WHEN discharge_coefficient_positive != 0 AND discharge_coefficient_negative != 0 THEN 'stroming in beide richtingen'
             WHEN discharge_coefficient_positive = 0 AND discharge_coefficient_negative = 0 THEN 'geen stroming'
             ELSE NULL
-        END AS afstromingsrichting,
+        END AS stromingsrichting,
         CASE
             WHEN discharge_coefficient_positive > discharge_coefficient_negative THEN discharge_coefficient_positive
             WHEN discharge_coefficient_positive < discharge_coefficient_negative THEN discharge_coefficient_negative
