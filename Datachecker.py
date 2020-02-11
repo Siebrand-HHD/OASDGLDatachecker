@@ -32,9 +32,15 @@ from osgeo import ogr
 # Import the code for the DockWidget
 from .Datachecker_dockwidget import DatacheckerDockWidget
 import os.path
+from .tool_quality_checks.scripts import run_scripts
 
 #Debugging in vs : https://gist.github.com/AsgerPetersen/9ea79ae4139f4977c31dd6ede2297f90
+class SettingsObjectPlugin(object):
+    """Contains the settings from the ini file"""
 
+    def __init__(self):
+        self.origin = "plugin"
+        
 class Datachecker:
     """QGIS Plugin Implementation."""
 
@@ -249,6 +255,21 @@ class Datachecker:
                             put.addLayer(vlayer)
                         if not vlayer.isValid():
                             print('failed to load')
+  
+    def pb_select_exp_folder(self):
+        foldername = QFileDialog.getExistingDirectory()
+        self.dockwidget.folderNaam_export.setText(foldername)
+        if foldername:
+            self.dockwidget.listExport.clear()
+            self.fill_export_list()  
+                            
+    def fill_export_list(self):
+        foldername= self.dockwidget.folderNaam_export.text()
+        exportList =[]
+        for file in os.listdir(foldername):
+            if file.endswith(".shp"):
+                exportList.append(file)
+        self.dockwidget.listExport.addItems(exportList)                        
 
     
     def laad_qml_styling(self):
@@ -266,6 +287,27 @@ class Datachecker:
             layer.loadNamedStyle(qmlpad)
             layer.triggerRepaint()
             
+    def draai_de_checks(self):
+        putfile = os.path.dirname(os.path.realpath(self.dockwidget.putFile.filePath()))
+        leidingfile = os.path.dirname(os.path.realpath(self.dockwidget.leidingFile.filePath()))
+        print (putfile , 'Volgende: ' , leidingfile)
+        settings = SettingsObjectPlugin()
+        settings.s="localhost"
+        settings.host="localhost"
+        settings.database="work_test_quality_checks"
+        settings.port="5432"
+        settings.username="postgres"
+        settings.password="postgres"
+        settings.dropdb = True
+        settings.createdb = True
+        settings.import_type = False
+        settings.checks = False
+        print(settings.__dict__)
+        run_scripts(settings)
+        settings.dropdb = False
+        settings.createdb = False
+       
+        
     def slider_function(self,value):
         layer = self.iface.mapCanvas().currentLayer()
         
@@ -293,6 +335,11 @@ class Datachecker:
             self.dockwidget.selectFolderButton.clicked.connect(self.pb_select_dc_folder)
             #self.dockwidget.folderNaam.editingFinished.connect(self.fill_checks_list)
             self.dockwidget.InladenGpkgButton.clicked.connect(self.laad_gpkg)
+            
+            self.dockwidget.selectFolderButton_export.clicked.connect(self.pb_select_exp_folder)
+            ##self.dockwidget.linePutten.dropevent.connect(over
+            self.dockwidget.DatachecksButton.clicked.connect(self.draai_de_checks)
+            
             # connect to provide cleanup on closing of dockwidget
             self.dockwidget.closingPlugin.connect(self.onClosePlugin)
 

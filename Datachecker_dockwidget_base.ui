@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>611</width>
-    <height>678</height>
+    <width>536</width>
+    <height>759</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -30,7 +30,7 @@
        <bool>true</bool>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <property name="documentMode">
        <bool>true</bool>
@@ -54,7 +54,7 @@
           <property name="title">
            <string>Checkresultaten selecteren</string>
           </property>
-          <property name="collapsed" stdset="0">
+          <property name="collapsed">
            <bool>false</bool>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -74,11 +74,11 @@
            </item>
            <item>
             <widget class="QListWidget" name="listChecks">
-             <property name="sizeAdjustPolicy">
-              <enum>QAbstractScrollArea::AdjustToContents</enum>
+             <property name="showDropIndicator" stdset="0">
+              <bool>false</bool>
              </property>
              <property name="dragEnabled">
-              <bool>true</bool>
+              <bool>false</bool>
              </property>
              <property name="selectionMode">
               <enum>QAbstractItemView::MultiSelection</enum>
@@ -109,25 +109,80 @@
           <property name="checkable">
            <bool>false</bool>
           </property>
-          <property name="collapsed" stdset="0">
-           <bool>true</bool>
+          <property name="collapsed">
+           <bool>false</bool>
           </property>
-          <property name="scrollOnExpand" stdset="0">
+          <property name="scrollOnExpand">
            <bool>false</bool>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">
            <item>
-            <widget class="QgsFileWidget" name="mQgsFileWidget" native="true"/>
+            <layout class="QHBoxLayout" name="horizontalLayout">
+             <item>
+              <widget class="QLabel" name="label">
+               <property name="text">
+                <string>Putten</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QgsFileWidget" name="putFile">
+               <property name="dialogTitle">
+                <string>Selecteer een te controleren bestand voor de Putten</string>
+               </property>
+               <property name="filter">
+                <string>*.shp</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </item>
            <item>
-            <widget class="QListWidget" name="listWidget"/>
+            <layout class="QHBoxLayout" name="horizontalLayout_8">
+             <item>
+              <widget class="QLabel" name="label_4">
+               <property name="text">
+                <string>Leidingen</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QgsFileWidget" name="leidingFile">
+               <property name="useLink">
+                <bool>false</bool>
+               </property>
+               <property name="fullUrl">
+                <bool>false</bool>
+               </property>
+               <property name="dialogTitle">
+                <string>Selecteer een te controleren bestand voor de Leingen</string>
+               </property>
+               <property name="filter">
+                <string>*.shp</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </item>
            <item>
-            <widget class="QPushButton" name="pushButton_2">
+            <widget class="QPushButton" name="DatachecksButton">
              <property name="text">
               <string>Datachecks uitvoeren</string>
              </property>
             </widget>
+           </item>
+           <item>
+            <spacer name="verticalSpacer_5">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
            </item>
           </layout>
          </widget>
@@ -137,6 +192,60 @@
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QgsCollapsibleGroupBox" name="mGroupBox_4">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>40</height>
+           </size>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_8">
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_5">
+             <item>
+              <widget class="QLineEdit" name="folderNaam_export"/>
+             </item>
+             <item>
+              <widget class="QPushButton" name="selectFolderButton_export">
+               <property name="text">
+                <string>Select Folder</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <widget class="QListWidget" name="listExport">
+             <property name="focusPolicy">
+              <enum>Qt::WheelFocus</enum>
+             </property>
+             <property name="acceptDrops">
+              <bool>true</bool>
+             </property>
+             <property name="showDropIndicator" stdset="0">
+              <bool>false</bool>
+             </property>
+             <property name="dragEnabled">
+              <bool>true</bool>
+             </property>
+             <property name="dragDropOverwriteMode">
+              <bool>true</bool>
+             </property>
+             <property name="dragDropMode">
+              <enum>QAbstractItemView::DragOnly</enum>
+             </property>
+             <property name="defaultDropAction">
+              <enum>Qt::CopyAction</enum>
+             </property>
+             <property name="selectionMode">
+              <enum>QAbstractItemView::SingleSelection</enum>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </widget>
         </item>
         <item>
@@ -328,6 +437,66 @@
         </item>
        </layout>
       </widget>
+      <widget class="QWidget" name="tab_4">
+       <attribute name="title">
+        <string>Instellingen</string>
+       </attribute>
+       <widget class="QTreeWidget" name="treeWidget">
+        <property name="geometry">
+         <rect>
+          <x>80</x>
+          <y>110</y>
+          <width>256</width>
+          <height>192</height>
+         </rect>
+        </property>
+        <column>
+         <property name="text">
+          <string notr="true">1</string>
+         </property>
+        </column>
+       </widget>
+       <widget class="QTreeWidget" name="treeWidget_2">
+        <property name="geometry">
+         <rect>
+          <x>25</x>
+          <y>341</y>
+          <width>381</width>
+          <height>181</height>
+         </rect>
+        </property>
+        <column>
+         <property name="text">
+          <string>1</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>New Column</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>New Column</string>
+         </property>
+        </column>
+        <item>
+         <property name="text">
+          <string>New Item</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>New Item</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>New Item</string>
+         </property>
+        </item>
+       </widget>
+      </widget>
       <widget class="QWidget" name="tab_3">
        <attribute name="title">
         <string>Page</string>
@@ -422,8 +591,8 @@
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>557</width>
-                 <height>132</height>
+                 <width>647</width>
+                 <height>172</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -447,7 +616,7 @@
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>98</width>
+                 <width>93</width>
                  <height>118</height>
                 </rect>
                </property>
@@ -481,11 +650,6 @@
          </widget>
         </item>
        </layout>
-      </widget>
-      <widget class="QWidget" name="tab_4">
-       <attribute name="title">
-        <string>Instellingen</string>
-       </attribute>
       </widget>
      </widget>
     </item>

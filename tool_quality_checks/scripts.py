@@ -22,18 +22,22 @@ def run_scripts(settings):
 
     # block with only server connection
     if settings.dropdb:
+        print("Drop the Citybuilder database")
         logger.info("Drop the Citybuilder database")
         drop_database(settings)
 
     if settings.createdb:
+        print("Create the Citybuilder database")
         logger.info("Create the Citybuilder database")
         create_database(settings)
 
     # block with database connection
     if settings.createdb or settings.import_type or settings.checks:
+        print("Hier ben ik")
         db = ThreediDatabase(settings)
 
     if settings.createdb:
+        print("Initialize the Citybuilder database")
         logger.info("Initialize the Citybuilder database")
         db.initialize_db_threedi()
 
