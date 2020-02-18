@@ -8,12 +8,12 @@ sql_background_views = {
         a.code AS rioolput,
         a.id AS threedi_id,
         CASE
-            WHEN shape = '00' or shape = '02' THEN 'rechthoekig'
+            WHEN shape = '00' OR shape = '02' THEN 'rechthoekig'
             WHEN shape = '01' THEN 'rond'
             ELSE 'overige'
  		END as vormput,
-        width AS breedteput,
-        length AS lengteput,
+        width * 1000 AS breedteput,
+        length * 1000 AS lengteput,
         CASE
             WHEN manhole_indicator = 0 THEN 'inspectieput'
             WHEN manhole_indicator = 1 THEN 'uitlaat'
@@ -58,8 +58,16 @@ sql_background_views = {
             WHEN shape = 6 THEN 'trapezium'
             ELSE 'overige'
  		END as vormprofiel,
-        width AS breedteleiding,
-        height AS hoogteleiding,
+        CASE
+            WHEN shape < 5 THEN (width * 1000)::double precision
+            WHEN shape > 4 THEN array_greatest(string_to_array(width,' '))::double precision
+            ELSE 'onbekend'
+        END AS breedteleiding,
+        CASE
+            WHEN shape < 5 THEN (height * 1000)::double precision
+            WHEN shape > 4 THEN array_greatest(string_to_array(height,' '))::double precision
+            ELSE 'onbekend'
+        END AS hoogteleiding,
         st_makeline(start_node.the_geom, end_node.the_geom) AS the_geom
     FROM v2_pipe pipe
     LEFT JOIN v2_connection_nodes start_node
@@ -88,8 +96,16 @@ sql_background_views = {
             ELSE NULL
         END AS afvoercoefficient,
         crest_level AS drempelniveau,
-        width AS drempelbreedte,
-        height AS vrijeoverstorthoogte,
+        CASE
+            WHEN shape < 5 THEN (width * 1000)::double precision
+            WHEN shape > 4 THEN array_greatest(string_to_array(width,' '))::double precision
+            ELSE 'onbekend'
+        END AS drempelbreedte,
+        CASE
+            WHEN shape < 5 THEN (height * 1000)::double precision
+            WHEN shape > 4 THEN array_greatest(string_to_array(height,' '))::double precision
+            ELSE 'onbekend'
+        END AS vrijeoverstorthoogte,
         st_makeline(start_node.the_geom, end_node.the_geom) AS the_geom
     FROM v2_weir weir
     LEFT JOIN v2_connection_nodes start_node
@@ -128,8 +144,16 @@ sql_background_views = {
             WHEN shape = 6 THEN 'trapezium'
             ELSE 'overige'
  		END AS vormprofiel,
-        width AS breedteleiding,
-        height AS hoogteleiding,
+        CASE
+            WHEN shape < 5 THEN (width * 1000)::double precision
+            WHEN shape > 4 THEN array_greatest(string_to_array(width,' '))::double precision
+            ELSE 'onbekend'
+        END AS breedteleiding,
+        CASE
+            WHEN shape < 5 THEN (height * 1000)::double precision
+            WHEN shape > 4 THEN array_greatest(string_to_array(height,' '))::double precision
+            ELSE 'onbekend'
+        END AS hoogteleiding,
         st_makeline(start_node.the_geom, end_node.the_geom) AS the_geom
     FROM v2_orifice orf
     LEFT JOIN v2_connection_nodes start_node
