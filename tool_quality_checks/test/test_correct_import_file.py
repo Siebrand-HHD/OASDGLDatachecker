@@ -42,6 +42,12 @@ def test_try_fix_geometry_valid():
     assert valid is True
 
 
+def test_try_fix_geometry_none():
+    line = None
+    geom, valid = try_fix_geometry(line)
+    assert valid is False
+
+
 def test_try_fix_geometry_unvalid_line():
     line = ogr.Geometry(ogr.wkbLineString)
     line.AddPoint(1116651.439379124, 637392.6969887456)
