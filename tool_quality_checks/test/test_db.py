@@ -9,6 +9,7 @@ from OASDGLDatachecker.tool_quality_checks.db import (
     create_database,
     drop_database,
 )
+from OASDGLDatachecker.tool_quality_checks.sql_views import sql_views
 
 from unittest import TestCase
 
@@ -125,6 +126,13 @@ class TestDB(TestCase):
             os.path.abspath(os.path.join(os.path.dirname(__file__), "..")), sql_reldir
         )
         self.db.execute_sql_dir(sql_absdir)
+
+    def test_create_view_from_dictionary(self):
+        self.db.create_preset_view_from_dictionary(
+            view_dictionary=sql_views,
+            view_table="v2_1d_boundary_conditions_view",
+            view_schema="chk",
+        )
 
     def test_01_create_table(self):
         self.db.create_table(

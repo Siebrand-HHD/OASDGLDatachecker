@@ -4,6 +4,8 @@ import os
 import logging
 
 from OASDGLDatachecker.tool_quality_checks import sql_checks
+from OASDGLDatachecker.tool_quality_checks.sql_views import sql_views
+from OASDGLDatachecker.tool_quality_checks.sql_background_views import sql_background_views
 
 logger = logging.getLogger(__name__)
 
@@ -18,8 +20,8 @@ def quality_checks(db, settings):
     v2_table_names = db.select_table_names("v2%")
     for table_name in v2_table_names:
         if db.get_count(table_name) > 0:
-            db.perform_checks_with_sql(settings, table_name, check_type="completeness")
-            db.perform_checks_with_sql(settings, table_name, check_type="quality")
+            perform_checks_with_sql(db, settings, table_name, check_type="completeness")
+            perform_checks_with_sql(db, settings, table_name, check_type="quality")
 
     db.populate_geometry_columns()
 
