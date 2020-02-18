@@ -143,7 +143,7 @@ class ThreediDatabase(object):
         self, view_dictionary, view_table, view_schema, drop_view=True
     ):
         """
-        Drops and Creates a view from a dictionary
+        Drop and create a view from a dictionary
         """
         if drop_view == True:
             drop_statement = """DROP VIEW IF EXISTS {view_schema}.{view_table};""".format(
