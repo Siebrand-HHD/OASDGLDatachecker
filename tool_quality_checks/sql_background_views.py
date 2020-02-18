@@ -12,8 +12,8 @@ sql_background_views = {
             WHEN shape = '01' THEN 'rond'
             ELSE 'overige'
  		END as vormput,
-        width * 1000 AS breedteput,
-        length * 1000 AS lengteput,
+        (width * 1000)::double precision AS breedteput,
+        (length * 1000)::double precision AS lengteput,
         CASE
             WHEN manhole_indicator = 0 THEN 'inspectieput'
             WHEN manhole_indicator = 1 THEN 'uitlaat'
@@ -60,12 +60,12 @@ sql_background_views = {
  		END as vormprofiel,
         CASE
             WHEN shape < 5 THEN (width * 1000)::double precision
-            WHEN shape > 4 THEN array_greatest(string_to_array(width,' '))::double precision
+            WHEN shape > 4 THEN (array_greatest(string_to_array(width,' ')) * 1000)::double precision
             ELSE 'onbekend'
         END AS breedteleiding,
         CASE
             WHEN shape < 5 THEN (height * 1000)::double precision
-            WHEN shape > 4 THEN array_greatest(string_to_array(height,' '))::double precision
+            WHEN shape > 4 THEN (array_greatest(string_to_array(height,' ')) * 1000)::double precision
             ELSE 'onbekend'
         END AS hoogteleiding,
         st_makeline(start_node.the_geom, end_node.the_geom) AS the_geom
@@ -98,12 +98,12 @@ sql_background_views = {
         crest_level AS drempelniveau,
         CASE
             WHEN shape < 5 THEN (width * 1000)::double precision
-            WHEN shape > 4 THEN array_greatest(string_to_array(width,' '))::double precision
+            WHEN shape > 4 THEN (array_greatest(string_to_array(width,' ')) * 1000)::double precision
             ELSE 'onbekend'
         END AS drempelbreedte,
         CASE
             WHEN shape < 5 THEN (height * 1000)::double precision
-            WHEN shape > 4 THEN array_greatest(string_to_array(height,' '))::double precision
+            WHEN shape > 4 THEN (array_greatest(string_to_array(height,' ')) * 1000)::double precision
             ELSE 'onbekend'
         END AS vrijeoverstorthoogte,
         st_makeline(start_node.the_geom, end_node.the_geom) AS the_geom
@@ -146,12 +146,12 @@ sql_background_views = {
  		END AS vormprofiel,
         CASE
             WHEN shape < 5 THEN (width * 1000)::double precision
-            WHEN shape > 4 THEN array_greatest(string_to_array(width,' '))::double precision
+            WHEN shape > 4 THEN (array_greatest(string_to_array(width,' ')) * 1000)::double precision
             ELSE 'onbekend'
         END AS breedteleiding,
         CASE
             WHEN shape < 5 THEN (height * 1000)::double precision
-            WHEN shape > 4 THEN array_greatest(string_to_array(height,' '))::double precision
+            WHEN shape > 4 THEN (array_greatest(string_to_array(height,' ')) * 1000)::double precision
             ELSE 'onbekend'
         END AS hoogteleiding,
         st_makeline(start_node.the_geom, end_node.the_geom) AS the_geom
