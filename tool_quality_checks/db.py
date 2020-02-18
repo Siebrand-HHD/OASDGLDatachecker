@@ -145,7 +145,7 @@ class ThreediDatabase(object):
         """
         Drop and create a view from a dictionary
         """
-        if drop_view == True:
+        if drop_view:
             drop_statement = """DROP VIEW IF EXISTS {view_schema}.{view_table};""".format(
                 view_table=view_table, view_schema=view_schema
             )
