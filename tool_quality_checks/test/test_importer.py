@@ -3,12 +3,14 @@
 import os
 import pytest
 from osgeo import osr
+from os.path import basename
 
 from OASDGLDatachecker.tool_quality_checks.importer import (
     set_ogr_connection_pg_database,
     set_ogr_connection,
     copy2pg_database,
     get_projection,
+    importer,
 )
 from OASDGLDatachecker.tool_quality_checks.scripts import SettingsObject
 from OASDGLDatachecker.tool_quality_checks.db import (
@@ -53,7 +55,9 @@ class TestDB(TestCase):
             set_ogr_connection(filepath)
 
     def test_copy2pg_database(self):
-        copy2pg_database(self.settings, SHP_ABSPATH, "test")
+        file_with_extention = basename(SHP_ABSPATH)
+        filename, file_extension = os.path.splitext(file_with_extention)
+        copy2pg_database(self.settings, SHP_ABSPATH, filename, "test")
         assert self.db.get_count("test") == 78
 
     def test_get_projection_not_good(self):
@@ -67,3 +71,25 @@ class TestDB(TestCase):
         sr = osr.SpatialReference()
         sr.ImportFromWkt(proj)
         assert get_projection(sr) == "EPSG:28992"
+
+    def test_importer(self):
+        manhole_layer_rel_path = "data\schiedam-test\schiedam-putten-test.shp"
+        self.settings.manhole_layer = os.path.join(
+            os.path.dirname(__file__), manhole_layer_rel_path
+        )
+        self.settings.import_type = "gbi"
+        importer(self.db, self.settings)
+        assert self.db.get_count("putten_gbi", "src") == 10
+
+    def test_importer_file_does_not_exists(self):
+        # TODO @REINOUT kon ik hier nu ies doen met fixtures ofzo?
+        wrong_filename = "kjfdla.zzp"
+        self.settings.manhole_layer = wrong_filename
+        with pytest.raises(FileNotFoundError):
+            importer(self.db, self.settings)
+
+    def test_importer_file_not_supported(self):
+        # TODO @REINOUT kon ik hier nu ies doen met fixtures ofzo?
+        self.settings.manhole_layer = INI_ABSPATH
+        with pytest.raises(AttributeError):
+            importer(self.db, self.settings)

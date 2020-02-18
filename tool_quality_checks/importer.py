@@ -6,17 +6,64 @@ import os
 import logging
 from osgeo import ogr
 from os.path import basename
+from OASDGLDatachecker.tool_quality_checks.correct_import_file import (
+    correct_vector_layer,
+)
 
 logger = logging.getLogger(__name__)
 ogr.UseExceptions()
 
 
-def copy2pg_database(settings, in_filepath, layer_name, schema="public"):
+def importer(db, settings):
+    """
+        Loads your input files into the database for checks
+    """
+    # initialize source schema
+    db.create_schema("src")
+
+    if not os.path.isfile(settings.manhole_layer):
+        logger.error(
+            "File %s does not exists on your computer" % settings.manhole_layer
+        )
+        raise FileNotFoundError()
+
+    # prepare file import
+    file_with_extention = basename(settings.manhole_layer)
+    filename, file_extension = os.path.splitext(file_with_extention)
+
+    if file_extension == ".shp":
+        copy2pg_database(
+            settings,
+            settings.manhole_layer,
+            filename,
+            "putten_" + settings.import_type,
+            schema="src",
+        )
+    else:
+        logger.error(
+            "File extension of %s is not supported by this tool, please use .shp"
+            % settings.manhole_layer
+        )
+        raise AttributeError()
+
+
+def copy2pg_database(settings, in_filepath, in_name, out_name, schema="public"):
+    """
+        copy a shapefile from your drive to the database
+    """
+
+    # currently only working for shapefile
+    # TODO change naming to also include sqlite and gpkg
     datasource = set_ogr_connection_pg_database(settings)
     in_source = set_ogr_connection(in_filepath)
-    in_name = os.path.splitext(basename(in_filepath))[0]
     in_layer = in_source.GetLayerByName(in_name)
     in_srid = in_layer.GetSpatialRef()
+
+    # correct vector layer to solve issues and stuff
+    correct_in_source, correct_layer_name = correct_vector_layer(
+        in_layer, out_name, epsg=28992
+    )
+    correct_in_layer = correct_in_source.GetLayerByName(correct_layer_name)
 
     # check projection of input file
     check_sr = get_projection(in_srid)
@@ -34,29 +81,28 @@ def copy2pg_database(settings, in_filepath, layer_name, schema="public"):
         "GEOMETRY_NAME=geom",
         "DIM=2",
     ]
-    try:
-        ogr.RegisterAll()
-        # TODO srid is now based on in_layer, which could be a strange spatial reference
-        # TODO findout how to make the target ref 28992 by default
-        new_layer = datasource.CreateLayer(
-            layer_name, in_layer.GetSpatialRef(), in_layer.GetGeomType(), options
-        )
-        for x in range(in_layer.GetLayerDefn().GetFieldCount()):
-            new_layer.CreateField(in_layer.GetLayerDefn().GetFieldDefn(x))
 
-        new_layer.StartTransaction()
-        for x in range(in_layer.GetFeatureCount()):
-            new_feature = in_layer.GetFeature(x)
-            new_feature.SetFID(-1)
-            new_layer.CreateFeature(new_feature)
-            if x % 128 == 0:
-                new_layer.CommitTransaction()
-                new_layer.StartTransaction()
-        new_layer.CommitTransaction()
+    ogr.RegisterAll()
+    # TODO srid is now based on in_layer, which could be a strange spatial reference
+    # TODO findout how to make the target ref 28992 by default
+    new_layer = datasource.CreateLayer(
+        correct_layer_name,
+        correct_in_layer.GetSpatialRef(),
+        correct_in_layer.GetGeomType(),
+        options,
+    )
+    for x in range(correct_in_layer.GetLayerDefn().GetFieldCount()):
+        new_layer.CreateField(correct_in_layer.GetLayerDefn().GetFieldDefn(x))
 
-    except Exception as e:
-        logger.warning(e)
-        raise
+    new_layer.StartTransaction()
+    for x in range(correct_in_layer.GetFeatureCount()):
+        new_feature = correct_in_layer.GetFeature(x)
+        new_feature.SetFID(-1)
+        new_layer.CreateFeature(new_feature)
+        if x % 128 == 0:
+            new_layer.CommitTransaction()
+            new_layer.StartTransaction()
+    new_layer.CommitTransaction()
 
     if new_layer.GetFeatureCount() == 0:
         raise ValueError("Postgres vector feature count is 0")

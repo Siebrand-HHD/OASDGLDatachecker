@@ -39,6 +39,7 @@ def run_scripts(settings):
 
     if settings.import_type:
         logger.info("Import your sewerage data of %s" % settings.import_type)
+        importer(db, settings)
 
     if settings.checks:
         logger.info("Check your sewerage system")
@@ -86,7 +87,11 @@ class SettingsObject(object):
         try:
             return super().__getattribute__(name)
         except AttributeError:
-            raise AttributeError("Setting '%s' is missing in the ini-file" % name)
+            logger.error(
+                "Setting '%s' is missing in your input. Please check the command line and ini-file."
+                % name
+            )
+            raise AttributeError()
 
 
 def get_parser():
