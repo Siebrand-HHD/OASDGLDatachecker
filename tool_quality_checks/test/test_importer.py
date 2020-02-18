@@ -23,7 +23,7 @@ from unittest import TestCase
 
 _ini_relpath = "data/instellingen_test.ini"
 INI_ABSPATH = os.path.join(os.path.dirname(__file__), _ini_relpath)
-_shp_relpath = "data/schiedam-test/schiedam-leidingen-test.shp"
+_shp_relpath = "data/rioolput.shp"
 SHP_ABSPATH = os.path.join(os.path.dirname(__file__), _shp_relpath)
 
 
@@ -77,9 +77,9 @@ class TestDB(TestCase):
     def test_import_filetype(self):
         self.db.create_schema("src")
         import_file_based_on_filetype(
-            self.db, self.settings, SHP_ABSPATH, out_name="leidingen_test"
+            self.db, self.settings, SHP_ABSPATH, out_name="putten_test"
         )
-        assert self.db.get_count("leidingen_test", "src") == 11
+        assert self.db.get_count("putten_test", "src") == 78
 
     def test_import_filetype_file_does_not_exists(self):
         with pytest.raises(FileNotFoundError):
@@ -94,12 +94,15 @@ class TestDB(TestCase):
             )
 
     def test_importer(self):
-        self.settings.manhole_layer = SHP_ABSPATH
+        manhole_layer_rel_path = "data\schiedam-test\schiedam-putten-test.shp"
+        self.settings.manhole_layer = os.path.join(
+            os.path.dirname(__file__), manhole_layer_rel_path
+        )
         pipe_layer_rel_path = "data\schiedam-test\schiedam-leidingen-test.shp"
         self.settings.pipe_layer = os.path.join(
             os.path.dirname(__file__), pipe_layer_rel_path
         )
         self.settings.import_type = "gbi"
         importer(self.db, self.settings)
-        assert self.db.get_count("leidingen", "gbi") == 10
-        assert self.db.get_count("v2_pipe", "public") == 10
+        assert self.db.get_count("leidingen_gbi", "src") == 11
+        assert self.db.get_count("v2_pipe", "public") == 11

@@ -22,10 +22,10 @@ def importer(db, settings):
     db.create_schema("src")
 
     import_file_based_on_filetype(
-        db, settings, settings.manhole_layer, "putten" + settings.import_type
+        db, settings, settings.manhole_layer, "putten_" + settings.import_type
     )
     import_file_based_on_filetype(
-        db, settings, settings.pipe_layer, "leidingen" + settings.import_type
+        db, settings, settings.pipe_layer, "leidingen_" + settings.import_type
     )
 
 
@@ -65,12 +65,12 @@ def copy2pg_database(settings, in_filepath, in_name, out_name, schema="public"):
     in_srid = in_layer.GetSpatialRef()
 
     # correct vector layer to solve issues and stuff
-    #correct_in_source, correct_layer_name = in_layer, out_name
+    # correct_in_source, correct_layer_name = in_layer, out_name
     correct_in_source, correct_layer_name = correct_vector_layer(
         in_layer, out_name, epsg=28992
     )
     correct_in_layer = correct_in_source.GetLayerByName(correct_layer_name)
-    
+
     # check projection of input file
     check_sr = get_projection(in_srid)
     if check_sr is None:
@@ -99,17 +99,16 @@ def copy2pg_database(settings, in_filepath, in_name, out_name, schema="public"):
     )
     for x in range(correct_in_layer.GetLayerDefn().GetFieldCount()):
         new_layer.CreateField(correct_in_layer.GetLayerDefn().GetFieldDefn(x))
-    
+
     new_layer.StartTransaction()
     for x in range(correct_in_layer.GetFeatureCount()):
         new_feature = correct_in_layer.GetFeature(x)
         new_feature.SetFID(-1)
         new_layer.CreateFeature(new_feature)
-        if x % 128 == 0:
-            new_layer.CommitTransaction()
-            new_layer.StartTransaction()
-    
-    print("hoi")
+        # print(new_feature.DumpReadable())
+        # if x % 128 == 0:
+        new_layer.CommitTransaction()
+        new_layer.StartTransaction()
     new_layer.CommitTransaction()
 
     if new_layer.GetFeatureCount() == 0:
