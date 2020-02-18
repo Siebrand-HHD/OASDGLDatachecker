@@ -5,7 +5,9 @@ import logging
 
 from OASDGLDatachecker.tool_quality_checks import sql_checks
 from OASDGLDatachecker.tool_quality_checks.sql_views import sql_views
-from OASDGLDatachecker.tool_quality_checks.sql_background_views import sql_background_views
+from OASDGLDatachecker.tool_quality_checks.sql_background_views import (
+    sql_background_views,
+)
 
 logger = logging.getLogger(__name__)
 

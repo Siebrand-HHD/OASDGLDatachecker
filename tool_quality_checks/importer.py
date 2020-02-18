@@ -21,28 +21,33 @@ def importer(db, settings):
     # initialize source schema
     db.create_schema("src")
 
-    if not os.path.isfile(settings.manhole_layer):
-        logger.error(
-            "File %s does not exists on your computer" % settings.manhole_layer
-        )
+    import_file_based_on_filetype(
+        db, settings, settings.manhole_layer, "putten" + settings.import_type
+    )
+    import_file_based_on_filetype(
+        db, settings, settings.pipe_layer, "leidingen" + settings.import_type
+    )
+
+
+def import_file_based_on_filetype(db, settings, file_path, out_name):
+    """
+        Check file type and send request to copy to database function
+    """
+
+    if not os.path.isfile(file_path):
+        logger.error("File %s does not exists on your computer" % file_path)
         raise FileNotFoundError()
 
     # prepare file import
-    file_with_extention = basename(settings.manhole_layer)
+    file_with_extention = basename(file_path)
     filename, file_extension = os.path.splitext(file_with_extention)
 
     if file_extension == ".shp":
-        copy2pg_database(
-            settings,
-            settings.manhole_layer,
-            filename,
-            "putten_" + settings.import_type,
-            schema="src",
-        )
+        copy2pg_database(settings, file_path, filename, out_name, schema="src")
     else:
         logger.error(
             "File extension of %s is not supported by this tool, please use .shp"
-            % settings.manhole_layer
+            % file_path
         )
         raise AttributeError()
 
@@ -60,11 +65,12 @@ def copy2pg_database(settings, in_filepath, in_name, out_name, schema="public"):
     in_srid = in_layer.GetSpatialRef()
 
     # correct vector layer to solve issues and stuff
+    #correct_in_source, correct_layer_name = in_layer, out_name
     correct_in_source, correct_layer_name = correct_vector_layer(
         in_layer, out_name, epsg=28992
     )
     correct_in_layer = correct_in_source.GetLayerByName(correct_layer_name)
-
+    
     # check projection of input file
     check_sr = get_projection(in_srid)
     if check_sr is None:
@@ -93,7 +99,7 @@ def copy2pg_database(settings, in_filepath, in_name, out_name, schema="public"):
     )
     for x in range(correct_in_layer.GetLayerDefn().GetFieldCount()):
         new_layer.CreateField(correct_in_layer.GetLayerDefn().GetFieldDefn(x))
-
+    
     new_layer.StartTransaction()
     for x in range(correct_in_layer.GetFeatureCount()):
         new_feature = correct_in_layer.GetFeature(x)
@@ -102,6 +108,8 @@ def copy2pg_database(settings, in_filepath, in_name, out_name, schema="public"):
         if x % 128 == 0:
             new_layer.CommitTransaction()
             new_layer.StartTransaction()
+    
+    print("hoi")
     new_layer.CommitTransaction()
 
     if new_layer.GetFeatureCount() == 0:

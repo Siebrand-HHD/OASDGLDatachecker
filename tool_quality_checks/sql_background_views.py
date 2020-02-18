@@ -3,7 +3,7 @@
 # TODO putmateriaal toevoegen      material AS materiaalput,
 
 sql_background_views = {
-"put": """CREATE OR REPLACE VIEW {schema}.put AS
+    "put": """CREATE OR REPLACE VIEW {schema}.put AS
     SELECT
         a.code AS rioolput,
         a.id AS threedi_id,
@@ -24,7 +24,7 @@ sql_background_views = {
         surface_level AS maaiveldhoogte,
         b.the_geom
     FROM v2_manhole a JOIN v2_connection_nodes b ON a.connection_node_id = b.id;""",
-"leiding": """CREATE OR REPLACE VIEW {schema}.leiding AS
+    "leiding": """CREATE OR REPLACE VIEW {schema}.leiding AS
     SELECT
         pipe.code AS leiding,
         pipe.id AS threedi_id,
@@ -68,7 +68,7 @@ sql_background_views = {
         ON 	pipe.connection_node_end_id = end_node.id 
     LEFT JOIN v2_cross_section_definition def
         ON pipe.cross_section_definition_id = def.id;""",
-"overstort": """CREATE OR REPLACE VIEW {schema}.overstort AS
+    "overstort": """CREATE OR REPLACE VIEW {schema}.overstort AS
     SELECT
         weir.code AS overstort,
         weir.id AS threedi_id,
@@ -98,7 +98,7 @@ sql_background_views = {
         ON 	weir.connection_node_end_id = end_node.id 
     LEFT JOIN v2_cross_section_definition def
         ON weir.cross_section_definition_id = def.id;""",
-"doorlaat": """CREATE OR REPLACE VIEW {schema}.doorlaat AS
+    "doorlaat": """CREATE OR REPLACE VIEW {schema}.doorlaat AS
     SELECT
         orf.code AS doorlaat,
         orf.id AS threedi_id,
@@ -138,7 +138,7 @@ sql_background_views = {
         ON 	orf.connection_node_end_id = end_node.id 
     LEFT JOIN v2_cross_section_definition def
         ON orf.cross_section_definition_id = def.id;""",
-"pomp": """CREATE OR REPLACE VIEW {schema}.pomp AS
+    "pomp": """CREATE OR REPLACE VIEW {schema}.pomp AS
     SELECT
         pump.code AS pomp,
         pump.id AS threedi_id,
@@ -170,5 +170,5 @@ sql_background_views = {
     LEFT JOIN v2_connection_nodes start_node
         ON 	pump.connection_node_start_id = start_node.id 
     LEFT JOIN v2_connection_nodes end_node
-        ON 	pump.connection_node_end_id = end_node.id;"""
+        ON 	pump.connection_node_end_id = end_node.id;""",
 }

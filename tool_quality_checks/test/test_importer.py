@@ -10,6 +10,7 @@ from OASDGLDatachecker.tool_quality_checks.importer import (
     set_ogr_connection,
     copy2pg_database,
     get_projection,
+    import_file_based_on_filetype,
     importer,
 )
 from OASDGLDatachecker.tool_quality_checks.scripts import SettingsObject
@@ -22,7 +23,7 @@ from unittest import TestCase
 
 _ini_relpath = "data/instellingen_test.ini"
 INI_ABSPATH = os.path.join(os.path.dirname(__file__), _ini_relpath)
-_shp_relpath = "data/rioolput.shp"
+_shp_relpath = "data/schiedam-test/schiedam-leidingen-test.shp"
 SHP_ABSPATH = os.path.join(os.path.dirname(__file__), _shp_relpath)
 
 
@@ -37,6 +38,7 @@ class TestDB(TestCase):
         create_database(cls.settings)
         cls.db = ThreediDatabase(cls.settings)
         cls.db.create_extension(extension_name="postgis")
+        cls.db.initialize_db_threedi()
 
     @classmethod
     def tearDownClass(cls):
@@ -72,24 +74,32 @@ class TestDB(TestCase):
         sr.ImportFromWkt(proj)
         assert get_projection(sr) == "EPSG:28992"
 
+    def test_import_filetype(self):
+        self.db.create_schema("src")
+        import_file_based_on_filetype(
+            self.db, self.settings, SHP_ABSPATH, out_name="leidingen_test"
+        )
+        assert self.db.get_count("leidingen_test", "src") == 11
+
+    def test_import_filetype_file_does_not_exists(self):
+        with pytest.raises(FileNotFoundError):
+            import_file_based_on_filetype(
+                self.db, self.settings, file_path="kjfdla.zzp", out_name="test"
+            )
+
+    def test_import_filetype_file_not_supported(self):
+        with pytest.raises(AttributeError):
+            import_file_based_on_filetype(
+                self.db, self.settings, file_path=INI_ABSPATH, out_name="test"
+            )
+
     def test_importer(self):
-        manhole_layer_rel_path = "data\schiedam-test\schiedam-putten-test.shp"
-        self.settings.manhole_layer = os.path.join(
-            os.path.dirname(__file__), manhole_layer_rel_path
+        self.settings.manhole_layer = SHP_ABSPATH
+        pipe_layer_rel_path = "data\schiedam-test\schiedam-leidingen-test.shp"
+        self.settings.pipe_layer = os.path.join(
+            os.path.dirname(__file__), pipe_layer_rel_path
         )
         self.settings.import_type = "gbi"
         importer(self.db, self.settings)
-        assert self.db.get_count("putten_gbi", "src") == 10
-
-    def test_importer_file_does_not_exists(self):
-        # TODO @REINOUT kon ik hier nu ies doen met fixtures ofzo?
-        wrong_filename = "kjfdla.zzp"
-        self.settings.manhole_layer = wrong_filename
-        with pytest.raises(FileNotFoundError):
-            importer(self.db, self.settings)
-
-    def test_importer_file_not_supported(self):
-        # TODO @REINOUT kon ik hier nu ies doen met fixtures ofzo?
-        self.settings.manhole_layer = INI_ABSPATH
-        with pytest.raises(AttributeError):
-            importer(self.db, self.settings)
+        assert self.db.get_count("leidingen", "gbi") == 10
+        assert self.db.get_count("v2_pipe", "public") == 10

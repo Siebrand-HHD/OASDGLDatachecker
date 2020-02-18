@@ -11,6 +11,7 @@ from OASDGLDatachecker.tool_quality_checks.db import (
     create_database,
     drop_database,
 )
+from OASDGLDatachecker.tool_quality_checks.importer import importer
 
 logger = logging.getLogger(__name__)
 
