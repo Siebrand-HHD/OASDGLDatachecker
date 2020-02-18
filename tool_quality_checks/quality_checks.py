@@ -4,6 +4,8 @@ import os
 import logging
 
 from OASDGLDatachecker.tool_quality_checks import sql_checks
+from OASDGLDatachecker.tool_quality_checks.sql_views import sql_views
+from OASDGLDatachecker.tool_quality_checks.sql_background_views import sql_background_views
 
 logger = logging.getLogger(__name__)
 
@@ -18,8 +20,8 @@ def quality_checks(db, settings):
     v2_table_names = db.select_table_names("v2%")
     for table_name in v2_table_names:
         if db.get_count(table_name) > 0:
-            db.perform_checks_with_sql(settings, table_name, check_type="completeness")
-            db.perform_checks_with_sql(settings, table_name, check_type="quality")
+            perform_checks_with_sql(db, settings, table_name, check_type="completeness")
+            perform_checks_with_sql(db, settings, table_name, check_type="quality")
 
     db.populate_geometry_columns()
 
@@ -28,6 +30,7 @@ def initialize_db_checks(db):
     """ Initialize database for checks """
 
     db.create_schema(schema_name="chk")
+    db.create_schema(schema_name="back")
     for schema, table in [
         ["public", "v2_1d_boundary_conditions_view"],
         ["public", "v2_pumpstation_point_view"],
@@ -37,7 +40,20 @@ def initialize_db_checks(db):
         ["chk", "v2_orifice_view_left_join"],
         ["chk", "v2_weir_view_left_join"],
     ]:
-        db.create_preset_threedi_view(view_table=table, view_schema=schema)
+        db.create_preset_view_from_dictionary(
+            view_dictionary=sql_views, view_table=table, view_schema=schema
+        )
+
+    for schema, table in [
+        ["back", "put"],
+        ["back", "leiding"],
+        ["back", "overstort"],
+        ["back", "doorlaat"],
+        ["back", "pomp"],
+    ]:
+        db.create_preset_view_from_dictionary(
+            view_dictionary=sql_background_views, view_table=table, view_schema=schema
+        )
 
     # install all functions out of folder "sql_functions"
     sql_reldir = "sql_functions"
