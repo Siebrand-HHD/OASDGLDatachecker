@@ -28,6 +28,7 @@ def initialize_db_checks(db):
     """ Initialize database for checks """
 
     db.create_schema(schema_name="chk")
+    db.create_schema(schema_name="model")
     for schema, table in [
         ["public", "v2_1d_boundary_conditions_view"],
         ["public", "v2_pumpstation_point_view"],
@@ -37,7 +38,20 @@ def initialize_db_checks(db):
         ["chk", "v2_orifice_view_left_join"],
         ["chk", "v2_weir_view_left_join"],
     ]:
-        db.create_preset_threedi_view(view_table=table, view_schema=schema)
+        db.create_preset_view_from_dictionary(
+            view_dictionary=sql_views, view_table=table, view_schema=schema
+        )
+
+    for schema, table in [
+        ["model", "put"],
+        ["model", "leiding"],
+        ["model", "overstort"],
+        ["model", "doorlaat"],
+        ["model", "pomp"],
+    ]:
+        db.create_preset_view_from_dictionary(
+            view_dictionary=sql_background_views, view_table=table, view_schema=schema
+        )
 
     # install all functions out of folder "sql_functions"
     sql_reldir = "sql_functions"
