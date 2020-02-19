@@ -29,7 +29,7 @@ def _connect_to_server(settings, sql_statement):
 
 def drop_database(settings):
     """drops a database"""
-    drop_database_statement = """DROP DATABASE {database_name};""".format(
+    drop_database_statement = """DROP DATABASE IF EXISTS {database_name};""".format(
         database_name=settings.database
     )
     _connect_to_server(settings, drop_database_statement)
