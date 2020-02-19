@@ -110,10 +110,9 @@ def copy2pg_database(settings, in_filepath, in_name, out_name, schema="public"):
         new_feature = correct_in_layer.GetFeature(x)
         new_feature.SetFID(-1)
         new_layer.CreateFeature(new_feature)
-        # print(new_feature.DumpReadable())
-        # if x % 128 == 0:
-        new_layer.CommitTransaction()
-        new_layer.StartTransaction()
+        if x % 128 == 0:
+            new_layer.CommitTransaction()
+            new_layer.StartTransaction()
     new_layer.CommitTransaction()
 
     if new_layer.GetFeatureCount() == 0:
