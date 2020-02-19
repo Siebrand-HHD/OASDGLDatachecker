@@ -5,7 +5,7 @@ import argparse
 import logging
 
 from configparser import RawConfigParser
-from OASDGLDatachecker.tool_quality_checks.quality_checks import quality_checks
+from OASDGLDatachecker.tool_quality_checks.check_sewerage import check_sewerage
 from OASDGLDatachecker.tool_quality_checks.db import (
     ThreediDatabase,
     create_database,
@@ -44,7 +44,7 @@ def run_scripts(settings):
 
     if settings.checks:
         logger.info("Check your sewerage system")
-        quality_checks(db, settings)
+        check_sewerage(db, settings)
 
 
 def resolve_ini(custom_ini_file):

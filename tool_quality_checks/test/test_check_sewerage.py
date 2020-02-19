@@ -10,7 +10,7 @@ from OASDGLDatachecker.tool_quality_checks.db import (
     create_database,
     drop_database,
 )
-from OASDGLDatachecker.tool_quality_checks.quality_checks import (
+from OASDGLDatachecker.tool_quality_checks.check_sewerage import (
     initialize_db_checks,
     perform_checks_with_sql,
 )

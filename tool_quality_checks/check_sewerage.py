@@ -5,15 +5,15 @@ import logging
 
 from OASDGLDatachecker.tool_quality_checks import sql_checks
 from OASDGLDatachecker.tool_quality_checks.sql_views import sql_views
-from OASDGLDatachecker.tool_quality_checks.sql_background_views import (
-    sql_background_views,
+from OASDGLDatachecker.tool_quality_checks.sql_model_views import (
+    sql_understandable_model_views,
 )
 
 logger = logging.getLogger(__name__)
 
 
-def quality_checks(db, settings):
-    """Overall function for checking our model data"""
+def check_sewerage(db, settings):
+    """Overall function for checking our sewerage model data"""
 
     # TODO always run this settings?
     initialize_db_checks(db)
@@ -54,7 +54,9 @@ def initialize_db_checks(db):
         ["model", "pomp"],
     ]:
         db.create_preset_view_from_dictionary(
-            view_dictionary=sql_background_views, view_table=table, view_schema=schema
+            view_dictionary=sql_understandable_model_views,
+            view_table=table,
+            view_schema=schema,
         )
 
     # install all functions out of folder "sql_functions"
