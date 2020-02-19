@@ -94,6 +94,7 @@ class TestDB(TestCase):
             )
 
     def test_importer(self):
+        # extra check is to check loading of date-types (2011-10-28) into the database
         manhole_layer_rel_path = "data\schiedam-test\schiedam-putten-test.shp"
         self.settings.manhole_layer = os.path.join(
             os.path.dirname(__file__), manhole_layer_rel_path
