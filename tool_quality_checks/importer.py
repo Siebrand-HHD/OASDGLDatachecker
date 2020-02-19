@@ -87,6 +87,7 @@ def copy2pg_database(settings, in_filepath, in_name, out_name, schema="public"):
         "OVERWRITE=YES",
         "SCHEMA={}".format(schema),
         "SPATIAL_INDEX=GIST",
+        # try to comment row below when running to transaction block error
         "FID=id",
         "PRECISION=NO",
         "GEOMETRY_NAME=geom",

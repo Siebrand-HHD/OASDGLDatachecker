@@ -8,7 +8,6 @@ import osr
 import logging
 
 DRIVER_OGR_MEM = ogr.GetDriverByName("Memory")
-DRIVER_OGR_SHP = ogr.GetDriverByName("ESRI Shapefile")
 _mem_num = 0
 
 logger = logging.getLogger(__name__)
