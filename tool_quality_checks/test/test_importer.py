@@ -106,3 +106,8 @@ class TestDB(TestCase):
         importer(self.db, self.settings)
         assert self.db.get_count("leidingen_gbi", "src") == 11
         assert self.db.get_count("v2_pipe", "public") == 11
+
+    def test_01_importer_relevant_settings_are_missing(self):
+        # run before others with 01
+        with pytest.raises(AttributeError):
+            importer(self.db, self.settings)

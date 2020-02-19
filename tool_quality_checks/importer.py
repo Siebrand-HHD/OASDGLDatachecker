@@ -18,6 +18,11 @@ def importer(db, settings):
     """
         Loads your input files into the database for checks
     """
+    # check if relevant parameters are there:
+    if not hasattr(settings, "manhole_layer") or not hasattr(settings, "pipe_layer"):
+        logger.error("One of the input file path is missing, like manhole or pip")
+        raise AttributeError()
+
     # initialize source schema
     db.create_schema("src")
 
