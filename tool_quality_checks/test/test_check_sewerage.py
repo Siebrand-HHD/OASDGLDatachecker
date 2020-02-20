@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Tests for quality_checks.py"""
+"""Tests for check_sewerage.py"""
 import os
 from unittest import TestCase
 import pytest
