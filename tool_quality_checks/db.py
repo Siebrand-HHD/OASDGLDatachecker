@@ -202,13 +202,6 @@ class ThreediDatabase(object):
         self.execute_sql_statement(sql_statement=sql_file, fetch=False)
         logger.debug("Execute sql file with function:" + filename)
 
-    def execute_sql_dir(self, dirname):
-        for root, subdirs, files in sorted(os.walk(dirname)):
-            for f in sorted(files):
-                file_path = os.path.join(root, f)
-                if file_path.endswith(".sql"):
-                    self.execute_sql_file(file_path)
-
     def commit_values(self, table_name, field_names, data, schema="public"):
         """
         :param table_name: destination table
