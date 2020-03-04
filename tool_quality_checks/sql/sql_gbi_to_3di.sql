@@ -92,10 +92,6 @@ FROM src.putten_gbi;
 
 -- CHECK OF AL JOUW materialen, strengtype etc voorkomen!!
 DELETE FROM v2_pipe;
-DELETE FROM v2_cross_section_definition;
-INSERT INTO v2_cross_section_definition(id, shape, width, height, code)
-VALUES (1, 1, 10, 1, 'tmp');
-
 INSERT INTO v2_pipe(
             id, display_name, code, sewerage_type,
             invert_level_start_point, invert_level_end_point, cross_section_definition_id,
@@ -124,7 +120,7 @@ SELECT
     
 	bob_begin_ AS invert_level_start_point,
 	bob_eind_a AS invert_level_end_point,
-	1 as cross_section_definition_id,
+	NULL as cross_section_definition_id,
 	CASE
 		WHEN lower(a.std_materi) LIKE '%beton%' THEN 0
 		WHEN lower(a.std_materi) LIKE '%pvc%' THEN 1
@@ -158,8 +154,7 @@ LIMIT 20;
 SELECT CASE diameter WHEN 0 then NULL::numeric END as diamter, * FROM src.leidingen_gbi LIMIT 20;
 ---- ZET IN 1 KEER ALLES OM NAAR LOCATION EN DEFINITION
 -- set sequence maximum id
---UPDATE v2_pipe SET cross_section_definition_id = 1;
-delete from v2_cross_section_definition where id > 1;
+delete from v2_cross_section_definition;
 select setval('v2_cross_section_definition_id_seq',1);
 --insert cross_section_definition and add definition_id in v2_cross_section_location
 with gather_data as (
