@@ -112,20 +112,11 @@ class TestDB(TestCase):
     # TODO: add checks for all types in sql.py
 
     def test_execute_sql_file(self):
-        sql_relpath = os.path.join(
-            "sql_functions", "function_array_greatest_or_smallest.sql"
-        )
+        sql_relpath = os.path.join("sql", "sql_function_array_greatest_or_smallest.sql")
         sql_abspath = os.path.join(
             os.path.abspath(os.path.join(os.path.dirname(__file__), "..")), sql_relpath
         )
         self.db.execute_sql_file(sql_abspath)
-
-    def test_execute_sql_dir(self):
-        sql_reldir = "sql_functions"
-        sql_absdir = os.path.join(
-            os.path.abspath(os.path.join(os.path.dirname(__file__), "..")), sql_reldir
-        )
-        self.db.execute_sql_dir(sql_absdir)
 
     def test_create_view_from_dictionary(self):
         self.db.create_preset_view_from_dictionary(
