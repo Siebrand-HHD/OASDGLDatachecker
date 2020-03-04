@@ -15,8 +15,10 @@ logger = logging.getLogger(__name__)
 def check_sewerage(db, settings):
     """Overall function for checking our sewerage model data"""
 
-    # TODO always run this settings?
+    # Now the checks always run - option make it variable
     initialize_db_checks(db)
+
+    #
 
     # get v2_table_names
     v2_table_names = db.select_table_names("v2%")
