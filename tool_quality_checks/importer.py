@@ -33,6 +33,13 @@ def importer(db, settings):
         db, settings, settings.pipe_layer, "leidingen_" + settings.import_type
     )
 
+    if settings.import_type == "gbi":
+        sql_relpath = os.path.join("sql", "sql_gbi_to_3di.sql")
+        sql_abspath = os.path.join(
+            os.path.abspath(os.path.dirname(__file__)), sql_relpath
+        )
+        db.execute_sql_file(sql_abspath)
+
 
 def import_file_based_on_filetype(db, settings, file_path, out_name):
     """
