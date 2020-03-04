@@ -128,6 +128,18 @@ def get_parser():
         help="Import your sewerage data",
     )
     parser.add_argument(
+        "-m",
+        metavar="MANHOLE_FILE",
+        dest="manhole_layer",
+        help="Optional: Define path to manhole_layer (GBI) for automization options. This location could also be stored in the inifile.",
+    )
+    parser.add_argument(
+        "-p",
+        metavar="PIPE_FILE",
+        dest="pipe_layer",
+        help="Optional: Define path to pipe_layer (GBI) for automization options. This location could also be stored in the inifile.",
+    )
+    parser.add_argument(
         "--checks",
         default=False,
         help="Run quality checks for sewerage system",
@@ -156,7 +168,9 @@ def main():
     ini_relpath = resolve_ini(kwargs["inifile"])
     settings = SettingsObject(ini_relpath)
     for key, value in kwargs.items():
-        setattr(settings, key, value)
+        # Skip none values so ini-file is not overwritten, like manhole_layer
+        if not value is None:
+            setattr(settings, key, value)
     run_scripts(settings)
 
 

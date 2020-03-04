@@ -58,8 +58,8 @@ sql_understandable_model_views = {
             WHEN shape = 6 THEN 'trapezium'
             ELSE 'overige'
  		END as vormprofiel,
-        width AS breedteleiding,
-        height AS hoogteleiding,
+        array_greatest(string_to_array(width,' ')) AS breedteleiding,
+        array_greatest(string_to_array(height,' ')) AS hoogteleiding,
         st_makeline(start_node.the_geom, end_node.the_geom) AS the_geom
     FROM v2_pipe pipe
     LEFT JOIN v2_connection_nodes start_node

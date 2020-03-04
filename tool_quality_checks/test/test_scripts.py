@@ -58,11 +58,30 @@ def test_resolve_ini_error():
 # create absolute path to ini
 _ini_relpath = "data/instellingen_mini_schiedam.ini"
 ini_abspath_full_check = os.path.join(os.path.dirname(__file__), _ini_relpath)
+_manhole_layer_rel_path = "data\schiedam-test\schiedam-putten-test.shp"
+manhole_layer_abs_path = os.path.join(
+    os.path.dirname(__file__), _manhole_layer_rel_path
+)
+_pipe_layer_rel_path = "data\schiedam-test\schiedam-leidingen-test.shp"
+pipe_layer_abs_path = os.path.join(os.path.dirname(__file__), _pipe_layer_rel_path)
 
 
 @mock.patch(
     "sys.argv",
-    ["program", "-i", ini_abspath_full_check, "--createdb", "--dropdb", "--checks"],
+    [
+        "program",
+        "-i",
+        ini_abspath_full_check,
+        "--createdb",
+        "--dropdb",
+        "--import",
+        "gbi",
+        "-m",
+        manhole_layer_abs_path,
+        "-p",
+        pipe_layer_abs_path,
+        "--checks",
+    ],
 )
 def test_main_run_scripts_full():
     main()

@@ -33,6 +33,12 @@ def initialize_db_checks(db):
 
     db.create_schema(schema_name="chk")
     db.create_schema(schema_name="model")
+
+    # install necessary functions out of folder "sql_functions"
+    sql_relpath = os.path.join("sql", "sql_function_array_greatest_or_smallest.sql")
+    sql_abspath = os.path.join(os.path.dirname(__file__), sql_relpath)
+    db.execute_sql_file(sql_abspath)
+
     for schema, table in [
         ["public", "v2_1d_boundary_conditions_view"],
         ["public", "v2_pumpstation_point_view"],
@@ -58,11 +64,6 @@ def initialize_db_checks(db):
             view_table=table,
             view_schema=schema,
         )
-
-    # install all functions out of folder "sql_functions"
-    sql_reldir = "sql_functions"
-    sql_absdir = os.path.join(os.path.dirname(__file__), sql_reldir)
-    db.execute_sql_dir(sql_absdir)
 
 
 def perform_checks_with_sql(db, settings, check_table, check_type):
