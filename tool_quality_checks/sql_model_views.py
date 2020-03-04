@@ -128,8 +128,8 @@ sql_understandable_model_views = {
             WHEN shape = 6 THEN 'getabelleerd trapezium'
             ELSE 'overige'
  		END AS vormprofiel,
-        width AS breedteleiding,
-        height AS hoogteleiding,
+        array_greatest(string_to_array(width,' ')) AS breedtedoorlaat,
+        array_greatest(string_to_array(height,' ')) AS hoogtedoorlaat,
         st_makeline(start_node.the_geom, end_node.the_geom) AS the_geom
     FROM v2_orifice orf
     LEFT JOIN v2_connection_nodes start_node
