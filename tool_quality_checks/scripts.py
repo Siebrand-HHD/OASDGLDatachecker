@@ -147,6 +147,13 @@ def get_parser():
         action="store_true",
     )
     parser.add_argument(
+        "-d",
+        "--dem",
+        metavar="DEM_FILE",
+        dest="dem",
+        help="Optional: Define path to raster with DEM values.",
+    )
+    parser.add_argument(
         "-i",
         "--inifile",
         metavar="INIFILE",

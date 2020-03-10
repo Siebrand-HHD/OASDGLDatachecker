@@ -64,6 +64,8 @@ manhole_layer_abs_path = os.path.join(
 )
 _pipe_layer_rel_path = "data\schiedam-test\schiedam-leidingen-test.shp"
 pipe_layer_abs_path = os.path.join(os.path.dirname(__file__), _pipe_layer_rel_path)
+_raster_rel_path = "data\schiedam-test\dem_schiedam_test.tif"
+raster_abs_path = os.path.join(os.path.dirname(__file__), _raster_rel_path)
 
 
 @mock.patch(
@@ -80,6 +82,8 @@ pipe_layer_abs_path = os.path.join(os.path.dirname(__file__), _pipe_layer_rel_pa
         manhole_layer_abs_path,
         "-p",
         pipe_layer_abs_path,
+        "-d",
+        raster_abs_path,
         "--checks",
     ],
 )
