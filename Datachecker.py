@@ -24,7 +24,7 @@
 from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, Qt
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QAction,QFileDialog
-from qgis.core import QgsProject,QgsVectorLayer
+from qgis.core import QgsProject,QgsVectorLayer,QgsLayerTreeLayer
 # Initialize Qt resources from file resources.py
 from .resources import *
 import os
@@ -35,6 +35,7 @@ import os.path
 from .tool_quality_checks.scripts import run_scripts
 
 #Debugging in vs : https://gist.github.com/AsgerPetersen/9ea79ae4139f4977c31dd6ede2297f90
+
 class SettingsObjectPlugin(object):
     """Contains the settings from the ini file"""
 
@@ -236,26 +237,36 @@ class Datachecker:
     
     def laad_gpkg(self):
         fileName= self.dockwidget.listChecks.selectedItems()
+        # dictionary with layer_names of gpkg and potential group name in QGIS
+        group_mapping = {'leiding': 'leidingen', 'put': 'putten', 'profiel': 'profielen'}
+        
         if len(fileName)>0:
             root=QgsProject.instance().layerTreeRoot()
-            leiding = root.addGroup("Leiding")
-            put=root.addGroup("putten")
             for gpkg in fileName:
                 foldername= self.dockwidget.folderNaam.text()
                 file = os.path.join(foldername,gpkg.text())
                 conn = ogr.Open(file)
-                for layer in conn:
-                    if layer.GetFeatureCount()>0:
-                        combined=file+"|layername={}".format(layer.GetName())
-                        vlayer=QgsVectorLayer(combined,layer.GetName(),"ogr")
-                        QgsProject.instance().addMapLayer(vlayer,False)
-                        if layer.GetName().split('_')[0]=='leiding':
-                            leiding.addLayer(vlayer)
-                        if layer.GetName().split('_')[0]=='put':
-                            put.addLayer(vlayer)
-                        if not vlayer.isValid():
-                            print('failed to load')
-  
+                
+                for key, value in group_mapping.items():
+                    group = root.addGroup(value)
+                    for layer in conn:
+                        if layer.GetFeatureCount()>0:
+                            combined=file+"|layername={}".format(layer.GetName())
+                            vlayer=QgsVectorLayer(combined,layer.GetName(),"ogr")                        
+                            QgsProject.instance().addMapLayer(vlayer,False)
+                            if layer.GetName().split('_')[0]==key:
+                                group.addLayer(vlayer)    
+                            if not vlayer.isValid():
+                                print('failed to load')
+                        
+                            
+        root = QgsProject.instance().layerTreeRoot()
+        for child in root.children():
+            if child.name() in group_mapping.values():
+                for child2 in child.children():
+                    if isinstance(child2, QgsLayerTreeLayer):
+                        child2.setCustomProperty("showFeatureCount", True)
+                        
     def pb_select_exp_folder(self):
         foldername = QFileDialog.getExistingDirectory()
         self.dockwidget.folderNaam_export.setText(foldername)
@@ -309,12 +320,20 @@ class Datachecker:
        
         
     def slider_function(self,value):
-        layer = self.iface.mapCanvas().currentLayer()
-        
-        layer.renderer().symbol().symbolLayer(0).setSize(value)
+        layer = self.iface.mapCanvas().currentLayer()        
+        #print(layer.renderer().type()) 
+        #for field in layer.renderer().symbol().symbolLayer(0):
+                #print(field.name(), field.typeName())
+            #layer.renderer().symbol().symbolLayer(0).setSize(value)
+        if layer.renderer().symbol().type()==1: # Lijnen
+            layer.renderer().symbol().symbolLayer(0).setWidth(value)
+            #print(layer.renderer().symbol().type())
+            
+        elif layer.renderer().symbol().type()==0:  # symbolen  
+            layer.renderer().symbol().symbolLayer(0).setSize(value)
         layer.triggerRepaint()
         print(layer.name())
-        print(value)
+        #print(value)
 
     def run(self):
         """Run method that loads and starts the plugin"""
