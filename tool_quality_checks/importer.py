@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 ogr.UseExceptions()
 
 
-def importer(db, settings):
+def import_sewerage_data_into_db(db, settings):
     """
         Loads your input files into the database for checks
     """

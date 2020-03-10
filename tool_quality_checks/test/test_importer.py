@@ -11,7 +11,7 @@ from OASDGLDatachecker.tool_quality_checks.importer import (
     copy2pg_database,
     get_projection,
     import_file_based_on_filetype,
-    importer,
+    import_sewerage_data_into_db,
 )
 from OASDGLDatachecker.tool_quality_checks.scripts import SettingsObject
 from OASDGLDatachecker.tool_quality_checks.db import (
@@ -93,7 +93,7 @@ class TestDB(TestCase):
                 self.db, self.settings, file_path=INI_ABSPATH, out_name="test"
             )
 
-    def test_importer(self):
+    def test_import_sewerage_data_into_db(self):
         # extra check is to check loading of date-types (2011-10-28) into the database
         manhole_layer_rel_path = "data\schiedam-test\schiedam-putten-test.shp"
         self.settings.manhole_layer = os.path.join(
@@ -104,7 +104,7 @@ class TestDB(TestCase):
             os.path.dirname(__file__), pipe_layer_rel_path
         )
         self.settings.import_type = "gbi"
-        importer(self.db, self.settings)
+        import_sewerage_data_into_db(self.db, self.settings)
         assert self.db.get_count("leidingen_gbi", "src") == 11
         assert self.db.get_count("v2_pipe", "public") == 11
         assert self.db.get_count("v2_cross_section_definition", "public") == 5
@@ -112,4 +112,4 @@ class TestDB(TestCase):
     def test_01_importer_relevant_settings_are_missing(self):
         # run before others with 01
         with pytest.raises(AttributeError):
-            importer(self.db, self.settings)
+            import_sewerage_data_into_db(self.db, self.settings)
