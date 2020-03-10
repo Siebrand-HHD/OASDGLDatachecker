@@ -46,7 +46,7 @@ def import_file_based_on_filetype(db, settings, file_path, out_name):
     """
 
     if not os.path.isfile(file_path):
-        logger.error("File %s does not exists on your computer" % file_path)
+        logger.error("File %s does not exists " % file_path)
         raise FileNotFoundError()
 
     # prepare file import
