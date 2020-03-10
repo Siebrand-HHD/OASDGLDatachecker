@@ -54,7 +54,7 @@ class TestDB(TestCase):
     @classmethod
     def tearDownClass(cls):
         cls.db.conn.close()
-        drop_database(cls.settings)
+        # drop_database(cls.settings)
 
     def test_initialize_db_checks(self):
         initialize_db_checks(self.db)
@@ -73,6 +73,18 @@ class TestDB(TestCase):
                 self.db, test_settings, "v2_manhole", "completeness"
             )
 
-    def test_check_sewerage(self):
+    def test_01_check_sewerage_no_dem(self):
         check_sewerage(self.db, self.settings)
         assert self.db.get_count("put_shape", "chk") == 1
+        assert self.db.get_count("put_maaiveld_check", "chk") == 0
+
+    def test_02_check_sewerage(self):
+        raster_rel_path = "data\schiedam-test\dem_schiedam_test.tif"
+        self.settings.dem = os.path.join(os.path.dirname(__file__), raster_rel_path)
+        check_sewerage(self.db, self.settings)
+        assert self.db.get_count("put_shape", "chk") == 1
+        assert "-8847.45" in str(
+            self.db.execute_sql_statement(
+                "SELECT hoogte_verschil FROM chk.put_maaiveld_check"
+            )[0][0]
+        )

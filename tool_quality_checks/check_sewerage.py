@@ -8,6 +8,13 @@ from OASDGLDatachecker.tool_quality_checks.sql_views import sql_views
 from OASDGLDatachecker.tool_quality_checks.sql_model_views import (
     sql_understandable_model_views,
 )
+from OASDGLDatachecker.tool_quality_checks.point_sampling import (
+    sample_points_and_create_pg_layer,
+    create_empty_point_sample_layer,
+)
+from OASDGLDatachecker.tool_quality_checks.importer import (
+    set_ogr_connection_pg_database,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +25,28 @@ def check_sewerage(db, settings):
     # Now the checks always run - option make it variable
     initialize_db_checks(db)
 
-    # TODO load dtm values
+    # load dtm values
+    if os.path.isfile(settings.dem):
+        sample_points_and_create_pg_layer(
+            settings,
+            settings.dem,
+            "v2_manhole_view",
+            "manhole_maaiveld",
+            "src",
+            settings.dem_field,
+        )
+    else:
+        # create empty layer to make sure that sql not crashes on table not known
+        conn = set_ogr_connection_pg_database(settings)
+        create_empty_point_sample_layer(
+            settings,
+            conn,
+            "v2_manhole_view",
+            "manhole_maaiveld",
+            "src",
+            settings.dem_field,
+        )
+        conn.Destroy()
 
     # get v2_table_names
     v2_table_names = db.select_table_names("v2%")
