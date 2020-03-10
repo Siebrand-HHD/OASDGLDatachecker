@@ -16,7 +16,7 @@ ogr.UseExceptions()
 
 def import_sewerage_data_into_db(db, settings):
     """
-        Loads your input files into the database for checks
+    Load input files into the database for checks
     """
     # check if relevant parameters are there:
     if not hasattr(settings, "manhole_layer") or not hasattr(settings, "pipe_layer"):
