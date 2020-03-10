@@ -5,7 +5,9 @@ Purpose to load OGR data like shapefiles into postgres
 import os
 import logging
 from osgeo import ogr
-from OASDGLDatachecker.tool_quality_checks.correct_ogr_file import correct_vector_layer
+from OASDGLDatachecker.tool_quality_checks.correct_import_file import (
+    correct_vector_layer,
+)
 
 logger = logging.getLogger(__name__)
 ogr.UseExceptions()
