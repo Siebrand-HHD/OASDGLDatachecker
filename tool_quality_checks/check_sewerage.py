@@ -16,6 +16,7 @@ from OASDGLDatachecker.tool_quality_checks.importer import (
     set_ogr_connection_pg_database,
 )
 
+OUR_DIR = os.path.dirname(__file__)
 logger = logging.getLogger(__name__)
 
 
@@ -70,7 +71,7 @@ def initialize_db_checks(db):
 
     # install necessary functions out of folder "sql_functions"
     sql_relpath = os.path.join("sql", "sql_function_array_greatest_or_smallest.sql")
-    sql_abspath = os.path.join(os.path.dirname(__file__), sql_relpath)
+    sql_abspath = os.path.join(OUR_DIR, sql_relpath)
     db.execute_sql_file(sql_abspath)
 
     for schema, table in [

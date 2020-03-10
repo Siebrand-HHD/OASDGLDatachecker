@@ -4,7 +4,7 @@ import os
 import psycopg2
 import logging
 
-
+OUR_DIR = os.path.dirname(__file__)
 logger = logging.getLogger(__name__)
 
 
@@ -81,9 +81,7 @@ class ThreediDatabase(object):
         sql_relpath = os.path.join(
             "threedi_database_schema", "work_empty_schema_2020-01-15.sql"
         )
-        sql_abspath = os.path.join(
-            os.path.abspath(os.path.dirname(__file__)), sql_relpath
-        )
+        sql_abspath = os.path.join(os.path.abspath(OUR_DIR), sql_relpath)
         self.execute_sql_file(sql_abspath)
 
     def get_count(self, table_name, schema="public"):

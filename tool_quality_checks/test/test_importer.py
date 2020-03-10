@@ -111,7 +111,7 @@ class TestDB(TestCase):
         # CURRENTLY USED FOR TESTS ONLY
         sql_relpath = os.path.join("sql", "sql_empty_3di_database.sql")
         sql_abspath = os.path.join(
-            os.path.abspath(os.path.join(os.path.dirname(__file__), "..")), sql_relpath
+            os.path.abspath(os.path.join(OUR_DIR, "..")), sql_relpath
         )
         self.db.execute_sql_file(sql_abspath)
 
@@ -123,16 +123,14 @@ class TestDB(TestCase):
     def test_02_importer_manhole_only(self):
         # extra check is to check loading of date-types (2011-10-28) into the database
         manhole_layer_rel_path = "data\schiedam-test\schiedam-putten-test.shp"
-        self.settings.manhole_layer = os.path.join(
-            os.path.dirname(__file__), manhole_layer_rel_path
-        )
+        self.settings.manhole_layer = os.path.join(OUR_DIR, manhole_layer_rel_path)
         self.settings.import_type = "gbi"
         import_sewerage_data_into_db(self.db, self.settings)
         assert self.db.get_count("putten_gbi", "src") == 10
         assert self.db.get_count("v2_manhole", "public") == 10
         sql_relpath = os.path.join("sql", "sql_empty_3di_database.sql")
         sql_abspath = os.path.join(
-            os.path.abspath(os.path.join(os.path.dirname(__file__), "..")), sql_relpath
+            os.path.abspath(os.path.join(OUR_DIR, "..")), sql_relpath
         )
         self.db.execute_sql_file(sql_abspath)
 

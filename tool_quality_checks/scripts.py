@@ -14,6 +14,7 @@ from OASDGLDatachecker.tool_quality_checks.db import (
 from OASDGLDatachecker.tool_quality_checks.importer import import_sewerage_data_into_db
 
 logger = logging.getLogger(__name__)
+OUR_DIR = os.path.dirname(__file__)
 
 
 def run_scripts(settings):
@@ -53,7 +54,7 @@ def resolve_ini(custom_ini_file):
     """
     # get default ini for testing purposes
     default_ini_relpath = os.path.join("test", "data", "instellingen_test.ini")
-    default_ini_relpath = os.path.join(os.path.dirname(__file__), default_ini_relpath)
+    default_ini_relpath = os.path.join(OUR_DIR, default_ini_relpath)
     if custom_ini_file is None:
         logger.info(
             "[*] Using default ini file {}".format(
