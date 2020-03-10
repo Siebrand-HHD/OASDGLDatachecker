@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Tests for quality_checks.py"""
+"""Tests for check_sewerage.py"""
 import os
 from unittest import TestCase
 import pytest
@@ -10,13 +10,14 @@ from OASDGLDatachecker.tool_quality_checks.db import (
     create_database,
     drop_database,
 )
-from OASDGLDatachecker.tool_quality_checks.quality_checks import (
+from OASDGLDatachecker.tool_quality_checks.check_sewerage import (
     initialize_db_checks,
     perform_checks_with_sql,
 )
 
+OUR_DIR = os.path.dirname(__file__)
 _ini_relpath = "data/instellingen_test.ini"
-INI_ABSPATH = os.path.join(os.path.dirname(__file__), _ini_relpath)
+INI_ABSPATH = os.path.join(OUR_DIR, _ini_relpath)
 
 """
 This test file assumes that the checks will be run in particular order.
@@ -51,9 +52,7 @@ class TestDB(TestCase):
 
     def test_perform_checks_with_sql_raise(self):
         ini_relpath_key_missing = "data/instellingen_test_missing_key.ini"
-        ini_abspath_key_missing = os.path.join(
-            os.path.dirname(__file__), ini_relpath_key_missing
-        )
+        ini_abspath_key_missing = os.path.join(OUR_DIR, ini_relpath_key_missing)
         test_settings = SettingsObject(ini_abspath_key_missing)
         with pytest.raises(Exception):
             self.db.perform_checks_with_sql(

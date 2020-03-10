@@ -29,7 +29,7 @@ def _connect_to_server(settings, sql_statement):
 
 def drop_database(settings):
     """drops a database"""
-    drop_database_statement = """DROP DATABASE {database_name};""".format(
+    drop_database_statement = """DROP DATABASE IF EXISTS {database_name};""".format(
         database_name=settings.database
     )
     _connect_to_server(settings, drop_database_statement)
@@ -201,13 +201,6 @@ class ThreediDatabase(object):
         sql_file = open(filename, "r").read()
         self.execute_sql_statement(sql_statement=sql_file, fetch=False)
         logger.debug("Execute sql file with function:" + filename)
-
-    def execute_sql_dir(self, dirname):
-        for root, subdirs, files in sorted(os.walk(dirname)):
-            for f in sorted(files):
-                file_path = os.path.join(root, f)
-                if file_path.endswith(".sql"):
-                    self.execute_sql_file(file_path)
 
     def commit_values(self, table_name, field_names, data, schema="public"):
         """
