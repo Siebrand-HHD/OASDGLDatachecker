@@ -38,18 +38,13 @@ def check_sewerage(db, settings):
             "v2_manhole_view",
             "manhole_maaiveld",
             "src",
-            settings.dem_field,
+            "maaiveld",
         )
     else:
         # create empty layer to make sure that sql not crashes on table not known
         conn = set_ogr_connection_pg_database(settings)
         create_empty_point_sample_layer(
-            settings,
-            conn,
-            "v2_manhole_view",
-            "manhole_maaiveld",
-            "src",
-            settings.dem_field,
+            settings, conn, "v2_manhole_view", "manhole_maaiveld", "src", "maaiveld"
         )
         conn.Destroy()
 

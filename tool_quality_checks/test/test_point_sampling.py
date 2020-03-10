@@ -70,7 +70,7 @@ class TestDB(TestCase):
             "v2_manhole_view",
             "manhole_maaiveld",
             "src",
-            self.settings.dem_field,
+            "maaiveld",
         )
         assert (
             self.db.execute_sql_statement(
