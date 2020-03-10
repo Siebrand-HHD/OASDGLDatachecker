@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-""" TODO Docstring. """
+""" Provide a list of checks regarding the sewerage system in a postgres db """
 import os
 import logging
 
