@@ -343,7 +343,7 @@ WHERE maaiveld IS NULL or maaiveld = -9999;
 DROP TABLE IF EXISTS chk.put_maaiveld_check;
 CREATE TABLE chk.put_maaiveld_check AS
 WITH calc_hoogte_verschil AS (
-	SELECT round((maaiveld - surface_level)::numeric,2) as hoogte_verschil, round(surface_level::numeric,2) as model_maaiveld, maaiveld as dem_maaiveld, a.*
+	SELECT round(({dem_field} - surface_level)::numeric,2) as hoogte_verschil, round(surface_level::numeric,2) as model_maaiveld, maaiveld as dem_maaiveld, a.*
 	FROM v2_manhole b JOIN src.manhole_maaiveld a ON a.{id_field} = b.id
 	WHERE maaiveld != -9999
 )
