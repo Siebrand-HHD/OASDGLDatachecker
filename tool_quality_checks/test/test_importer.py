@@ -21,10 +21,11 @@ from OASDGLDatachecker.tool_quality_checks.db import (
 )
 from unittest import TestCase
 
+OUR_DIR = os.path.dirname(__file__)
 _ini_relpath = "data/instellingen_test.ini"
-INI_ABSPATH = os.path.join(os.path.dirname(__file__), _ini_relpath)
+INI_ABSPATH = os.path.join(OUR_DIR, _ini_relpath)
 _shp_relpath = "data/rioolput.shp"
-SHP_ABSPATH = os.path.join(os.path.dirname(__file__), _shp_relpath)
+SHP_ABSPATH = os.path.join(OUR_DIR, _shp_relpath)
 
 
 class TestDB(TestCase):
@@ -96,13 +97,9 @@ class TestDB(TestCase):
     def test_import_sewerage_data_into_db(self):
         # extra check is to check loading of date-types (2011-10-28) into the database
         manhole_layer_rel_path = "data\schiedam-test\schiedam-putten-test.shp"
-        self.settings.manhole_layer = os.path.join(
-            os.path.dirname(__file__), manhole_layer_rel_path
-        )
+        self.settings.manhole_layer = os.path.join(OUR_DIR, manhole_layer_rel_path)
         pipe_layer_rel_path = "data\schiedam-test\schiedam-leidingen-test.shp"
-        self.settings.pipe_layer = os.path.join(
-            os.path.dirname(__file__), pipe_layer_rel_path
-        )
+        self.settings.pipe_layer = os.path.join(OUR_DIR, pipe_layer_rel_path)
         self.settings.import_type = "gbi"
         import_sewerage_data_into_db(self.db, self.settings)
         assert self.db.get_count("leidingen_gbi", "src") == 11

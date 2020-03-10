@@ -92,7 +92,7 @@ class SettingsObject(object):
                 "Setting '%s' is missing in your input. Please check the command line and ini-file."
                 % name
             )
-            raise AttributeError()
+            raise
 
 
 def get_parser():

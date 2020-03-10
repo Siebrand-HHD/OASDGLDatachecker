@@ -12,6 +12,7 @@ from OASDGLDatachecker.tool_quality_checks.correct_import_file import (
 
 logger = logging.getLogger(__name__)
 ogr.UseExceptions()
+OUR_DIR = os.path.dirname(__file__)
 
 
 def import_sewerage_data_into_db(db, settings):
@@ -20,7 +21,7 @@ def import_sewerage_data_into_db(db, settings):
     """
     # check if relevant parameters are there:
     if not hasattr(settings, "manhole_layer") or not hasattr(settings, "pipe_layer"):
-        logger.error("One of the input file path is missing, like manhole or pip")
+        logger.error("Input file path for manhole layer is missing")
         raise AttributeError()
 
     # initialize source schema
@@ -35,9 +36,7 @@ def import_sewerage_data_into_db(db, settings):
 
     if settings.import_type == "gbi":
         sql_relpath = os.path.join("sql", "sql_gbi_to_3di.sql")
-        sql_abspath = os.path.join(
-            os.path.abspath(os.path.dirname(__file__)), sql_relpath
-        )
+        sql_abspath = os.path.join(OUR_DIR, sql_relpath)
         db.execute_sql_file(sql_abspath)
 
 
@@ -66,7 +65,7 @@ def import_file_based_on_filetype(db, settings, file_path, out_name):
 
 def copy2pg_database(settings, in_filepath, in_name, out_name, schema="public"):
     """
-        copy a shapefile from your drive to the database
+        copy an ogr datasource, like ESRI shapefile, to the database
     """
 
     # currently only working for shapefile
@@ -78,10 +77,10 @@ def copy2pg_database(settings, in_filepath, in_name, out_name, schema="public"):
 
     # correct vector layer to solve issues and stuff
     # correct_in_source, correct_layer_name = in_layer, out_name
-    correct_in_source, correct_layer_name = correct_vector_layer(
+    corrected_in_source, corrected_layer_name = correct_vector_layer(
         in_layer, out_name, epsg=28992
     )
-    correct_in_layer = correct_in_source.GetLayerByName(correct_layer_name)
+    corrected_in_layer = corrected_in_source.GetLayerByName(corrected_layer_name)
 
     # check projection of input file
     check_sr = get_projection(in_srid)
@@ -105,20 +104,20 @@ def copy2pg_database(settings, in_filepath, in_name, out_name, schema="public"):
     # TODO srid is now based on in_layer, which could be a strange spatial reference
     # TODO findout how to make the target ref 28992 by default
     new_layer = datasource.CreateLayer(
-        correct_layer_name,
-        correct_in_layer.GetSpatialRef(),
-        correct_in_layer.GetGeomType(),
+        corrected_layer_name,
+        corrected_in_layer.GetSpatialRef(),
+        corrected_in_layer.GetGeomType(),
         options,
     )
-    for x in range(correct_in_layer.GetLayerDefn().GetFieldCount()):
-        new_layer.CreateField(correct_in_layer.GetLayerDefn().GetFieldDefn(x))
+    for i in range(corrected_in_layer.GetLayerDefn().GetFieldCount()):
+        new_layer.CreateField(corrected_in_layer.GetLayerDefn().GetFieldDefn(i))
 
     new_layer.StartTransaction()
-    for x in range(correct_in_layer.GetFeatureCount()):
-        new_feature = correct_in_layer.GetFeature(x)
+    for j in range(corrected_in_layer.GetFeatureCount()):
+        new_feature = corrected_in_layer.GetFeature(j)
         new_feature.SetFID(-1)
         new_layer.CreateFeature(new_feature)
-        if x % 128 == 0:
+        if j % 128 == 0:
             new_layer.CommitTransaction()
             new_layer.StartTransaction()
     new_layer.CommitTransaction()
