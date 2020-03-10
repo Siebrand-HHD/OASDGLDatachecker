@@ -336,16 +336,16 @@ DROP TABLE IF EXISTS chk.put_buiten_dem;
 CREATE TABLE chk.put_buiten_dem AS
 SELECT *
 FROM src.manhole_maaiveld
-WHERE {dem_field} IS NULL or {dem_field} = -9999;
+WHERE maaiveld IS NULL or maaiveld = -9999;
 
 -- AHN2 Check - hoogte verschil
 -- betrouwbaarheid putten tov AHN2
 DROP TABLE IF EXISTS chk.put_maaiveld_check;
 CREATE TABLE chk.put_maaiveld_check AS
 WITH calc_hoogte_verschil AS (
-	SELECT round(({dem_field} - surface_level)::numeric,2) as hoogte_verschil, round(surface_level::numeric,2) as model_maaiveld, maaiveld as dem_maaiveld, a.*
-	FROM v2_manhole b JOIN src.manhole_maaiveld a ON a.{id_field} = b.id
-	WHERE {dem_field} != -9999
+	SELECT round((maaiveld - surface_level)::numeric,2) as hoogte_verschil, round(surface_level::numeric,2) as model_maaiveld, maaiveld as dem_maaiveld, a.*
+	FROM v2_manhole b JOIN src.manhole_maaiveld a ON a.manh_id = b.id
+	WHERE maaiveld != -9999
 )
 SELECT *
 FROM calc_hoogte_verschil
