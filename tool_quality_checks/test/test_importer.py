@@ -118,7 +118,7 @@ class TestDB(TestCase):
     def test_01_importer_relevant_settings_are_missing(self):
         # run before others with 01
         with pytest.raises(AttributeError):
-            importer(self.db, self.settings)
+            import_sewerage_data_into_db(self.db, self.settings)
 
     def test_02_importer_manhole_only(self):
         # extra check is to check loading of date-types (2011-10-28) into the database
@@ -127,7 +127,7 @@ class TestDB(TestCase):
             os.path.dirname(__file__), manhole_layer_rel_path
         )
         self.settings.import_type = "gbi"
-        importer(self.db, self.settings)
+        import_sewerage_data_into_db(self.db, self.settings)
         assert self.db.get_count("putten_gbi", "src") == 10
         assert self.db.get_count("v2_manhole", "public") == 10
         sql_relpath = os.path.join("sql", "sql_empty_3di_database.sql")

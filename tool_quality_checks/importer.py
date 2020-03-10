@@ -43,15 +43,11 @@ def import_sewerage_data_into_db(db, settings):
 
     if settings.import_type == "gbi":
         sql_relpath = os.path.join("sql", "sql_gbi_manholes_to_3di.sql")
-        sql_abspath = os.path.join(
-            OUR_DIR, sql_relpath
-        )
+        sql_abspath = os.path.join(OUR_DIR, sql_relpath)
         db.execute_sql_file(sql_abspath)
         if available_gbi_pipe_layer:
             sql_relpath = os.path.join("sql", "sql_gbi_pipes_to_3di.sql")
-            sql_abspath = os.path.join(
-                OUR_DIR, sql_relpath
-            )
+            sql_abspath = os.path.join(OUR_DIR, sql_relpath)
             db.execute_sql_file(sql_abspath)
 
 
@@ -110,10 +106,10 @@ def copy2pg_database(settings, in_source, in_name, out_name, schema="public"):
 
     # correct vector layer to solve issues and stuff
     # correct_in_source, correct_layer_name = in_layer, out_name
-    correct_in_source, correct_layer_name = correct_vector_layer(
+    corrected_in_source, corrected_layer_name = correct_vector_layer(
         in_layer, out_name, epsg=28992
     )
-    correct_in_layer = correct_in_source.GetLayerByName(correct_layer_name)
+    corrected_in_layer = corrected_in_source.GetLayerByName(corrected_layer_name)
 
     options = [
         "OVERWRITE=YES",
