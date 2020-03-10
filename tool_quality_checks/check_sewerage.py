@@ -20,7 +20,11 @@ logger = logging.getLogger(__name__)
 
 
 def check_sewerage(db, settings):
-    """Overall function for checking our sewerage model data"""
+    """
+    Overall function for checking our sewerage model data
+    
+    Result: list of check-tables in the postgres database in 'chk' schema
+    """
 
     # Now the checks always run - option make it variable
     initialize_db_checks(db)

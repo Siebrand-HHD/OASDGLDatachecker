@@ -5,7 +5,8 @@ import sys
 import mock
 import pytest
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+OUR_DIR = os.path.dirname(__file__)
+sys.path.insert(0, os.path.abspath(os.path.join(OUR_DIR, "..")))
 import scripts
 from OASDGLDatachecker.tool_quality_checks.scripts import (
     SettingsObject,
@@ -24,14 +25,14 @@ def test_get_parser():
 
 def test_settingsobject():
     ini_path = "data//instellingen_test.ini"
-    ini_path = os.path.join(os.path.dirname(__file__), ini_path)
+    ini_path = os.path.join(OUR_DIR, ini_path)
     settings = SettingsObject(ini_path)
     assert settings.__dict__["hoogte_verschil"] == "0.2"
 
 
 def test_settingsobject_raise():
     ini_path = "data//instellingen_test_missing_db.ini"
-    ini_path = os.path.join(os.path.dirname(__file__), ini_path)
+    ini_path = os.path.join(OUR_DIR, ini_path)
     settings = SettingsObject(ini_path)
     with pytest.raises(Exception):
         settings.database
@@ -39,7 +40,7 @@ def test_settingsobject_raise():
 
 def test_resolve_ini_custom():
     ini_path = "data\\dummy.ini"
-    ini_path = os.path.join(os.path.dirname(__file__), ini_path)
+    ini_path = os.path.join(OUR_DIR, ini_path)
     ini_path = resolve_ini(ini_path)
     assert "\\test\\data\\dummy.ini" in ini_path
 
@@ -57,15 +58,13 @@ def test_resolve_ini_error():
 "LARGE TESTS"
 # create absolute path to ini
 _ini_relpath = "data/instellingen_mini_schiedam.ini"
-ini_abspath_full_check = os.path.join(os.path.dirname(__file__), _ini_relpath)
+ini_abspath_full_check = os.path.join(OUR_DIR, _ini_relpath)
 _manhole_layer_rel_path = "data\schiedam-test\schiedam-putten-test.shp"
-manhole_layer_abs_path = os.path.join(
-    os.path.dirname(__file__), _manhole_layer_rel_path
-)
+manhole_layer_abs_path = os.path.join(OUR_DIR, _manhole_layer_rel_path)
 _pipe_layer_rel_path = "data\schiedam-test\schiedam-leidingen-test.shp"
-pipe_layer_abs_path = os.path.join(os.path.dirname(__file__), _pipe_layer_rel_path)
+pipe_layer_abs_path = os.path.join(OUR_DIR, _pipe_layer_rel_path)
 _raster_rel_path = "data\schiedam-test\dem_schiedam_test.tif"
-raster_abs_path = os.path.join(os.path.dirname(__file__), _raster_rel_path)
+raster_abs_path = os.path.join(OUR_DIR, _raster_rel_path)
 
 
 @mock.patch(

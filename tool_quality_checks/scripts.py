@@ -11,7 +11,7 @@ from OASDGLDatachecker.tool_quality_checks.db import (
     create_database,
     drop_database,
 )
-from OASDGLDatachecker.tool_quality_checks.importer import importer
+from OASDGLDatachecker.tool_quality_checks.importer import import_sewerage_data_into_db
 
 logger = logging.getLogger(__name__)
 
@@ -40,7 +40,7 @@ def run_scripts(settings):
 
     if settings.import_type:
         logger.info("Import your sewerage data of %s" % settings.import_type)
-        importer(db, settings)
+        import_sewerage_data_into_db(db, settings)
 
     if settings.checks:
         logger.info("Check your sewerage system")
@@ -92,7 +92,7 @@ class SettingsObject(object):
                 "Setting '%s' is missing in your input. Please check the command line and ini-file."
                 % name
             )
-            raise AttributeError()
+            raise
 
 
 def get_parser():

@@ -14,13 +14,14 @@ from OASDGLDatachecker.tool_quality_checks.correct_import_file import (
 )
 from OASDGLDatachecker.tool_quality_checks.importer import set_ogr_connection
 
+OUR_DIR = os.path.dirname(__file__)
 _shp_relpath = "data/rioolput.shp"
-_shp_abspath = os.path.join(os.path.dirname(__file__), _shp_relpath)
+_shp_abspath = os.path.join(OUR_DIR, _shp_relpath)
 _shp_in_ds = set_ogr_connection(_shp_abspath)
 SHP_IN_LAYER = _shp_in_ds[0]
 
 _gpkg_relpath = "data/fix_geometries.gpkg"
-_gpkg_abspath = os.path.join(os.path.dirname(__file__), _gpkg_relpath)
+_gpkg_abspath = os.path.join(OUR_DIR, _gpkg_relpath)
 GPKG_IN_DS = set_ogr_connection(_gpkg_abspath)
 
 
