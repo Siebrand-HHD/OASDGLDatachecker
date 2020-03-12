@@ -47,7 +47,7 @@ def sample_points_and_create_pg_layer(
     conn = set_ogr_connection_pg_database(settings)
 
     # Create target layer
-    target_layer = create_empty_point_sample_layer(
+    target_layer = create_point_sample_layer(
         settings,
         conn,
         input_point_layer,
@@ -101,13 +101,13 @@ def get_inverse(a, b, c, d):
     return d * D, -b * D, -c * D, a * D
 
 
-def create_empty_point_sample_layer(
+def create_point_sample_layer(
     settings, conn, input_point_layer, output_point_layer, output_schema, raster_field
 ):
     copy2pg_database(
         settings, conn, input_point_layer, output_point_layer, schema=output_schema
     )
-    target_layer = conn.GetLayerByName("src." + output_point_layer)
+    target_layer = conn.GetLayerByName(output_schema + "." + output_point_layer)
 
     target_field = ogr.FieldDefn(str(raster_field), ogr.OFTReal)
     target_layer.CreateField(target_field)

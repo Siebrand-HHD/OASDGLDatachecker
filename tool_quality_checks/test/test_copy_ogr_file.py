@@ -70,16 +70,16 @@ class TestDB(TestCase):
         copy2ogr(in_source, "test", out_source, "test_2", schema="src")
         assert self.db.get_count("test_2", schema="src") == 78
 
-    def test_02_copy2ogr_pg2gpkg(self):
-        in_source = set_ogr_connection_pg_database(self.settings)
+    # def test_02_copy2ogr_pg2gpkg(self):
+    #     in_source = set_ogr_connection_pg_database(self.settings)
         
-        # TODO TEST PART NEEDS FUNCTION LATER
+    #     # TODO TEST PART NEEDS FUNCTION LATER
         
-        out_source = 
+    #     out_source = 
         
         
-        copy2ogr(in_source, "test", out_source, "test", schema="src")
-        assert self.db.get_count("test_2", schema="src") == 78
+    #     copy2ogr(in_source, "test", out_source, "test", schema="src")
+    #     assert self.db.get_count("test_2", schema="src") == 78
 
     def test_copy2pg_database_no_ds_raise(self):
         in_source = set_ogr_connection_pg_database(self.settings)

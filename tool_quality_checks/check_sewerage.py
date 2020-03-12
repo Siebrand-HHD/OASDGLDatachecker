@@ -10,7 +10,7 @@ from OASDGLDatachecker.tool_quality_checks.sql_model_views import (
 )
 from OASDGLDatachecker.tool_quality_checks.point_sampling import (
     sample_points_and_create_pg_layer,
-    create_empty_point_sample_layer,
+    create_point_sample_layer,
 )
 from OASDGLDatachecker.tool_quality_checks.importer import (
     set_ogr_connection_pg_database,
@@ -43,7 +43,7 @@ def check_sewerage(db, settings):
     else:
         # create empty layer to make sure that sql not crashes on table not known
         conn = set_ogr_connection_pg_database(settings)
-        create_empty_point_sample_layer(
+        create_point_sample_layer(
             settings, conn, "v2_manhole_view", "manhole_maaiveld", "src", "maaiveld"
         )
         conn.Destroy()
@@ -63,6 +63,7 @@ def initialize_db_checks(db):
 
     db.create_schema(schema_name="chk")
     db.create_schema(schema_name="model")
+    db.create_schema(schema_name="src")
 
     # install necessary functions out of folder "sql_functions"
     sql_relpath = os.path.join("sql", "sql_function_array_greatest_or_smallest.sql")

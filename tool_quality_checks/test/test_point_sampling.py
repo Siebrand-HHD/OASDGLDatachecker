@@ -15,7 +15,7 @@ from OASDGLDatachecker.tool_quality_checks.db import (
 from OASDGLDatachecker.tool_quality_checks.point_sampling import (
     sample_points_and_create_pg_layer,
     get_inverse,
-    create_empty_point_sample_layer,
+    create_point_sample_layer,
 )
 from unittest import TestCase
 
@@ -53,12 +53,12 @@ class TestDB(TestCase):
         inverse = get_inverse(1, 2, 3, 4)
         assert inverse == (-2.0, 1.0, 1.5, -0.5)
 
-    def create_empty_point_sample_layer(self):
+    def test_create_empty_point_sample_layer(self):
         conn = set_ogr_connection_pg_database(self.settings)
-        create_empty_point_sample_layer(
+        create_point_sample_layer(
             self.settings, conn, "v2_manhole_view", "test_maaiveld", "src", "test"
         )
-        assert self.db.count("src.test_maaiveld") == 0
+        assert self.db.get_count("test_maaiveld", schema="src") == 10
         conn.Destroy()
 
     def test_point_sampling(self):
