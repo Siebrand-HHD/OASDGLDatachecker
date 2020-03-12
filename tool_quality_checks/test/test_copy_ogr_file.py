@@ -72,12 +72,11 @@ class TestDB(TestCase):
 
     # def test_02_copy2ogr_pg2gpkg(self):
     #     in_source = set_ogr_connection_pg_database(self.settings)
-        
+
     #     # TODO TEST PART NEEDS FUNCTION LATER
-        
-    #     out_source = 
-        
-        
+
+    #     out_source =
+
     #     copy2ogr(in_source, "test", out_source, "test", schema="src")
     #     assert self.db.get_count("test_2", schema="src") == 78
 
