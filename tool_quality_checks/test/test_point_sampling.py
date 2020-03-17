@@ -53,12 +53,17 @@ class TestDB(TestCase):
         inverse = get_inverse(1, 2, 3, 4)
         assert inverse == (-2.0, 1.0, 1.5, -0.5)
 
-    def test_create_empty_point_sample_layer(self):
+    def test_create_point_sample_layer(self):
         conn = set_ogr_connection_pg_database(self.settings)
         create_point_sample_layer(
-            self.settings, conn, "v2_manhole_view", "test_maaiveld", "src", "test"
+            self.settings,
+            conn,
+            input_point_layer="v2_manhole_view",
+            output_point_layer="test_maaiveld",
+            output_schema="src",
+            output_raster_column="test",
         )
-        assert self.db.get_count("test_maaiveld", schema="src") == 10
+        assert self.db.get_count("test_maaiveld", "src") == 10
         conn.Destroy()
 
     def test_point_sampling(self):
