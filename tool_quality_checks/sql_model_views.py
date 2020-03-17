@@ -51,11 +51,11 @@ sql_understandable_model_views = {
             ELSE 'overige'
  		END as materiaalleiding,
         CASE
-            WHEN shape = 1 THEN 'rechthoekig'
+            WHEN shape = 1 THEN 'rechthoekig (open)'
             WHEN shape = 2 THEN 'rond'
             WHEN shape = 3 THEN 'eivormig'
-            WHEN shape = 5 THEN 'tabulated'
-            WHEN shape = 6 THEN 'trapezium'
+            WHEN shape = 5 THEN 'rechthoekig (getabelleerd)'
+            WHEN shape = 6 THEN 'getabelleerd trapezium'
             ELSE 'overige'
  		END as vormprofiel,
         array_greatest(string_to_array(width,' ')) AS breedteleiding,
@@ -121,15 +121,15 @@ sql_understandable_model_views = {
         discharge_coefficient_positive AS contractiecoefficientdoorlaatprofiel,
         crest_level AS doorlaatniveau,
         CASE
-            WHEN shape = 1 THEN 'rechthoekig'
+            WHEN shape = 1 THEN 'rechthoekig (open)'
             WHEN shape = 2 THEN 'rond'
             WHEN shape = 3 THEN 'eivormig'
-            WHEN shape = 5 THEN 'tabulated'
-            WHEN shape = 6 THEN 'trapezium'
+            WHEN shape = 5 THEN 'rechthoekig (getabelleerd)'
+            WHEN shape = 6 THEN 'getabelleerd trapezium'
             ELSE 'overige'
  		END AS vormprofiel,
-        width AS breedteleiding,
-        height AS hoogteleiding,
+        array_greatest(string_to_array(width,' ')) AS breedtedoorlaat,
+        array_greatest(string_to_array(height,' ')) AS hoogtedoorlaat,
         st_makeline(start_node.the_geom, end_node.the_geom) AS the_geom
     FROM v2_orifice orf
     LEFT JOIN v2_connection_nodes start_node

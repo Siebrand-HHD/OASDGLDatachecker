@@ -20,7 +20,7 @@ def import_sewerage_data_into_db(db, settings):
     Load input files into the database for checks
     """
     # check if relevant parameters are there:
-    if not hasattr(settings, "manhole_layer") or not hasattr(settings, "pipe_layer"):
+    if not hasattr(settings, "manhole_layer"):
         logger.error("Input file path for manhole layer is missing")
         raise AttributeError()
 
@@ -30,14 +30,25 @@ def import_sewerage_data_into_db(db, settings):
     import_file_based_on_filetype(
         db, settings, settings.manhole_layer, "putten_" + settings.import_type
     )
-    import_file_based_on_filetype(
-        db, settings, settings.pipe_layer, "leidingen_" + settings.import_type
-    )
+
+    # check if pipe_layer is available
+    if hasattr(settings, "pipe_layer"):
+        import_file_based_on_filetype(
+            db, settings, settings.pipe_layer, "leidingen_" + settings.import_type
+        )
+        has_gbi_pipe_layer = True
+    else:
+        logger.warning("Pipe layer is not available.")
+        has_gbi_pipe_layer = False
 
     if settings.import_type == "gbi":
-        sql_relpath = os.path.join("sql", "sql_gbi_to_3di.sql")
+        sql_relpath = os.path.join("sql", "sql_gbi_manholes_to_3di.sql")
         sql_abspath = os.path.join(OUR_DIR, sql_relpath)
         db.execute_sql_file(sql_abspath)
+        if has_gbi_pipe_layer:
+            sql_relpath = os.path.join("sql", "sql_gbi_pipes_to_3di.sql")
+            sql_abspath = os.path.join(OUR_DIR, sql_relpath)
+            db.execute_sql_file(sql_abspath)
 
 
 def import_file_based_on_filetype(db, settings, file_path, out_name):
@@ -54,7 +65,9 @@ def import_file_based_on_filetype(db, settings, file_path, out_name):
     filename, file_extension = os.path.splitext(file_with_extention)
 
     if file_extension == ".shp":
-        copy2pg_database(settings, file_path, filename, out_name, schema="src")
+        in_source = set_ogr_connection(file_path)
+        copy2pg_database(settings, in_source, filename, out_name, schema="src")
+        in_source.Destroy()
     else:
         logger.error(
             "File extension of %s is not supported by this tool, please use .shp"
@@ -63,7 +76,7 @@ def import_file_based_on_filetype(db, settings, file_path, out_name):
         raise AttributeError()
 
 
-def copy2pg_database(settings, in_filepath, in_name, out_name, schema="public"):
+def copy2pg_database(settings, in_source, in_name, out_name, schema="public"):
     """
         copy an ogr datasource, like ESRI shapefile, to the database
     """
@@ -71,8 +84,10 @@ def copy2pg_database(settings, in_filepath, in_name, out_name, schema="public"):
     # currently only working for shapefile
     # TODO change naming to also include sqlite and gpkg
     datasource = set_ogr_connection_pg_database(settings)
-    in_source = set_ogr_connection(in_filepath)
     in_layer = in_source.GetLayerByName(in_name)
+    if in_layer is None:
+        logger.error("I could not find the table in your datasource:", in_name)
+        raise AttributeError()
     in_srid = in_layer.GetSpatialRef()
 
     # correct vector layer to solve issues and stuff
@@ -88,6 +103,13 @@ def copy2pg_database(settings, in_filepath, in_name, out_name, schema="public"):
         logger.warning(
             "[!] Warning : Projection is not complete EPSG projection code missing in shapefile."
         )
+
+    # correct vector layer to solve issues and stuff
+    # correct_in_source, correct_layer_name = in_layer, out_name
+    corrected_in_source, corrected_layer_name = correct_vector_layer(
+        in_layer, out_name, epsg=28992
+    )
+    corrected_in_layer = corrected_in_source.GetLayerByName(corrected_layer_name)
 
     options = [
         "OVERWRITE=YES",
@@ -128,7 +150,6 @@ def copy2pg_database(settings, in_filepath, in_name, out_name, schema="public"):
     new_layer = None
 
     datasource.Destroy()
-    in_source.Destroy()
 
 
 def get_projection(sr):
@@ -158,7 +179,7 @@ def set_ogr_connection(connection_path):
     """ Establishes the db connection. """
     # Connect met de database
 
-    ogr_conn = ogr.Open(connection_path)
+    ogr_conn = ogr.Open(connection_path, 1)
     if ogr_conn is None:
         raise ConnectionError("I am unable to read the file: %s" % connection_path)
     return ogr_conn
