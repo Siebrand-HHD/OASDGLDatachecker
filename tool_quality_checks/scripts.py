@@ -53,8 +53,7 @@ def resolve_ini(custom_ini_file):
     decide which ini file to use
     """
     # get default ini for testing purposes
-    default_ini_relpath = os.path.join("test", "data", "instellingen_test.ini")
-    default_ini_relpath = os.path.join(OUR_DIR, default_ini_relpath)
+    default_ini_relpath = os.path.join(OUR_DIR, "test", "data", "instellingen_test.ini")
     if custom_ini_file is None:
         logger.info(
             "[*] Using default ini file {}".format(

@@ -36,16 +36,16 @@ def import_sewerage_data_into_db(db, settings):
         import_file_based_on_filetype(
             db, settings, settings.pipe_layer, "leidingen_" + settings.import_type
         )
-        available_gbi_pipe_layer = True
+        has_gbi_pipe_layer = True
     else:
         logger.warning("Pipe layer is not available.")
-        available_gbi_pipe_layer = False
+        has_gbi_pipe_layer = False
 
     if settings.import_type == "gbi":
         sql_relpath = os.path.join("sql", "sql_gbi_manholes_to_3di.sql")
         sql_abspath = os.path.join(OUR_DIR, sql_relpath)
         db.execute_sql_file(sql_abspath)
-        if available_gbi_pipe_layer:
+        if has_gbi_pipe_layer:
             sql_relpath = os.path.join("sql", "sql_gbi_pipes_to_3di.sql")
             sql_abspath = os.path.join(OUR_DIR, sql_relpath)
             db.execute_sql_file(sql_abspath)
