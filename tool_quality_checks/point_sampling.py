@@ -73,7 +73,7 @@ def sample_points_and_create_pg_layer(
         j = np.int64(e * (x - p) + f * (y - q))
         i = np.int64(g * (x - p) + h * (y - q))
 
-        # try & except used to set put buiten DEM extent to -9999 (nodatavalue)
+        # try & except used to set put outside of DEM extent to -9999 (nodatavalue)
         try:
             # uitlezen van raster op basis van pixel nummer
             arrayval = raster_band.ReadAsArray(int(j), int(i), 1, 1).astype(np.float)
