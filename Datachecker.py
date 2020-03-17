@@ -334,7 +334,23 @@ class Datachecker:
         layer.triggerRepaint()
         print(layer.name())
         #print(value)
+        
+    def instellingen_opslaan(self):
+        velden = {'sp_hoogtemin', 'sp_hoogtemax', 'sp_lengtemin','sp_lengtemax', 'sp_afmetingmin','sp_afmetingmax', 'sp_dekkingmin', 'sp_verhangmax', 'sp_hoogteverschil', 'sp_paddingput'}        
+        for veld in velden:
+            box = getattr(self.dockwidget, veld)
+            waarde = box.value()
+            # print(veld, waarde)            
+            self.save_qsetting('Instellingen', veld, waarde)
+            
 
+    def save_qsetting(self, group, key, value):
+        # file waar het opgelsagen wordt: C:\Users\onnoc\AppData\Roaming\QGIS\QGIS3\profiles\default\QGIS\QGIS3.INI
+        s= QSettings()        
+        s.setValue( 'OASDGLDatachecker/' + group + '/' + key, value) 
+        test = s.value( 'OASDGLDatachecker/' + group + '/' + key)
+        
+            
     def run(self):
         """Run method that loads and starts the plugin"""
         if not self.pluginIsActive:
@@ -358,6 +374,7 @@ class Datachecker:
             self.dockwidget.selectFolderButton_export.clicked.connect(self.pb_select_exp_folder)
             ##self.dockwidget.linePutten.dropevent.connect(over
             self.dockwidget.DatachecksButton.clicked.connect(self.draai_de_checks)
+            self.dockwidget.instellingenopslaan.clicked.connect(self.instellingen_opslaan)
             
             # connect to provide cleanup on closing of dockwidget
             self.dockwidget.closingPlugin.connect(self.onClosePlugin)

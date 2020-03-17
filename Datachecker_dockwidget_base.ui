@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>536</width>
+    <width>533</width>
     <height>759</height>
    </rect>
   </property>
@@ -33,7 +33,7 @@
        <bool>true</bool>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <property name="documentMode">
        <bool>true</bool>
@@ -448,7 +448,7 @@
         <item>
          <layout class="QGridLayout" name="gridLayout_3">
           <item row="4" column="1">
-           <widget class="QDoubleSpinBox" name="doubleSpinBox_5">
+           <widget class="QDoubleSpinBox" name="sp_lengtemax">
             <property name="decimals">
              <number>1</number>
             </property>
@@ -517,7 +517,7 @@
            </widget>
           </item>
           <item row="2" column="1">
-           <widget class="QDoubleSpinBox" name="doubleSpinBox_4">
+           <widget class="QDoubleSpinBox" name="sp_lengtemin">
             <property name="decimals">
              <number>1</number>
             </property>
@@ -527,7 +527,7 @@
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QDoubleSpinBox" name="doubleSpinBox">
+           <widget class="QDoubleSpinBox" name="sp_hoogtemin">
             <property name="minimumSize">
              <size>
               <width>100</width>
@@ -546,7 +546,7 @@
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="QDoubleSpinBox" name="doubleSpinBox_3">
+           <widget class="QDoubleSpinBox" name="sp_hoogtemax">
             <property name="decimals">
              <number>1</number>
             </property>
@@ -572,7 +572,7 @@
            </spacer>
           </item>
           <item row="8" column="1">
-           <widget class="QDoubleSpinBox" name="doubleSpinBox_8">
+           <widget class="QDoubleSpinBox" name="sp_verhangmax">
             <property name="decimals">
              <number>1</number>
             </property>
@@ -582,7 +582,7 @@
            </widget>
           </item>
           <item row="5" column="1">
-           <widget class="QDoubleSpinBox" name="doubleSpinBox_6">
+           <widget class="QDoubleSpinBox" name="sp_afmetingmin">
             <property name="decimals">
              <number>1</number>
             </property>
@@ -592,7 +592,7 @@
            </widget>
           </item>
           <item row="7" column="1">
-           <widget class="QDoubleSpinBox" name="doubleSpinBox_7">
+           <widget class="QDoubleSpinBox" name="sp_dekkingmin">
             <property name="decimals">
              <number>1</number>
             </property>
@@ -602,7 +602,7 @@
            </widget>
           </item>
           <item row="10" column="1">
-           <widget class="QDoubleSpinBox" name="doubleSpinBox_10">
+           <widget class="QDoubleSpinBox" name="sp_hoogteverschil">
             <property name="decimals">
              <number>1</number>
             </property>
@@ -612,7 +612,7 @@
            </widget>
           </item>
           <item row="11" column="1">
-           <widget class="QDoubleSpinBox" name="doubleSpinBox_11">
+           <widget class="QDoubleSpinBox" name="sp_paddingput">
             <property name="decimals">
              <number>1</number>
             </property>
@@ -636,7 +636,7 @@
            </widget>
           </item>
           <item row="6" column="1">
-           <widget class="QDoubleSpinBox" name="doubleSpinBox_9">
+           <widget class="QDoubleSpinBox" name="sp_afmetingmax">
             <property name="decimals">
              <number>1</number>
             </property>
@@ -645,6 +645,24 @@
             </property>
             <property name="value">
              <double>5.000000000000000</double>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_7">
+          <item>
+           <widget class="QPushButton" name="instellingenopslaan">
+            <property name="text">
+             <string>Instellingen opslaan</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pushButton_10">
+            <property name="text">
+             <string>Default</string>
             </property>
            </widget>
           </item>
@@ -759,7 +777,7 @@
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>98</width>
+                 <width>93</width>
                  <height>66</height>
                 </rect>
                </property>
@@ -784,8 +802,8 @@
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>98</width>
-                 <height>118</height>
+                 <width>479</width>
+                 <height>239</height>
                 </rect>
                </property>
                <attribute name="label">
