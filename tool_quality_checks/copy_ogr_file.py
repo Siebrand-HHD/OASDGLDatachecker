@@ -64,9 +64,9 @@ def copy2ogr(in_source, in_name, out_source, out_name, schema="public"):
     # TODO findout how to make the target ref 28992 by default
     new_layer = out_source.CreateLayer(
         corrected_layer_name,
-        corrected_in_layer.GetSpatialRef(),
-        corrected_in_layer.GetGeomType(),
-        options,
+        srs=corrected_in_layer.GetSpatialRef(),
+        geom_type=corrected_in_layer.GetGeomType(),
+        options=options,
     )
     for i in range(corrected_in_layer.GetLayerDefn().GetFieldCount()):
         new_layer.CreateField(corrected_in_layer.GetLayerDefn().GetFieldDefn(i))
@@ -75,8 +75,6 @@ def copy2ogr(in_source, in_name, out_source, out_name, schema="public"):
     for j in range(corrected_in_layer.GetFeatureCount()):
         new_feature = corrected_in_layer.GetFeature(j)
         new_feature.SetFID(-1)
-        new_geom = new_feature.geometry()
-        new_feature.SetGeometry(new_geom)
         new_layer.CreateFeature(new_feature)
         # if j % 128 == 0:
         new_layer.CommitTransaction()

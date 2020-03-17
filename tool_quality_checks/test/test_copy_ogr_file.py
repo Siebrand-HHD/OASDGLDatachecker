@@ -68,13 +68,13 @@ class TestDB(TestCase):
         with pytest.raises(Exception):
             set_ogr_connection(filepath)
 
-    def test_01_copy2ogr_shp2pg(self):
-        file_with_extention = basename(SHP_ABSPATH)
-        filename, file_extension = os.path.splitext(file_with_extention)
-        in_source = set_ogr_connection(SHP_ABSPATH)
-        out_source = set_ogr_connection_pg_database(self.settings)
-        copy2ogr(in_source, filename, out_source, "test")
-        assert self.db.get_count("test") == 78
+    # def test_01_copy2ogr_shp2pg(self):
+    #     file_with_extention = basename(SHP_ABSPATH)
+    #     filename, file_extension = os.path.splitext(file_with_extention)
+    #     in_source = set_ogr_connection(SHP_ABSPATH)
+    #     out_source = set_ogr_connection_pg_database(self.settings)
+    #     copy2ogr(in_source, filename, out_source, "test")
+    #     assert self.db.get_count("test") == 78
 
     def test_01_copy2ogr_shp2gpkg(self):
         file_with_extention = basename(SHP_ABSPATH)
@@ -83,35 +83,35 @@ class TestDB(TestCase):
         copy2ogr(in_source, filename, self.gpkg_source, "test_shp_gpkg")
         assert 0 == 1
 
-    def test_02_copy2ogr_pg2pg(self):
-        in_source = set_ogr_connection_pg_database(self.settings)
-        out_source = in_source
-        copy2ogr(in_source, "test", out_source, "test_2", schema="src")
-        assert self.db.get_count("test_2", schema="src") == 78
+    # def test_02_copy2ogr_pg2pg(self):
+    #     in_source = set_ogr_connection_pg_database(self.settings)
+    #     out_source = in_source
+    #     copy2ogr(in_source, "test", out_source, "test_2", schema="src")
+    #     assert self.db.get_count("test_2", schema="src") == 78
 
-    def test_02_copy2ogr_pg2gpkg(self):
-        in_source = set_ogr_connection_pg_database(self.settings)
-        if os.path.isfile(GKPG_ABSPATH):
-            os.remove(GKPG_ABSPATH)
-        out_source = None
-        out_source = DRIVER_OGR_GPKG.CreateDataSource(GKPG_ABSPATH)
-        copy2ogr(in_source, "test", self.gpkg_source, "test_pg_gpkg")
-        assert 0 == 1
+    # def test_02_copy2ogr_pg2gpkg(self):
+    #     in_source = set_ogr_connection_pg_database(self.settings)
+    #     if os.path.isfile(GKPG_ABSPATH):
+    #         os.remove(GKPG_ABSPATH)
+    #     out_source = None
+    #     out_source = DRIVER_OGR_GPKG.CreateDataSource(GKPG_ABSPATH)
+    #     copy2ogr(in_source, "test", self.gpkg_source, "test_pg_gpkg")
+    #     assert 0 == 1
 
-    def test_02_copy2ogr_pg2shp(self):
-        in_source = set_ogr_connection_pg_database(self.settings)
-        if os.path.isfile(SHP_OUT_ABSPATH):
-            DRIVER_OGR_SHP.DeleteDataSource(SHP_OUT_ABSPATH)
-        out_source = None
-        out_source = DRIVER_OGR_SHP.CreateDataSource(SHP_OUT_ABSPATH)
-        copy2ogr(in_source, "test", out_source, "test")
-        assert os.path.getsize(SHP_OUT_ABSPATH) == 2284
+    # def test_02_copy2ogr_pg2shp(self):
+    #     in_source = set_ogr_connection_pg_database(self.settings)
+    #     if os.path.isfile(SHP_OUT_ABSPATH):
+    #         DRIVER_OGR_SHP.DeleteDataSource(SHP_OUT_ABSPATH)
+    #     out_source = None
+    #     out_source = DRIVER_OGR_SHP.CreateDataSource(SHP_OUT_ABSPATH)
+    #     copy2ogr(in_source, "test", out_source, "test")
+    #     assert os.path.getsize(SHP_OUT_ABSPATH) == 2284
 
-    def test_copy2pg_database_no_ds_raise(self):
-        in_source = set_ogr_connection_pg_database(self.settings)
-        out_source = in_source
-        with pytest.raises(AttributeError):
-            copy2ogr(in_source, "not_existing", out_source, "test_2", schema="src")
+    # def test_copy2pg_database_no_ds_raise(self):
+    #     in_source = set_ogr_connection_pg_database(self.settings)
+    #     out_source = in_source
+    #     with pytest.raises(AttributeError):
+    #         copy2ogr(in_source, "not_existing", out_source, "test_2", schema="src")
 
     def test_get_projection_not_good(self):
         proj = """PROJCS["Amersfoort_RD_New",GEOGCS["GCS_Amersfoort",DATUM["D_Amersfoort",SPHEROID["Bessel_1841",6377397.155,299.1528128]],PRIMEM["Greenwich",0],UNIT["Degree",0.017453292519943295]],PROJECTION["Double_Stereographic"],PARAMETER["latitude_of_origin",52.15616055555555],PARAMETER["central_meridian",5.38763888888889],PARAMETER["scale_factor",0.9999079],PARAMETER["false_easting",155000],PARAMETER["false_northing",463000],UNIT["Meter",1]]"""
