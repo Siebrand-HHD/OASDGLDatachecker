@@ -9,12 +9,13 @@ from OASDGLDatachecker.tool_quality_checks.db import (
     create_database,
     drop_database,
 )
+from OASDGLDatachecker.tool_quality_checks.sql_views import sql_views
 
 from unittest import TestCase
 
-
+OUR_DIR = os.path.dirname(__file__)
 _ini_relpath = "data/instellingen_test.ini"
-INI_ABSPATH = os.path.join(os.path.dirname(__file__), _ini_relpath)
+INI_ABSPATH = os.path.join(OUR_DIR, _ini_relpath)
 
 """
 This test file assumes that the checks will be run in particular order.
@@ -111,20 +112,18 @@ class TestDB(TestCase):
     # TODO: add checks for all types in sql.py
 
     def test_execute_sql_file(self):
-        sql_relpath = os.path.join(
-            "sql_functions", "function_array_greatest_or_smallest.sql"
-        )
+        sql_relpath = os.path.join("sql", "sql_function_array_greatest_or_smallest.sql")
         sql_abspath = os.path.join(
-            os.path.abspath(os.path.join(os.path.dirname(__file__), "..")), sql_relpath
+            os.path.abspath(os.path.join(OUR_DIR, "..")), sql_relpath
         )
         self.db.execute_sql_file(sql_abspath)
 
-    def test_execute_sql_dir(self):
-        sql_reldir = "sql_functions"
-        sql_absdir = os.path.join(
-            os.path.abspath(os.path.join(os.path.dirname(__file__), "..")), sql_reldir
+    def test_create_view_from_dictionary(self):
+        self.db.create_preset_view_from_dictionary(
+            view_dictionary=sql_views,
+            view_table="v2_1d_boundary_conditions_view",
+            view_schema="chk",
         )
-        self.db.execute_sql_dir(sql_absdir)
 
     def test_01_create_table(self):
         self.db.create_table(

@@ -4,8 +4,6 @@ import os
 import psycopg2
 import logging
 
-from OASDGLDatachecker.tool_quality_checks import sql_views
-
 
 logger = logging.getLogger(__name__)
 
@@ -31,7 +29,7 @@ def _connect_to_server(settings, sql_statement):
 
 def drop_database(settings):
     """drops a database"""
-    drop_database_statement = """DROP DATABASE {database_name};""".format(
+    drop_database_statement = """DROP DATABASE IF EXISTS {database_name};""".format(
         database_name=settings.database
     )
     _connect_to_server(settings, drop_database_statement)
@@ -141,6 +139,20 @@ class ThreediDatabase(object):
         )
         self.execute_sql_statement(sql_statement=create_schema_statement, fetch=False)
 
+    def create_preset_view_from_dictionary(
+        self, view_dictionary, view_table, view_schema, drop_view=True
+    ):
+        """
+        Drop and create a view from a dictionary
+        """
+        if drop_view:
+            drop_statement = """DROP VIEW IF EXISTS {view_schema}.{view_table};""".format(
+                view_table=view_table, view_schema=view_schema
+            )
+            self.execute_sql_statement(drop_statement, fetch=False)
+        create_statement = view_dictionary[view_table].format(schema=view_schema)
+        self.execute_sql_statement(sql_statement=create_statement, fetch=False)
+
     def populate_geometry_columns(self):
         """Populate geometry columns"""
         populate_geometry_columns_statement = """
@@ -184,32 +196,11 @@ class ThreediDatabase(object):
         self.execute_sql_statement(create_str, fetch=False)
         logger.info("[+] Successfully created table {}.{}".format(schema, table_name))
 
-    def create_preset_threedi_view(self, view_table, view_schema, drop_view=True):
-        """
-        Creates a view with a join to v2_connection_nodes table
-        
-        :param view_table - table of which the view is created
-        """
-        if drop_view == True:
-            drop_statement = """DROP VIEW IF EXISTS {view_table};""".format(
-                view_table=view_table
-            )
-            self.execute_sql_statement(drop_statement, fetch=False)
-        create_statement = sql_views.sql_views[view_table].format(schema=view_schema)
-        self.execute_sql_statement(sql_statement=create_statement, fetch=False)
-
     def execute_sql_file(self, filename):
         # Open and read the file as a single buffer
         sql_file = open(filename, "r").read()
         self.execute_sql_statement(sql_statement=sql_file, fetch=False)
         logger.debug("Execute sql file with function:" + filename)
-
-    def execute_sql_dir(self, dirname):
-        for root, subdirs, files in sorted(os.walk(dirname)):
-            for f in sorted(files):
-                file_path = os.path.join(root, f)
-                if file_path.endswith(".sql"):
-                    self.execute_sql_file(file_path)
 
     def commit_values(self, table_name, field_names, data, schema="public"):
         """
