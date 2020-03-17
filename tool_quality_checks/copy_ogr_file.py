@@ -75,10 +75,12 @@ def copy2ogr(in_source, in_name, out_source, out_name, schema="public"):
     for j in range(corrected_in_layer.GetFeatureCount()):
         new_feature = corrected_in_layer.GetFeature(j)
         new_feature.SetFID(-1)
+        new_geom = new_feature.geometry()
+        new_feature.SetGeometry(new_geom)
         new_layer.CreateFeature(new_feature)
-        if j % 128 == 0:
-            new_layer.CommitTransaction()
-            new_layer.StartTransaction()
+        # if j % 128 == 0:
+        new_layer.CommitTransaction()
+        new_layer.StartTransaction()
     new_layer.CommitTransaction()
 
     if new_layer.GetFeatureCount() == 0:

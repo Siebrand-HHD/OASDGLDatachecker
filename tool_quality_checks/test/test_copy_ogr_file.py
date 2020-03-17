@@ -2,7 +2,7 @@
 """Tests for importer.py"""
 import os
 import pytest
-from osgeo import osr
+from osgeo import osr, ogr
 from os.path import basename
 
 from OASDGLDatachecker.tool_quality_checks.copy_ogr_file import (
@@ -20,10 +20,12 @@ from OASDGLDatachecker.tool_quality_checks.db import (
 from unittest import TestCase
 
 OUR_DIR = os.path.dirname(__file__)
-_ini_relpath = "data/instellingen_test.ini"
-INI_ABSPATH = os.path.join(OUR_DIR, _ini_relpath)
-_shp_relpath = "data/rioolput.shp"
-SHP_ABSPATH = os.path.join(OUR_DIR, _shp_relpath)
+INI_ABSPATH = os.path.join(OUR_DIR, "data/instellingen_test.ini")
+SHP_ABSPATH = os.path.join(OUR_DIR, "data/rioolput.shp")
+GKPG_ABSPATH = os.path.join(OUR_DIR, "data/test_copy_ogr.gpkg")
+SHP_OUT_ABSPATH = os.path.join(OUR_DIR, "data/test_copy_ogr.shp")
+DRIVER_OGR_GPKG = ogr.GetDriverByName("GPKG")
+DRIVER_OGR_SHP = ogr.GetDriverByName("ESRI Shapefile")
 
 
 class TestDB(TestCase):
@@ -39,11 +41,21 @@ class TestDB(TestCase):
         cls.db.create_extension(extension_name="postgis")
         cls.db.initialize_db_threedi()
         cls.db.create_schema("src")
+        # Create geopackage datasource
+        # if os.path.isfile(GKPG_ABSPATH):
+        #     os.remove(GKPG_ABSPATH)
+        # cls.gpkg_source = None
+        # cls.gpkg_source = DRIVER_OGR_GPKG.CreateDataSource(GKPG_ABSPATH)
+        cls.gpkg_source = set_ogr_connection(GKPG_ABSPATH)
 
     @classmethod
     def tearDownClass(cls):
         cls.db.conn.close()
         # drop_database(cls.settings)
+        if os.path.isfile(SHP_OUT_ABSPATH):
+            DRIVER_OGR_SHP.DeleteDataSource(SHP_OUT_ABSPATH)
+        # if os.path.isfile(GKPG_ABSPATH):
+        #     os.remove(GKPG_ABSPATH)
 
     def test_ogr_connection_pg_database(self):
         set_ogr_connection_pg_database(self.settings)
@@ -64,21 +76,36 @@ class TestDB(TestCase):
         copy2ogr(in_source, filename, out_source, "test")
         assert self.db.get_count("test") == 78
 
+    def test_01_copy2ogr_shp2gpkg(self):
+        file_with_extention = basename(SHP_ABSPATH)
+        filename, file_extension = os.path.splitext(file_with_extention)
+        in_source = set_ogr_connection(SHP_ABSPATH)
+        copy2ogr(in_source, filename, self.gpkg_source, "test_shp_gpkg")
+        assert 0 == 1
+
     def test_02_copy2ogr_pg2pg(self):
         in_source = set_ogr_connection_pg_database(self.settings)
         out_source = in_source
         copy2ogr(in_source, "test", out_source, "test_2", schema="src")
         assert self.db.get_count("test_2", schema="src") == 78
 
-    # def test_02_copy2ogr_pg2gpkg(self):
-    #     in_source = set_ogr_connection_pg_database(self.settings)
+    def test_02_copy2ogr_pg2gpkg(self):
+        in_source = set_ogr_connection_pg_database(self.settings)
+        if os.path.isfile(GKPG_ABSPATH):
+            os.remove(GKPG_ABSPATH)
+        out_source = None
+        out_source = DRIVER_OGR_GPKG.CreateDataSource(GKPG_ABSPATH)
+        copy2ogr(in_source, "test", self.gpkg_source, "test_pg_gpkg")
+        assert 0 == 1
 
-    #     # TODO TEST PART NEEDS FUNCTION LATER
-
-    #     out_source =
-
-    #     copy2ogr(in_source, "test", out_source, "test", schema="src")
-    #     assert self.db.get_count("test_2", schema="src") == 78
+    def test_02_copy2ogr_pg2shp(self):
+        in_source = set_ogr_connection_pg_database(self.settings)
+        if os.path.isfile(SHP_OUT_ABSPATH):
+            DRIVER_OGR_SHP.DeleteDataSource(SHP_OUT_ABSPATH)
+        out_source = None
+        out_source = DRIVER_OGR_SHP.CreateDataSource(SHP_OUT_ABSPATH)
+        copy2ogr(in_source, "test", out_source, "test")
+        assert os.path.getsize(SHP_OUT_ABSPATH) == 2284
 
     def test_copy2pg_database_no_ds_raise(self):
         in_source = set_ogr_connection_pg_database(self.settings)
