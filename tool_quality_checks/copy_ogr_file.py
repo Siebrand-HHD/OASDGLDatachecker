@@ -8,6 +8,7 @@ from osgeo import ogr
 from OASDGLDatachecker.tool_quality_checks.correct_import_file import (
     correct_vector_layer,
 )
+import subprocess
 
 logger = logging.getLogger(__name__)
 ogr.UseExceptions()
@@ -68,17 +69,27 @@ def copy2ogr(in_source, in_name, out_source, out_name, schema="public"):
         geom_type=corrected_in_layer.GetGeomType(),
         options=options,
     )
-    for i in range(corrected_in_layer.GetLayerDefn().GetFieldCount()):
-        new_layer.CreateField(corrected_in_layer.GetLayerDefn().GetFieldDefn(i))
+
+    field_names_list = []
+    defn = corrected_in_layer.GetLayerDefn()
+    for i in range(defn.GetFieldCount()):
+        new_layer.CreateField(defn.GetFieldDefn(i))
+        field_names_list.append(defn.GetFieldDefn(i).GetName())
 
     new_layer.StartTransaction()
     for j in range(corrected_in_layer.GetFeatureCount()):
-        new_feature = corrected_in_layer.GetFeature(j)
+        copy_feature = corrected_in_layer.GetFeature(j)
+        copy_feature.SetFID(-1)
+        new_feature = ogr.Feature(new_layer.GetLayerDefn())
         new_feature.SetFID(-1)
+        for key in field_names_list:
+            new_feature[key] = copy_feature[key]
+        new_geom = copy_feature.geometry()
+        new_feature.SetGeometry(new_geom)
         new_layer.CreateFeature(new_feature)
-        # if j % 128 == 0:
-        new_layer.CommitTransaction()
-        new_layer.StartTransaction()
+        if j % 128 == 0:
+            new_layer.CommitTransaction()
+            new_layer.StartTransaction()
     new_layer.CommitTransaction()
 
     if new_layer.GetFeatureCount() == 0:
@@ -118,3 +129,36 @@ def set_ogr_connection(connection_path):
     if ogr_conn is None:
         raise ConnectionError("I am unable to read the file: %s" % connection_path)
     return ogr_conn
+
+
+def ugly_copy2ogr_pg2gpkg(settings, output_gpkg):
+
+    command = [
+        "ogr2ogr",
+        "-overwrite",
+        "--config",
+        "PG_LIST_ALL_TABLES",
+        "YES",
+        "--config",
+        "PG_SKIP_VIEWS",
+        "YES",
+        "-f",
+        "GPKG",
+        output_gpkg,
+        "-progress",
+        "PG:dbname={} host={} port={} user={} password={} schemas={} active_schema={}".format(
+            settings.database,
+            settings.host,
+            settings.port,
+            settings.username,
+            settings.password,
+            "chk",
+            "chk",
+        ),
+        "-preserve_fid",
+        "-lco",
+        "FID=id",
+        "-lco",
+        "GEOMETRY_NAME=the_geom",
+    ]
+    subprocess.check_call(command)

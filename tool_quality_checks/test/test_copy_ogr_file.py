@@ -10,6 +10,7 @@ from OASDGLDatachecker.tool_quality_checks.copy_ogr_file import (
     set_ogr_connection,
     copy2ogr,
     get_projection,
+    ugly_copy2ogr_pg2gpkg,
 )
 from OASDGLDatachecker.tool_quality_checks.scripts import SettingsObject
 from OASDGLDatachecker.tool_quality_checks.db import (
@@ -42,10 +43,10 @@ class TestDB(TestCase):
         cls.db.initialize_db_threedi()
         cls.db.create_schema("src")
         # Create geopackage datasource
-        # if os.path.isfile(GKPG_ABSPATH):
-        #     os.remove(GKPG_ABSPATH)
-        # cls.gpkg_source = None
-        # cls.gpkg_source = DRIVER_OGR_GPKG.CreateDataSource(GKPG_ABSPATH)
+        if os.path.isfile(GKPG_ABSPATH):
+            os.remove(GKPG_ABSPATH)
+        cls.gpkg_source = None
+        cls.gpkg_source = DRIVER_OGR_GPKG.CreateDataSource(GKPG_ABSPATH)
         cls.gpkg_source = set_ogr_connection(GKPG_ABSPATH)
 
     @classmethod
@@ -68,50 +69,52 @@ class TestDB(TestCase):
         with pytest.raises(Exception):
             set_ogr_connection(filepath)
 
-    # def test_01_copy2ogr_shp2pg(self):
-    #     file_with_extention = basename(SHP_ABSPATH)
-    #     filename, file_extension = os.path.splitext(file_with_extention)
-    #     in_source = set_ogr_connection(SHP_ABSPATH)
-    #     out_source = set_ogr_connection_pg_database(self.settings)
-    #     copy2ogr(in_source, filename, out_source, "test")
-    #     assert self.db.get_count("test") == 78
+    def test_01_copy2ogr_shp2pg(self):
+        file_with_extention = basename(SHP_ABSPATH)
+        filename, file_extension = os.path.splitext(file_with_extention)
+        in_source = set_ogr_connection(SHP_ABSPATH)
+        out_source = set_ogr_connection_pg_database(self.settings)
+        copy2ogr(in_source, filename, out_source, "test")
+        assert self.db.get_count("test") == 79
 
     def test_01_copy2ogr_shp2gpkg(self):
         file_with_extention = basename(SHP_ABSPATH)
         filename, file_extension = os.path.splitext(file_with_extention)
         in_source = set_ogr_connection(SHP_ABSPATH)
         copy2ogr(in_source, filename, self.gpkg_source, "test_shp_gpkg")
-        assert 0 == 1
+        feature_count = self.gpkg_source.GetLayerByName(
+            "test_shp_gpkg"
+        ).GetFeatureCount()
+        assert feature_count == 79
 
-    # def test_02_copy2ogr_pg2pg(self):
-    #     in_source = set_ogr_connection_pg_database(self.settings)
-    #     out_source = in_source
-    #     copy2ogr(in_source, "test", out_source, "test_2", schema="src")
-    #     assert self.db.get_count("test_2", schema="src") == 78
+    def test_02_copy2ogr_pg2pg(self):
+        in_source = set_ogr_connection_pg_database(self.settings)
+        out_source = in_source
+        copy2ogr(in_source, "test", out_source, "test_2", schema="src")
+        assert self.db.get_count("test_2", schema="src") == 79
 
-    # def test_02_copy2ogr_pg2gpkg(self):
-    #     in_source = set_ogr_connection_pg_database(self.settings)
-    #     if os.path.isfile(GKPG_ABSPATH):
-    #         os.remove(GKPG_ABSPATH)
-    #     out_source = None
-    #     out_source = DRIVER_OGR_GPKG.CreateDataSource(GKPG_ABSPATH)
-    #     copy2ogr(in_source, "test", self.gpkg_source, "test_pg_gpkg")
-    #     assert 0 == 1
+    def test_02_copy2ogr_pg2gpkg(self):
+        in_source = set_ogr_connection_pg_database(self.settings)
+        copy2ogr(in_source, "test", self.gpkg_source, "test_pg_gpkg")
+        feature_count = self.gpkg_source.GetLayerByName(
+            "test_pg_gpkg"
+        ).GetFeatureCount()
+        assert feature_count == 79
 
-    # def test_02_copy2ogr_pg2shp(self):
-    #     in_source = set_ogr_connection_pg_database(self.settings)
-    #     if os.path.isfile(SHP_OUT_ABSPATH):
-    #         DRIVER_OGR_SHP.DeleteDataSource(SHP_OUT_ABSPATH)
-    #     out_source = None
-    #     out_source = DRIVER_OGR_SHP.CreateDataSource(SHP_OUT_ABSPATH)
-    #     copy2ogr(in_source, "test", out_source, "test")
-    #     assert os.path.getsize(SHP_OUT_ABSPATH) == 2284
+    def test_02_copy2ogr_pg2shp(self):
+        in_source = set_ogr_connection_pg_database(self.settings)
+        if os.path.isfile(SHP_OUT_ABSPATH):
+            DRIVER_OGR_SHP.DeleteDataSource(SHP_OUT_ABSPATH)
+        out_source = None
+        out_source = DRIVER_OGR_SHP.CreateDataSource(SHP_OUT_ABSPATH)
+        copy2ogr(in_source, "test", out_source, "test")
+        assert os.path.getsize(SHP_OUT_ABSPATH) == 2284
 
-    # def test_copy2pg_database_no_ds_raise(self):
-    #     in_source = set_ogr_connection_pg_database(self.settings)
-    #     out_source = in_source
-    #     with pytest.raises(AttributeError):
-    #         copy2ogr(in_source, "not_existing", out_source, "test_2", schema="src")
+    def test_copy2pg_database_no_ds_raise(self):
+        in_source = set_ogr_connection_pg_database(self.settings)
+        out_source = in_source
+        with pytest.raises(AttributeError):
+            copy2ogr(in_source, "not_existing", out_source, "test_2", schema="src")
 
     def test_get_projection_not_good(self):
         proj = """PROJCS["Amersfoort_RD_New",GEOGCS["GCS_Amersfoort",DATUM["D_Amersfoort",SPHEROID["Bessel_1841",6377397.155,299.1528128]],PRIMEM["Greenwich",0],UNIT["Degree",0.017453292519943295]],PROJECTION["Double_Stereographic"],PARAMETER["latitude_of_origin",52.15616055555555],PARAMETER["central_meridian",5.38763888888889],PARAMETER["scale_factor",0.9999079],PARAMETER["false_easting",155000],PARAMETER["false_northing",463000],UNIT["Meter",1]]"""
@@ -124,3 +127,23 @@ class TestDB(TestCase):
         sr = osr.SpatialReference()
         sr.ImportFromWkt(proj)
         assert get_projection(sr) == "EPSG:28992"
+
+    def test_ugly_copy2ogr_pg2gpkg(self):
+        # load GBI data set into tester
+        manhole_layer_rel_path = "data\schiedam-test\schiedam-putten-test.shp"
+        self.settings.manhole_layer = os.path.join(OUR_DIR, manhole_layer_rel_path)
+        pipe_layer_rel_path = "data\schiedam-test\schiedam-leidingen-test.shp"
+        self.settings.pipe_layer = os.path.join(OUR_DIR, pipe_layer_rel_path)
+        self.settings.import_type = "gbi"
+        from OASDGLDatachecker.tool_quality_checks.importer import (
+            import_sewerage_data_into_db,
+        )
+
+        import_sewerage_data_into_db(self.db, self.settings)
+        raster_rel_path = "data\schiedam-test\dem_schiedam_test.tif"
+        self.settings.dem = os.path.join(OUR_DIR, raster_rel_path)
+        from OASDGLDatachecker.tool_quality_checks.check_sewerage import check_sewerage
+
+        check_sewerage(self.db, self.settings)
+        output_gpkg_path = os.path.join(OUR_DIR, "data/check_results.gpkg")
+        ugly_copy2ogr_pg2gpkg(self.settings, output_gpkg_path)

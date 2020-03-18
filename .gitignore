@@ -7,3 +7,4 @@ __pycache__
 *-shm
 *.gpkg-wal
 *.xml
+tool_quality_checks/test/data/test_copy_ogr.*
