@@ -127,23 +127,3 @@ class TestDB(TestCase):
         sr = osr.SpatialReference()
         sr.ImportFromWkt(proj)
         assert get_projection(sr) == "EPSG:28992"
-
-    def test_ugly_copy2ogr_pg2gpkg(self):
-        # load GBI data set into tester
-        manhole_layer_rel_path = "data\schiedam-test\schiedam-putten-test.shp"
-        self.settings.manhole_layer = os.path.join(OUR_DIR, manhole_layer_rel_path)
-        pipe_layer_rel_path = "data\schiedam-test\schiedam-leidingen-test.shp"
-        self.settings.pipe_layer = os.path.join(OUR_DIR, pipe_layer_rel_path)
-        self.settings.import_type = "gbi"
-        from OASDGLDatachecker.tool_quality_checks.importer import (
-            import_sewerage_data_into_db,
-        )
-
-        import_sewerage_data_into_db(self.db, self.settings)
-        raster_rel_path = "data\schiedam-test\dem_schiedam_test.tif"
-        self.settings.dem = os.path.join(OUR_DIR, raster_rel_path)
-        from OASDGLDatachecker.tool_quality_checks.check_sewerage import check_sewerage
-
-        check_sewerage(self.db, self.settings)
-        output_gpkg_path = os.path.join(OUR_DIR, "data/check_results.gpkg")
-        ugly_copy2ogr_pg2gpkg(self.settings, output_gpkg_path)

@@ -129,36 +129,3 @@ def set_ogr_connection(connection_path):
     if ogr_conn is None:
         raise ConnectionError("I am unable to read the file: %s" % connection_path)
     return ogr_conn
-
-
-def ugly_copy2ogr_pg2gpkg(settings, output_gpkg):
-
-    command = [
-        "ogr2ogr",
-        "-overwrite",
-        "--config",
-        "PG_LIST_ALL_TABLES",
-        "YES",
-        "--config",
-        "PG_SKIP_VIEWS",
-        "YES",
-        "-f",
-        "GPKG",
-        output_gpkg,
-        "-progress",
-        "PG:dbname={} host={} port={} user={} password={} schemas={} active_schema={}".format(
-            settings.database,
-            settings.host,
-            settings.port,
-            settings.username,
-            settings.password,
-            "chk",
-            "chk",
-        ),
-        "-preserve_fid",
-        "-lco",
-        "FID=id",
-        "-lco",
-        "GEOMETRY_NAME=the_geom",
-    ]
-    subprocess.check_call(command)
