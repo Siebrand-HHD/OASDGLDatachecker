@@ -10,7 +10,6 @@ from OASDGLDatachecker.tool_quality_checks.copy_ogr_file import (
     set_ogr_connection,
     copy2ogr,
     get_projection,
-    ugly_copy2ogr_pg2gpkg,
 )
 from OASDGLDatachecker.tool_quality_checks.scripts import SettingsObject
 from OASDGLDatachecker.tool_quality_checks.db import (
@@ -108,7 +107,7 @@ class TestDB(TestCase):
         out_source = None
         out_source = DRIVER_OGR_SHP.CreateDataSource(SHP_OUT_ABSPATH)
         copy2ogr(in_source, "test", out_source, "test")
-        assert os.path.getsize(SHP_OUT_ABSPATH) == 2284
+        assert os.path.getsize(SHP_OUT_ABSPATH) == 2312
 
     def test_copy2pg_database_no_ds_raise(self):
         in_source = set_ogr_connection_pg_database(self.settings)
