@@ -33,8 +33,12 @@ from osgeo import ogr
 from .Datachecker_dockwidget import DatacheckerDockWidget
 import os.path
 from .tool_quality_checks.scripts import run_scripts
+from pathlib import Path, PureWindowsPath
 
 #Debugging in vs : https://gist.github.com/AsgerPetersen/9ea79ae4139f4977c31dd6ede2297f90
+
+velden = {'min_levels', 'max_levels', 'min_length','max_length', 'max_verhang','min_dekking', 'hoogte_verschil', 'min_dimensions', 'max_dimensions', 'padding_manhole'}     
+
 
 class SettingsObjectPlugin(object):
     """Contains the settings from the ini file"""
@@ -298,10 +302,22 @@ class Datachecker:
             layer.loadNamedStyle(qmlpad)
             layer.triggerRepaint()
             
-    def draai_de_checks(self):
-        putfile = os.path.dirname(os.path.realpath(self.dockwidget.putFile.filePath()))
-        leidingfile = os.path.dirname(os.path.realpath(self.dockwidget.leidingFile.filePath()))
-        print (putfile , 'Volgende: ' , leidingfile)
+    def save_folderchecks(self):
+        folderchecks = os.path.realpath(self.dockwidget.folderNaam.text())              
+        self.save_qsetting('paths', 'folderchecks',folderchecks)
+            
+    def save_leidingfile(self):
+        leidingfile = os.path.realpath(self.dockwidget.leidingFile.filePath())              
+        self.save_qsetting('paths', 'leidingfile',leidingfile)        
+        
+    def save_putfile(self):
+        # putfile = os.path.dirname(os.path.realpath(self.dockwidget.putFile.filePath()))   
+        putfile = os.path.realpath(self.dockwidget.putFile.filePath())
+        self.save_qsetting('paths', 'putfile',putfile)
+              
+        
+    def draai_de_checks(self):       
+        
         settings = SettingsObjectPlugin()
         settings.s="localhost"
         settings.host="localhost"
@@ -312,7 +328,17 @@ class Datachecker:
         settings.dropdb = True
         settings.createdb = True
         settings.import_type = False
-        settings.checks = False
+        settings.import_type = 'gbi'
+        settings.checks = True
+        
+        putfile = self.get_qsetting('paths', 'putfile')
+        settings.manhole_layer = putfile
+        leidingfile = self.get_qsetting('paths', 'leidingfile')
+        settings.pipe_layer = leidingfile
+        
+        settings.dem = os.path.realpath('C:\\Users\onnoc\AppData\Roaming\QGIS\QGIS3\profiles\default\python\plugins\OASDGLDatachecker\tool_quality_checks\test\data\schiedam-test\dem_schiedam_test.tif')
+        self.instellingen_ophalen(settings)
+        
         print(settings.__dict__)
         run_scripts(settings)
         settings.dropdb = False
@@ -335,14 +361,20 @@ class Datachecker:
         print(layer.name())
         #print(value)
         
-    def instellingen_opslaan(self):
-        velden = {'sp_hoogtemin', 'sp_hoogtemax', 'sp_lengtemin','sp_lengtemax', 'sp_afmetingmin','sp_afmetingmax', 'sp_dekkingmin', 'sp_verhangmax', 'sp_hoogteverschil', 'sp_paddingput'}        
+    def instellingen_opslaan(self):           
         for veld in velden:
             box = getattr(self.dockwidget, veld)
             waarde = box.value()
             # print(veld, waarde)            
             self.save_qsetting('Instellingen', veld, waarde)
-            
+    
+    def instellingen_ophalen(self, settings):
+        s= QSettings()
+        group = 'Instellingen'
+        for veld in velden:
+            value = s.value( 'OASDGLDatachecker/' + group + '/' + veld)
+            setattr(settings, veld, value)
+            print(value)  
 
     def save_qsetting(self, group, key, value):
         # file waar het opgelsagen wordt: C:\Users\onnoc\AppData\Roaming\QGIS\QGIS3\profiles\default\QGIS\QGIS3.INI
@@ -350,7 +382,20 @@ class Datachecker:
         s.setValue( 'OASDGLDatachecker/' + group + '/' + key, value) 
         test = s.value( 'OASDGLDatachecker/' + group + '/' + key)
         
-            
+    def get_qsetting(self, group, key):
+        s= QSettings()
+        value = s.value( 'OASDGLDatachecker/' + group + '/' + key)
+        print(value)  
+        return(value)
+        
+    def initialize_paths(self):
+        foldernaam=self.get_qsetting('paths', 'folderchecks')
+        if foldernaam:
+            foldernaam=Path(foldernaam)
+            self.dockwidget.folderNaam.setText(str(foldernaam))
+            self.fill_checks_list()
+        
+        
     def run(self):
         """Run method that loads and starts the plugin"""
         if not self.pluginIsActive:
@@ -367,15 +412,20 @@ class Datachecker:
             
             self.dockwidget.ObjectSlider.valueChanged.connect(self.slider_function)
             self.dockwidget.applyStylingButton.clicked.connect(self.laad_qml_styling)
-            self.dockwidget.selectFolderButton.clicked.connect(self.pb_select_dc_folder)
+            self.dockwidget.selectFolderButton.clicked.connect(self.pb_select_dc_folder)            
+            self.dockwidget.folderNaam.textChanged.connect(self.save_folderchecks)
             #self.dockwidget.folderNaam.editingFinished.connect(self.fill_checks_list)
             self.dockwidget.InladenGpkgButton.clicked.connect(self.laad_gpkg)
             
             self.dockwidget.selectFolderButton_export.clicked.connect(self.pb_select_exp_folder)
             ##self.dockwidget.linePutten.dropevent.connect(over
+            
+            self.dockwidget.leidingFile.fileChanged.connect(self.save_leidingfile)
+            self.dockwidget.putFile.fileChanged.connect(self.save_putfile)            
             self.dockwidget.DatachecksButton.clicked.connect(self.draai_de_checks)
             self.dockwidget.instellingenopslaan.clicked.connect(self.instellingen_opslaan)
             
+                       
             # connect to provide cleanup on closing of dockwidget
             self.dockwidget.closingPlugin.connect(self.onClosePlugin)
 
@@ -383,3 +433,4 @@ class Datachecker:
             # TODO: fix to allow choice of dock location
             self.iface.addDockWidget(Qt.RightDockWidgetArea, self.dockwidget)
             self.dockwidget.show()
+            self.initialize_paths()
