@@ -65,6 +65,7 @@ _pipe_layer_rel_path = "data\schiedam-test\schiedam-leidingen-test.shp"
 pipe_layer_abs_path = os.path.join(OUR_DIR, _pipe_layer_rel_path)
 _raster_rel_path = "data\schiedam-test\dem_schiedam_test.tif"
 raster_abs_path = os.path.join(OUR_DIR, _raster_rel_path)
+geopackage_abs_path = os.path.join(OUR_DIR, "data\schiedam-test\export_scripts.gpkg")
 
 
 @mock.patch(
@@ -84,6 +85,9 @@ raster_abs_path = os.path.join(OUR_DIR, _raster_rel_path)
         "-d",
         raster_abs_path,
         "--checks",
+        "-g",
+        geopackage_abs_path,
+        "--export",
     ],
 )
 def test_main_run_scripts_full():

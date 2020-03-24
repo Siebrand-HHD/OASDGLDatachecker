@@ -5,10 +5,8 @@ Purpose to load postgres checks to geopackage
 import os
 import logging
 from osgeo import ogr
-from os.path import basename
 from OASDGLDatachecker.tool_quality_checks.copy_ogr_layer import (
     copy2ogr,
-    set_ogr_connection,
     set_ogr_connection_pg_database,
 )
 

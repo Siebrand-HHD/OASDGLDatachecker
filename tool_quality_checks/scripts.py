@@ -12,6 +12,8 @@ from OASDGLDatachecker.tool_quality_checks.db import (
     drop_database,
 )
 from OASDGLDatachecker.tool_quality_checks.importer import import_sewerage_data_into_db
+from OASDGLDatachecker.tool_quality_checks.exporter import export_checks_from_db_to_gpkg
+
 
 logger = logging.getLogger(__name__)
 OUR_DIR = os.path.dirname(__file__)
@@ -46,6 +48,10 @@ def run_scripts(settings):
     if settings.checks:
         logger.info("Check your sewerage system")
         check_sewerage(db, settings)
+
+    if settings.export:
+        logger.info("Export database to geopackage")
+        export_checks_from_db_to_gpkg(settings)
 
 
 def resolve_ini(custom_ini_file):
@@ -152,6 +158,20 @@ def get_parser():
         metavar="DEM_FILE",
         dest="dem",
         help="Optional: define path to raster with DEM values.",
+    )
+    parser.add_argument(
+        "--export",
+        default=False,
+        help="Export quality checks to geopackage",
+        dest="export",
+        action="store_true",
+    )
+    parser.add_argument(
+        "-g",
+        "--gpkg",
+        metavar="GPKG_OUTPUT_FILE",
+        dest="gpkg_output_layer",
+        help="Optional: define path to geopackage output file",
     )
     parser.add_argument(
         "-i",

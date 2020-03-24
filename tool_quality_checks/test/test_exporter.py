@@ -51,7 +51,7 @@ class TestDB(TestCase):
 
     def test_export_checks_from_db_to_gpkg(self):
         self.settings.gpkg_output_layer = os.path.join(
-            OUR_DIR, "data\schiedam-test\export.gpkg"
+            OUR_DIR, "data\schiedam-test\export_exporter.gpkg"
         )
         export_checks_from_db_to_gpkg(self.settings)
         in_source = set_ogr_connection(self.settings.gpkg_output_layer)
