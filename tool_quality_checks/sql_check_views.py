@@ -5,7 +5,7 @@ sql_checks = {
 ------------------- Putten -------------------------
 ----------------------------------------------------
 -- Maaiveldhoogte aanwezig
-CREATE OR REPLACE VIEW {schema}.put_maaiveldniveau_compleet AS
+CREATE OR REPLACE VIEW {schema}.put_maaiveldniveau_leeg AS
     SELECT
         a.code AS rioolput,
         a.id AS threedi_id,
@@ -14,7 +14,7 @@ CREATE OR REPLACE VIEW {schema}.put_maaiveldniveau_compleet AS
     FROM v2_manhole a JOIN v2_connection_nodes b ON a.connection_node_id = b.id
     WHERE surface_level IS NULL;
 -- putbodem aanwezig
-CREATE OR REPLACE VIEW {schema}.put_z_coordinaat_compleet AS
+CREATE OR REPLACE VIEW {schema}.put_z_coordinaat_leeg AS
     SELECT
         a.code AS rioolput,
         a.id AS threedi_id,
@@ -23,7 +23,7 @@ CREATE OR REPLACE VIEW {schema}.put_z_coordinaat_compleet AS
     FROM v2_manhole a JOIN v2_connection_nodes b ON a.connection_node_id = b.id
     WHERE bottom_level IS NULL;
 -- Vorm aanwezig
-CREATE OR REPLACE VIEW {schema}.put_vorm_compleet AS
+CREATE OR REPLACE VIEW {schema}.put_vorm_leeg AS
     SELECT
         a.code AS rioolput,
         a.id AS threedi_id,
@@ -33,7 +33,7 @@ CREATE OR REPLACE VIEW {schema}.put_vorm_compleet AS
     FROM v2_manhole a JOIN v2_connection_nodes b ON a.connection_node_id = b.id
     WHERE shape IS NULL;
 -- putten zonder afmeting
-CREATE OR REPLACE VIEW {schema}.put_afmeting_compleet AS
+CREATE OR REPLACE VIEW {schema}.put_afmeting_leeg AS
     SELECT
         a.code AS rioolput,
         a.id AS threedi_id,
@@ -42,8 +42,8 @@ CREATE OR REPLACE VIEW {schema}.put_afmeting_compleet AS
         (length * 1000)::double precision AS lengte,
         CASE 
             WHEN width IS NULL THEN 'breedte ontbreekt'::text
-            WHEN width != length AND shape != 'rect' THEN 'breedte is ongelijk aan lengte'::text
-            WHEN (width IS NULL OR length IS NULL) AND shape = 'rect' THEN 'breedte of lengte ontbreekt'::text
+            WHEN width != length AND shape != 'rect' THEN 'rond/vierkant: breedte is ongelijk aan lengte'::text
+            WHEN (width IS NULL OR length IS NULL) AND shape = 'rect' THEN 'rechthoekig: breedte of lengte ontbreekt'::text
         END AS bericht,
         b.the_geom
     FROM v2_manhole a JOIN v2_connection_nodes b ON a.connection_node_id = b.id
@@ -53,7 +53,7 @@ CREATE OR REPLACE VIEW {schema}.put_afmeting_compleet AS
 ----------------- Leidingen ------------------------
 ----------------------------------------------------
 -- check begin- en eindpunt aanwezig
-CREATE OR REPLACE VIEW {schema}.leiding_punten_compleet AS
+CREATE OR REPLACE VIEW {schema}.leiding_punten_leeg AS
     SELECT
         pipe.code AS leiding,
         pipe.id AS threedi_id,
@@ -72,7 +72,7 @@ CREATE OR REPLACE VIEW {schema}.leiding_punten_compleet AS
         ON 	pipe.connection_node_end_id = end_node.id
     WHERE pipe.connection_node_start_id IS NULL OR pipe.connection_node_end_id IS NULL;
 -- BOB's aanwezig
-CREATE OR REPLACE VIEW {schema}.leiding_bob_compleet AS
+CREATE OR REPLACE VIEW {schema}.leiding_bob_leeg AS
     SELECT
         pipe.code AS leiding,
         pipe.id AS threedi_id,
@@ -94,7 +94,7 @@ CREATE OR REPLACE VIEW {schema}.leiding_bob_compleet AS
         ON 	pipe.connection_node_end_id = end_node.id
     WHERE pipe.invert_level_start_point IS NULL OR pipe.invert_level_end_point IS NULL;
 -- Dwarsdoorsnede ontbreekt
-CREATE OR REPLACE VIEW {schema}.leiding_vorm_compleet AS
+CREATE OR REPLACE VIEW {schema}.leiding_vorm_leeg AS
     SELECT
         pipe.code AS leiding,
         pipe.id AS threedi_id,
@@ -109,7 +109,7 @@ CREATE OR REPLACE VIEW {schema}.leiding_vorm_compleet AS
         ON 	pipe.connection_node_end_id = end_node.id
     WHERE cross_section_definition_id IS NULL;
 -- Dwarsdoorsnede compleet
-CREATE OR REPLACE VIEW {schema}.leiding_afmeting_compleet AS
+CREATE OR REPLACE VIEW {schema}.leiding_afmeting_leeg AS
     SELECT
         pipe.code AS leiding,
         pipe.id AS threedi_id,
@@ -123,8 +123,8 @@ CREATE OR REPLACE VIEW {schema}.leiding_afmeting_compleet AS
             WHEN shape = 6 THEN 'getabelleerd trapezium'::text
             ELSE 'overige'
  		END as vormprofiel,
-        (array_greatest(string_to_array(width,' ')) * 1000)::double precision AS breedte,
-        (array_greatest(string_to_array(height,' ')) * 1000)::double precision AS hoogte,
+        (array_greatest(string_to_array(width,' '))::float * 1000)::double precision AS breedte,
+        (array_greatest(string_to_array(height,' '))::float * 1000)::double precision AS hoogte,
         CASE
             WHEN (shape = 4 OR shape > 6) AND width = NULL THEN 'vorm en breedte ontbreken'::text
             WHEN shape = 4 OR shape > 6 THEN 'vorm ontbreekt'::text
@@ -148,7 +148,7 @@ CREATE OR REPLACE VIEW {schema}.leiding_afmeting_compleet AS
 ----------------- Overstorten ----------------------
 ----------------------------------------------------
 -- check begin- en eindpunt aanwezig
-CREATE OR REPLACE VIEW {schema}.overstort_punten_compleet AS
+CREATE OR REPLACE VIEW {schema}.overstort_punten_leeg AS
     SELECT
         weir.code AS overstort,
         weir.id AS threedi_id,
@@ -169,7 +169,7 @@ CREATE OR REPLACE VIEW {schema}.overstort_punten_compleet AS
         ON weir.cross_section_definition_id = def.id
     WHERE weir.connection_node_start_id IS NULL OR weir.connection_node_end_id IS NULL;
 -- Drempelhoogte aanwezig
-CREATE OR REPLACE VIEW {schema}.overstort_niveau_compleet_onlogisch AS
+CREATE OR REPLACE VIEW {schema}.overstort_niveau_leeg_onlogisch AS
     SELECT
         weir.code AS overstort,
         weir.id AS threedi_id,
@@ -178,7 +178,7 @@ CREATE OR REPLACE VIEW {schema}.overstort_niveau_compleet_onlogisch AS
         weir.crest_level AS drempelniveau,
         CASE
             WHEN weir.crest_level IS NULL THEN 'drempelniveau ontbreekt'::text
-            WHEN weir.crest_level IS 0 THEN 'drempelniveau is nul'::text
+            WHEN weir.crest_level = 0 THEN 'drempelniveau is nul'::text
             WHEN weir.crest_level < {min_levels} THEN 'drempelniveau is zeer laag'::text
             WHEN weir.crest_level > {max_levels} THEN 'drempelniveau is zeer hoog'::text
             ELSE NULL
@@ -192,11 +192,11 @@ CREATE OR REPLACE VIEW {schema}.overstort_niveau_compleet_onlogisch AS
     LEFT JOIN v2_cross_section_definition def
         ON weir.cross_section_definition_id = def.id
     WHERE weir.crest_level IS NULL
-		OR weir.crest_level IS 0
+		OR weir.crest_level = 0
 		OR weir.crest_level < {min_levels}
 		OR weir.crest_level > {max_levels};
 -- Dwarsdoorsnede ontbreekt
-CREATE OR REPLACE VIEW {schema}.leiding_dwarsdoorsnede_compleet AS
+CREATE OR REPLACE VIEW {schema}.leiding_dwarsdoorsnede_leeg AS
     SELECT
         weir.code AS leiding,
         weir.id AS threedi_id,
@@ -211,7 +211,7 @@ CREATE OR REPLACE VIEW {schema}.leiding_dwarsdoorsnede_compleet AS
         ON 	weir.connection_node_end_id = end_node.id
     WHERE cross_section_definition_id IS NULL;
 -- Drempelbreedte aanwezig
-CREATE OR REPLACE VIEW {schema}.overstort_breedte_compleet_onlogisch AS
+CREATE OR REPLACE VIEW {schema}.overstort_breedte_leeg_onlogisch AS
     SELECT
         weir.code AS overstort,
         weir.id AS threedi_id,
@@ -220,8 +220,8 @@ CREATE OR REPLACE VIEW {schema}.overstort_breedte_compleet_onlogisch AS
         def.width AS drempelbreedte,
         CASE
             WHEN def.width IS NULL THEN 'drempelbreedte ontbreekt'::text
-            WHEN def.width IS 0 THEN 'drempelbreedte is nul'::text
-            WHEN def.width < 0 THEN 'drempelbreedte is negatief'::text
+            WHEN def.width::numeric = 0 THEN 'drempelbreedte is nul'::text
+            WHEN def.width::numeric < 0 THEN 'drempelbreedte is negatief'::text
             ELSE NULL
         END AS bericht,
         st_makeline(start_node.the_geom, end_node.the_geom) AS the_geom
@@ -233,10 +233,10 @@ CREATE OR REPLACE VIEW {schema}.overstort_breedte_compleet_onlogisch AS
     LEFT JOIN v2_cross_section_definition def
         ON weir.cross_section_definition_id = def.id
     WHERE def.width IS NULL
-		OR def.width IS 0
-		OR def.width < 0;
+		OR def.width::numeric = 0
+		OR def.width::numeric < 0;
 -- Discharge coefficient aanwezig
-CREATE OR REPLACE VIEW {schema}.overstort_stroming_compleet AS
+CREATE OR REPLACE VIEW {schema}.overstort_stroming_leeg AS
     SELECT
         weir.code AS overstort,
         weir.id AS threedi_id,
@@ -272,14 +272,14 @@ CREATE OR REPLACE VIEW {schema}.overstort_stroming_compleet AS
         ON weir.cross_section_definition_id = def.id
     WHERE discharge_coefficient_positive IS NULL
         OR discharge_coefficient_negative IS NULL
-        OR discharge_coefficient_positive IS 0
-        OR discharge_coefficient_negative IS 0;
+        OR discharge_coefficient_positive = 0
+        OR discharge_coefficient_negative = 0;
 """,
     "sql_completeness_orifice": """
 ------------------- Doorlaten ----------------------
 ----------------------------------------------------
 -- check begin- en eindpunt aanwezig
-CREATE OR REPLACE VIEW {schema}.doorlaat_punten_compleet AS
+CREATE OR REPLACE VIEW {schema}.doorlaat_punten_leeg AS
     SELECT
         orf.code AS doorlaat,
         orf.id AS threedi_id,
@@ -300,7 +300,7 @@ CREATE OR REPLACE VIEW {schema}.doorlaat_punten_compleet AS
         ON orf.cross_section_definition_id = def.id
     WHERE orf.connection_node_start_id IS NULL OR orf.connection_node_end_id IS NULL;
 -- Openingshoogte aanwezig en logisch
-CREATE OR REPLACE VIEW {schema}.doorlaat_niveau_compleet_onlogisch AS
+CREATE OR REPLACE VIEW {schema}.doorlaat_niveau_leeg_onlogisch AS
     SELECT
         orf.code AS doorlaat,
         orf.id AS threedi_id,
@@ -309,7 +309,7 @@ CREATE OR REPLACE VIEW {schema}.doorlaat_niveau_compleet_onlogisch AS
         orf.crest_level AS doorlaatniveau,
         CASE
             WHEN orf.crest_level IS NULL THEN 'doorlaatniveau ontbreekt'::text
-            WHEN orf.crest_level IS 0 THEN 'doorlaatniveau is nul'::text
+            WHEN orf.crest_level = 0 THEN 'doorlaatniveau is nul'::text
             WHEN orf.crest_level < {min_levels} THEN 'doorlaatniveau is zeer laag'::text
             WHEN orf.crest_level > {max_levels} THEN 'doorlaatniveau is zeer hoog'::text
             ELSE NULL
@@ -323,11 +323,11 @@ CREATE OR REPLACE VIEW {schema}.doorlaat_niveau_compleet_onlogisch AS
     LEFT JOIN v2_cross_section_definition def
         ON orf.cross_section_definition_id = def.id
     WHERE orf.crest_level IS NULL
-		OR orf.crest_level IS 0
+		OR orf.crest_level = 0
 		OR orf.crest_level < {min_levels}
 		OR orf.crest_level > {max_levels};
 -- Dwarsdoorsnede ontbreekt
-CREATE OR REPLACE VIEW {schema}.doorlaat_vorm_compleet AS
+CREATE OR REPLACE VIEW {schema}.doorlaat_vorm_leeg AS
     SELECT
         orf.code AS leiding,
         orf.id AS threedi_id,
@@ -342,17 +342,17 @@ CREATE OR REPLACE VIEW {schema}.doorlaat_vorm_compleet AS
         ON 	orf.connection_node_end_id = end_node.id
     WHERE cross_section_definition_id IS NULL;
 -- Drempelbreedte aanwezig, 0 of negatief
-CREATE OR REPLACE VIEW {schema}.doorlaat_breedte_compleet_onlogisch AS
+CREATE OR REPLACE VIEW {schema}.doorlaat_breedte_leeg_onlogisch AS
     SELECT
         orf.code AS doorlaat,
         orf.id AS threedi_id,
         start_node.code AS beginpunt,
         end_node.code AS eindpunt,
-        (array_greatest(string_to_array(width,' ')) * 1000)::double precision AS breedte,
+        (array_greatest(string_to_array(width,' '))::float * 1000)::double precision AS breedte,
         CASE
             WHEN def.width IS NULL THEN 'drempelbreedte ontbreekt'::text
-            WHEN def.width IS 0 THEN 'drempelbreedte is nul'::text
-            WHEN def.width < 0 THEN 'drempelbreedte is negatief'::text
+            WHEN def.width::numeric = 0 THEN 'drempelbreedte is nul'::text
+            WHEN def.width::numeric < 0 THEN 'drempelbreedte is negatief'::text
             ELSE NULL
         END AS bericht,
         st_makeline(start_node.the_geom, end_node.the_geom) AS the_geom
@@ -364,10 +364,10 @@ CREATE OR REPLACE VIEW {schema}.doorlaat_breedte_compleet_onlogisch AS
     LEFT JOIN v2_cross_section_definition def
         ON orf.cross_section_definition_id = def.id
     WHERE def.width IS NULL
-		OR def.width IS 0
-		OR def.width < 0;
+		OR def.width::numeric = 0
+		OR def.width::numeric < 0;
 -- Discharge coefficient en stroming aanwezig
-CREATE OR REPLACE VIEW {schema}.doorlaat_stroming_compleet AS
+CREATE OR REPLACE VIEW {schema}.doorlaat_stroming_leeg AS
     SELECT
         orf.code AS overstort,
         orf.id AS threedi_id,
@@ -403,23 +403,27 @@ CREATE OR REPLACE VIEW {schema}.doorlaat_stroming_compleet AS
         ON orf.cross_section_definition_id = def.id
     WHERE discharge_coefficient_positive IS NULL
         OR discharge_coefficient_negative IS NULL
-        OR discharge_coefficient_positive IS 0
-        OR discharge_coefficient_negative IS 0;
+        OR discharge_coefficient_positive = 0
+        OR discharge_coefficient_negative = 0;
 """,
     "sql_completeness_pumpstation": """
 ------------------- Gemalen ------------------------
 ----------------------------------------------------
 -- Aantal pompen
-CREATE OR REPLACE VIEW {schema}.pomp_punt_compleet AS
+CREATE OR REPLACE VIEW {schema}.pomp_punt_leeg AS
     SELECT
         pump.code AS pomp,
         pump.id AS threedi_id,
         start_node.code AS beginpuntpomp,
         end_node.code AS eindpuntpomp
     FROM v2_pumpstation pump
+    LEFT JOIN v2_connection_nodes start_node
+        ON 	pump.connection_node_start_id = start_node.id 
+    LEFT JOIN v2_connection_nodes end_node
+        ON 	pump.connection_node_end_id = end_node.id 
     WHERE connection_node_start_id IS NULL;
 -- Aan- en afslagpeil onbekend
-CREATE OR REPLACE VIEW {schema}.pomp_aan_afslagpeil_compleet AS
+CREATE OR REPLACE VIEW {schema}.pomp_aan_afslagpeil_leeg AS
     SELECT
         pump.code AS pomp,
         pump.id AS threedi_id,
@@ -459,7 +463,7 @@ CREATE OR REPLACE VIEW {schema}.pomp_aan_afslagpeil_compleet AS
         ON 	pump.connection_node_end_id = end_node.id
     WHERE start_level IS NULL OR lower_stop_level IS NULL;
 -- capaciteit onbekend, 0 of negatief
-CREATE OR REPLACE VIEW {schema}.pomp_capaciteit_compleet AS
+CREATE OR REPLACE VIEW {schema}.pomp_capaciteit_leeg AS
     SELECT
         pump.code AS pomp,
         pump.id AS threedi_id,
@@ -468,7 +472,7 @@ CREATE OR REPLACE VIEW {schema}.pomp_capaciteit_compleet AS
         capacity AS pompcapaciteit,
         CASE
             WHEN capacity = NULL THEN 'pompcapaciteit ontbreekt'::text
-            WHEN capacity = 0 THEN 'pompcapaciteit is 0'::text
+            WHEN capacity = 0 THEN 'pompcapaciteit = 0'::text
             WHEN capacity < 0 THEN 'pompcapaciteit is negatief'::text
             ELSE NULL
  		END AS bericht,
@@ -478,7 +482,7 @@ CREATE OR REPLACE VIEW {schema}.pomp_capaciteit_compleet AS
         ON 	pump.connection_node_start_id = start_node.id 
     LEFT JOIN v2_connection_nodes end_node
         ON 	pump.connection_node_end_id = end_node.id
-    WHERE capacity IS NULL OR capacity IS 0 OR capacity < 0;
+    WHERE capacity IS NULL OR capacity = 0 OR capacity < 0;
 """,
     # ---------------------------------------------------
     # ----------- Kwaliteitchecks Riolering -------------
@@ -487,7 +491,7 @@ CREATE OR REPLACE VIEW {schema}.pomp_capaciteit_compleet AS
 ------------------- Putten -------------------------
 ----------------------------------------------------
 -- Maaiveldhoogte logisch
-CREATE OR REPLACE VIEW {schema}.put_maaiveldniveau_kwaliteit AS
+CREATE OR REPLACE VIEW {schema}.put_maaiveldniveau_onlogisch AS
     SELECT
         a.code AS rioolput,
         a.id AS threedi_id,
@@ -498,7 +502,7 @@ CREATE OR REPLACE VIEW {schema}.put_maaiveldniveau_kwaliteit AS
 		OR surface_level < {min_levels}
 		OR surface_level > {max_levels};
 -- putbodem logisch
-CREATE OR REPLACE VIEW {schema}.put_z_coordinaat_kwaliteit AS
+CREATE OR REPLACE VIEW {schema}.put_z_coordinaat_onlogisch AS
     SELECT
         a.code AS rioolput,
         a.id AS threedi_id,
@@ -510,7 +514,7 @@ CREATE OR REPLACE VIEW {schema}.put_z_coordinaat_kwaliteit AS
         OR bottom_level > {max_levels}
     ORDER BY bottom_level;
 -- Afmetingen putten logisch
-CREATE OR REPLACE VIEW {schema}.put_afmeting_kwaliteit AS
+CREATE OR REPLACE VIEW {schema}.put_afmeting_onlogisch AS
     SELECT
         a.code AS rioolput,
         a.id AS threedi_id,
@@ -708,14 +712,14 @@ CREATE OR REPLACE VIEW {schema}.put_inkomende_leidingen AS
             SELECT
                 start_orf.the_geom AS point,
                 'doorlaat' AS line_type
-            FROM v2_orifice orf JOIN v2_connection_nodes start_orf ON weir.connection_node_start_id = start_orf.id 
+            FROM v2_orifice orf JOIN v2_connection_nodes start_orf ON orf.connection_node_start_id = start_orf.id 
             UNION ALL
             SELECT
                 end_orf.the_geom AS point,
                 'doorlaat' AS line_type
             FROM v2_orifice orf JOIN v2_connection_nodes end_orf ON orf.connection_node_end_id = end_orf.id
         ) AS a
-    GROUP BY point
+    GROUP BY geom
     HAVING count(*) > 1),
 nr_connections AS (
     SELECT
@@ -728,7 +732,7 @@ nr_connections AS (
         v2_connection_nodes AS a JOIN v2_manhole c ON a.id = c.connection_node_id,
         verbindingen AS b
     WHERE a.the_geom && b.geom)
-    SELECT * from nr_connections AS n WHERE aantal_verbindingen > {max_verbindingen}
+    SELECT * from nr_connections AS n WHERE aantal_verbindingen > {max_connections}
     ORDER BY aantal_verbindingen DESC;
 -------------------- Uitlaten ----------------------
 ----------------------------------------------------
@@ -762,11 +766,11 @@ CREATE OR REPLACE VIEW {schema}.put_uitlaat_meerdere_verbindingen AS
                 end_orf.the_geom AS point
             FROM v2_orifice orf JOIN v2_connection_nodes end_orf ON orf.connection_node_end_id = end_orf.id
         ) AS a
-    GROUP BY point
+    GROUP BY geom
     HAVING count(*) > 1)
 SELECT
-    b.code AS rioolput,
-    b.id AS threedi_id,
+    c.code AS rioolput,
+    a.id AS threedi_id,
     CASE
         WHEN c.manhole_indicator = 0 THEN 'inspectieput'
         WHEN c.manhole_indicator = 1 THEN 'uitlaat'
@@ -807,7 +811,7 @@ CREATE OR REPLACE VIEW {schema}.leiding_kort AS
         pipe.id AS threedi_id,
         start_node.code AS beginpunt,
         end_node.code AS eindpunt,
-        ST_Length(st_makeline(start_node.the_geom, end_node.the_geom)) AS lengte_leiding
+        ST_Length(st_makeline(start_node.the_geom, end_node.the_geom)) AS lengte_leiding,
         st_makeline(start_node.the_geom, end_node.the_geom) AS the_geom
     FROM v2_pipe pipe
     LEFT JOIN v2_connection_nodes start_node
@@ -822,7 +826,7 @@ CREATE OR REPLACE VIEW {schema}.leiding_lang AS
         pipe.id AS threedi_id,
         start_node.code AS beginpunt,
         end_node.code AS eindpunt,
-        ST_Length(st_makeline(start_node.the_geom, end_node.the_geom)) AS lengte_leiding
+        ST_Length(st_makeline(start_node.the_geom, end_node.the_geom)) AS lengte_leiding,
         st_makeline(start_node.the_geom, end_node.the_geom) AS the_geom
     FROM v2_pipe pipe
     LEFT JOIN v2_connection_nodes start_node
@@ -837,14 +841,12 @@ CREATE OR REPLACE VIEW {schema}.kunstwerken_dubbel AS
         string_agg(display_name::text, ', ' ORDER BY line_type) AS leidingen,
         string_agg(line_type::text, ', ' ORDER BY line_type) AS type_leidingen,
         count(*) AS aantal_leidingen,
-        start_point AS beginpunt,
-        end_point AS eindpunt,
         the_geom
     FROM (
         SELECT
-            pipe.id AS line_id
-            pipe.code AS display_name
-            'leiding' AS line_type
+            pipe.id AS line_id,
+            pipe.code AS display_name,
+            'leiding' AS line_type,
             start_node.code AS start_point,
             end_node.code AS end_point,
             st_makeline(start_node.the_geom, end_node.the_geom) AS the_geom
@@ -855,9 +857,9 @@ CREATE OR REPLACE VIEW {schema}.kunstwerken_dubbel AS
             ON 	pipe.connection_node_end_id = end_node.id
         UNION ALL
         SELECT
-            weir.id AS line_id
-            weir.code AS display_name
-            'leiding' AS line_type
+            weir.id AS line_id,
+            weir.code AS display_name,
+            'leiding' AS line_type,
             start_node.code AS start_point,
             end_node.code AS end_point,
             st_makeline(start_node.the_geom, end_node.the_geom) AS the_geom
@@ -868,9 +870,9 @@ CREATE OR REPLACE VIEW {schema}.kunstwerken_dubbel AS
             ON 	weir.connection_node_end_id = end_node.id
         UNION ALL
         SELECT
-            orf.id AS line_id
-            orf.code AS display_name
-            'leiding' AS line_type
+            orf.id AS line_id,
+            orf.code AS display_name,
+            'leiding' AS line_type,
             start_node.code AS start_point,
             end_node.code AS end_point,
             st_makeline(start_node.the_geom, end_node.the_geom) AS the_geom
@@ -880,13 +882,13 @@ CREATE OR REPLACE VIEW {schema}.kunstwerken_dubbel AS
         LEFT JOIN v2_connection_nodes end_node
             ON 	orf.connection_node_end_id = end_node.id
     ) AS a
-    GROUP BY point
+    GROUP BY the_geom
     HAVING count(*) > 1;
 -- Verbindingen tussen Gemengd/RWA/DWA
 CREATE OR REPLACE VIEW {schema}.leiding_verkeerde_types_verbonden AS
     WITH nodes AS (
         SELECT
-            point AS geom
+            point AS geom,
             sewerage_type
         FROM (
             SELECT
@@ -904,14 +906,14 @@ CREATE OR REPLACE VIEW {schema}.leiding_verkeerde_types_verbonden AS
     count_nodes_pipe_typologies AS (
         SELECT
             count(*) AS pipe_typologies,
-            string_agg(pipe_sewerage_type::Text, ', ' ORDER BY pipe_sewerage_type) AS typologies,
+            string_agg(sewerage_type::Text, ', ' ORDER BY sewerage_type) AS typologies,
             geom AS the_geom
         FROM nodes
         GROUP BY geom)
     SELECT DISTINCT ON (the_geom)
         c.code AS rioolput,
         c.id AS threedi_id,
-        b.sewerage_type AS type_inzameling
+        typologies AS type_inzameling,
         a.the_geom
     FROM
         v2_connection_nodes AS a JOIN v2_manhole c ON a.id = c.connection_node_id,
@@ -985,7 +987,7 @@ CREATE OR REPLACE VIEW {schema}.leiding_dekking_start AS
     LEFT JOIN v2_cross_section_definition def
         ON pipe.cross_section_definition_id = def.id,
     src.manhole_maaiveld ahn JOIN v2_manhole manh ON manh.id = ahn.manh_id
-    WHERE round((surface_level - invert_level_start_point -
+    WHERE
         round((surface_level - invert_level_start_point -
         ( CASE
             WHEN def.shape = 2 THEN def.width::double precision
@@ -996,7 +998,7 @@ CREATE OR REPLACE VIEW {schema}.leiding_dekking_start AS
 		))::numeric,3) < {min_dekking}
         AND ahn.manh_id = pipe.connection_node_start_id
         AND pipe.invert_level_start_point IS NOT NULL
-        AND manh.surface_level IS NOT NULL);
+        AND manh.surface_level IS NOT NULL;
 -- Dekking minder dan een bepaalde dekking voor end_node
 CREATE OR REPLACE VIEW {schema}.leiding_dekking_eind AS
     SELECT
@@ -1046,7 +1048,7 @@ CREATE OR REPLACE VIEW {schema}.leiding_dekking_eind AS
     LEFT JOIN v2_cross_section_definition def
         ON pipe.cross_section_definition_id = def.id,
     src.manhole_maaiveld ahn JOIN v2_manhole manh ON manh.id = ahn.manh_id
-    WHERE round((surface_level - invert_level_end_point -
+    WHERE
         round((surface_level - invert_level_end_point -
         ( CASE
             WHEN def.shape = 2 THEN def.width::double precision
@@ -1057,7 +1059,7 @@ CREATE OR REPLACE VIEW {schema}.leiding_dekking_eind AS
 		))::numeric,3) < {min_dekking}
         AND ahn.manh_id = pipe.connection_node_end_id
         AND pipe.invert_level_end_point IS NOT NULL
-        AND manh.surface_level IS NOT NULL);
+        AND manh.surface_level IS NOT NULL;
 -- Dwarsdoorsnede logisch
 CREATE OR REPLACE VIEW {schema}.leiding_doorsnede_onlogisch AS
     SELECT
@@ -1100,7 +1102,7 @@ CREATE OR REPLACE VIEW {schema}.leiding_doorsnede_onlogisch AS
         OR (height::double precision = 0 AND shape < 5)
         OR (width != height AND height IS NOT NULL AND shape = 2)
         OR (round(1.5*width::numeric,4) != round(height::numeric,4) AND shape = 3)
-        OR (height IS NULL AND (shape = 5 OR shape = 6)
+        OR (height IS NULL AND (shape = 5 OR shape = 6))
         OR ((NOT width LIKE '% %' OR NOT height LIKE '% %') AND shape > 4);
 """,
     "sql_quality_weir": """
@@ -1150,7 +1152,7 @@ CREATE OR REPLACE VIEW {schema}.overstort_drempel_onder_putbodem AS
     LEFT JOIN v2_connection_nodes end_node
         ON 	weir.connection_node_end_id = end_node.id
     LEFT JOIN v2_manhole manh
-        ON 	manh.connection_node_start_id = start_node.id
+        ON 	manh.connection_node_id = start_node.id
     WHERE weir.crest_level < manh.bottom_level;
 -- overstort lengte
 CREATE OR REPLACE VIEW {schema}.overstort_korte_lengte AS
@@ -1159,7 +1161,7 @@ CREATE OR REPLACE VIEW {schema}.overstort_korte_lengte AS
         weir.id AS threedi_id,
         start_node.code AS beginpunt,
         end_node.code AS eindpunt,
-        ST_Length(st_makeline(start_node.the_geom, end_node.the_geom)) AS lengte_overstort
+        ST_Length(st_makeline(start_node.the_geom, end_node.the_geom)) AS lengte_overstort,
         st_makeline(start_node.the_geom, end_node.the_geom) AS the_geom
     FROM v2_weir weir
     LEFT JOIN v2_connection_nodes start_node
@@ -1175,7 +1177,7 @@ CREATE OR REPLACE VIEW {schema}.overstort_verkeerd_uit_sufhyd AS
         weir.id AS threedi_id,
         start_node.code AS beginpunt,
         end_node.code AS eindpunt,
-        ST_Length(st_makeline(start_node.the_geom, end_node.the_geom)) AS lengte_overstort
+        ST_Length(st_makeline(start_node.the_geom, end_node.the_geom)) AS lengte_overstort,
         st_makeline(start_node.the_geom, end_node.the_geom) AS the_geom
     FROM v2_weir weir
     LEFT JOIN v2_connection_nodes start_node
@@ -1198,8 +1200,8 @@ CREATE OR REPLACE VIEW {schema}.overstort_doorsnede_onlogisch AS
             WHEN shape = 6 THEN 'getabelleerd trapezium'
             ELSE 'overige'
  		END as vormprofiel,
-        (array_greatest(string_to_array(width,' ')) * 1000)::double precision AS breedte,
-        (array_greatest(string_to_array(height,' ')) * 1000)::double precision AS hoogte,
+        (array_greatest(string_to_array(width,' '))::float * 1000)::double precision AS breedte,
+        (array_greatest(string_to_array(height,' '))::float * 1000)::double precision AS hoogte,
         CASE
             WHEN width::double precision = 0 AND shape < 5 THEN 'breedte is nul'
             WHEN height::double precision = 0 AND shape < 5 THEN 'hoogte is nul'
@@ -1225,7 +1227,7 @@ CREATE OR REPLACE VIEW {schema}.overstort_doorsnede_onlogisch AS
         OR (height::double precision = 0 AND shape < 5)
         OR (width != height AND height IS NOT NULL AND shape = 2)
         OR (round(1.5*width::numeric,4) != round(height::numeric,4) AND shape = 3)
-        OR (height IS NULL AND (shape = 5 OR shape = 6)
+        OR (height IS NULL AND (shape = 5 OR shape = 6))
         OR ((NOT width LIKE '% %' OR NOT height LIKE '% %') AND shape > 4);
 """,
     "sql_quality_orifice": """
@@ -1275,7 +1277,7 @@ CREATE OR REPLACE VIEW {schema}.doorlaat_drempel_onder_putbodem AS
     LEFT JOIN v2_connection_nodes end_node
         ON 	orf.connection_node_end_id = end_node.id
     LEFT JOIN v2_manhole manh
-        ON 	(manh.connection_node_start_id = start_node.id OR manh.connection_node_end_id = end_node.id)
+        ON 	(manh.connection_node_id = start_node.id OR manh.connection_node_id = end_node.id)
     WHERE orf.crest_level < manh.bottom_level;
 -- doorlaat lengte
 CREATE OR REPLACE VIEW {schema}.doorlaat_korte_lengte AS
@@ -1284,7 +1286,7 @@ CREATE OR REPLACE VIEW {schema}.doorlaat_korte_lengte AS
         orf.id AS threedi_id,
         start_node.code AS beginpunt,
         end_node.code AS eindpunt,
-        ST_Length(st_makeline(start_node.the_geom, end_node.the_geom)) AS lengte_overstort
+        ST_Length(st_makeline(start_node.the_geom, end_node.the_geom)) AS lengte_overstort,
         st_makeline(start_node.the_geom, end_node.the_geom) AS the_geom
     FROM v2_orifice orf
     LEFT JOIN v2_connection_nodes start_node
@@ -1307,8 +1309,8 @@ CREATE OR REPLACE VIEW {schema}.doorlaat_doorsnede_onlogisch AS
             WHEN shape = 6 THEN 'getabelleerd trapezium'
             ELSE 'overige'
  		END as vormprofiel,
-        (array_greatest(string_to_array(width,' ')) * 1000)::double precision AS breedte,
-        (array_greatest(string_to_array(height,' ')) * 1000)::double precision AS hoogte,
+        (array_greatest(string_to_array(width,' '))::float * 1000)::double precision AS breedte,
+        (array_greatest(string_to_array(height,' '))::float * 1000)::double precision AS hoogte,
         CASE
             WHEN width::double precision = 0 AND shape < 5 THEN 'breedte is nul'
             WHEN height::double precision = 0 AND shape < 5 THEN 'hoogte is nul'
@@ -1334,7 +1336,7 @@ CREATE OR REPLACE VIEW {schema}.doorlaat_doorsnede_onlogisch AS
         OR (height::double precision = 0 AND shape < 5)
         OR (width != height AND height IS NOT NULL AND shape = 2)
         OR (round(1.5*width::numeric,4) != round(height::numeric,4) AND shape = 3)
-        OR (height IS NULL AND (shape = 5 OR shape = 6)
+        OR (height IS NULL AND (shape = 5 OR shape = 6))
         OR ((NOT width LIKE '% %' OR NOT height LIKE '% %') AND shape > 4);
 """,
     "sql_quality_pumpstation": """
@@ -1391,10 +1393,10 @@ CREATE OR REPLACE VIEW {schema}.pomp_aan_afslagpeil_onlogisch AS
         ON 	pump.connection_node_start_id = start_node.id 
     LEFT JOIN v2_connection_nodes end_node
         ON 	pump.connection_node_end_id = end_node.id
-    WHERE start_level IS 0
+    WHERE start_level = 0
         OR start_level < {min_levels}
         OR start_level > {max_levels}
-        OR lower_stop_level IS 0
+        OR lower_stop_level = 0
         OR lower_stop_level < {min_levels}
         OR lower_stop_level > {max_levels}
         OR upper_stop_level < {min_levels}
@@ -1449,8 +1451,8 @@ CREATE OR REPLACE VIEW {schema}.pomp_aanslagpeil_vs_maaiveld AS
     LEFT JOIN v2_connection_nodes end_node
         ON 	pump.connection_node_end_id = end_node.id
     LEFT JOIN v2_manhole manh
-        ON start_node.id = manh.connection_node_id,
-    src.manhole_maaiveld ahn JOIN v2_manhole manh ON manh.id = ahn.manh_id
+        ON start_node.id = manh.connection_node_id
+    LEFT JOIN src.manhole_maaiveld ahn ON manh.id = ahn.manh_id
     WHERE (start_level > maaiveld OR start_level > surface_level) AND pump.type = 1;
 """,
 }
