@@ -7,6 +7,7 @@ import logging
 from osgeo import ogr
 from OASDGLDatachecker.tool_quality_checks.correct_import_file import (
     correct_vector_layer,
+    correct_layer_name_length
 )
 
 logger = logging.getLogger(__name__)
@@ -27,47 +28,66 @@ def copy2ogr(in_source, in_name, out_source, out_name, schema="public"):
         raise AttributeError()
     in_srid = in_layer.GetSpatialRef()
 
-    # correct vector layer to solve issues and stuff
-    # correct_in_source, correct_layer_name = in_layer, out_name
-    corrected_in_source, corrected_layer_name = correct_vector_layer(
-        in_layer, out_name, epsg=28992
-    )
-    corrected_in_layer = corrected_in_source.GetLayerByName(corrected_layer_name)
+    if in_srid is None:
+        has_geom = False
+    else:
+        has_geom = True
 
-    # check projection of input file
-    check_sr = get_projection(in_srid)
-    if check_sr is None:
-        logger.warning(
-            "[!] Warning : Projection is not complete EPSG projection code missing in shapefile."
+    if has_geom:
+        # correct vector layer to solve issues and stuff
+        # correct_in_source, correct_layer_name = in_layer, out_name
+        corrected_in_source, corrected_layer_name = correct_vector_layer(
+            in_layer, out_name, epsg=28992
         )
+        corrected_in_layer = corrected_in_source.GetLayerByName(corrected_layer_name)
 
-    # correct vector layer to solve issues and stuff
-    # correct_in_source, correct_layer_name = in_layer, out_name
-    corrected_in_source, corrected_layer_name = correct_vector_layer(
-        in_layer, out_name, epsg=28992
-    )
-    corrected_in_layer = corrected_in_source.GetLayerByName(corrected_layer_name)
+        # check projection of input file
+        check_sr = get_projection(in_srid)
+        if check_sr is None:
+            logger.warning(
+                "[!] Warning : Projection is not complete EPSG projection code missing in shapefile."
+            )
 
-    options = [
-        "OVERWRITE=YES",
-        "SCHEMA={}".format(schema),
-        "SPATIAL_INDEX=GIST",
-        # try to comment row below when running to transaction block error
-        "FID=id",
-        "PRECISION=NO",
-        "GEOMETRY_NAME=geom",
-        "DIM=2",
-    ]
+        # correct vector layer to solve issues and stuff
+        # correct_in_source, correct_layer_name = in_layer, out_name
+        corrected_in_source, corrected_layer_name = correct_vector_layer(
+            in_layer, out_name, epsg=28992
+        )
+        corrected_in_layer = corrected_in_source.GetLayerByName(corrected_layer_name)
 
-    ogr.RegisterAll()
-    # TODO srid is now based on in_layer, which could be a strange spatial reference
-    # TODO findout how to make the target ref 28992 by default
-    new_layer = out_source.CreateLayer(
-        corrected_layer_name,
-        srs=corrected_in_layer.GetSpatialRef(),
-        geom_type=corrected_in_layer.GetGeomType(),
-        options=options,
-    )
+        options = [
+            "OVERWRITE=YES",
+            "SCHEMA={}".format(schema),
+            "SPATIAL_INDEX=GIST",
+            # try to comment row below when running to transaction block error
+            "FID=id",
+            "PRECISION=NO",
+            "GEOMETRY_NAME=geom",
+            "DIM=2",
+        ]
+
+        ogr.RegisterAll()
+        # TODO srid is now based on in_layer, which could be a strange spatial reference
+        # TODO findout how to make the target ref 28992 by default
+        new_layer = out_source.CreateLayer(
+            corrected_layer_name,
+            srs=corrected_in_layer.GetSpatialRef(),
+            geom_type=corrected_in_layer.GetGeomType(),
+            options=options,
+        )
+    else:
+        corrected_layer_name = correct_layer_name_length(out_name)
+        corrected_in_layer = in_layer
+        
+        options = [
+            "OVERWRITE=YES",
+            "SCHEMA={}".format(schema),
+            # try to comment row below when running to transaction block error
+            "FID=id",
+            "PRECISION=NO",
+        ]
+
+        new_layer = out_source.CreateLayer(corrected_layer_name, options=options)
 
     field_names_list = []
     defn = corrected_in_layer.GetLayerDefn()
@@ -83,8 +103,9 @@ def copy2ogr(in_source, in_name, out_source, out_name, schema="public"):
         new_feature.SetFID(-1)
         for key in field_names_list:
             new_feature[key] = copy_feature[key]
-        new_geom = copy_feature.geometry()
-        new_feature.SetGeometry(new_geom)
+        if has_geom:
+            new_geom = copy_feature.geometry()
+            new_feature.SetGeometry(new_geom)
         new_layer.CreateFeature(new_feature)
         if j % 128 == 0:
             new_layer.CommitTransaction()

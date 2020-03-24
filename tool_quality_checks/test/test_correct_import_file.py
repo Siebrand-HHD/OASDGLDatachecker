@@ -11,6 +11,7 @@ from OASDGLDatachecker.tool_quality_checks.correct_import_file import (
     add_singlepart_geometry,
     transform_multipart_to_singlepart,
     correct_vector_layer,
+    correct_layer_name_length,
 )
 from OASDGLDatachecker.tool_quality_checks.importer import set_ogr_connection
 
@@ -130,6 +131,18 @@ def test_transform_multipart_to_singlepart():
     test_dump = mem_layer.GetFeature(1).ExportToJson()
     assert '"coordinates": [[[4.358551040042' in test_dump
     assert lost_feat == [2]
+
+
+def test_correct_layer_name_length_long():
+    layer_name = "this_is_much_longer_than_what_should_be_the_length_of_the_layer"
+    new_layer_name = correct_layer_name_length(layer_name)
+    assert new_layer_name == "this_is_much_longer_than_what_should_be_the_length"
+
+
+def test_correct_layer_name_length_short():
+    layer_name = "this_is_short"
+    new_layer_name = correct_layer_name_length(layer_name)
+    assert new_layer_name == "this_is_short"
 
 
 def test_correct_vector_layer_manholes_3D_point(caplog):

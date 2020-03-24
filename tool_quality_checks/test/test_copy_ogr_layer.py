@@ -55,7 +55,7 @@ class TestDB(TestCase):
         if os.path.isfile(SHP_OUT_ABSPATH):
             DRIVER_OGR_SHP.DeleteDataSource(SHP_OUT_ABSPATH)
         if os.path.isfile(GKPG_ABSPATH):
-            os.remove(GKPG_ABSPATH)
+            DRIVER_OGR_GPKG.DeleteDataSource(GKPG_ABSPATH)
 
     def test_ogr_connection_pg_database(self):
         set_ogr_connection_pg_database(self.settings)
@@ -91,6 +91,14 @@ class TestDB(TestCase):
         out_source = in_source
         copy2ogr(in_source, "test", out_source, "test_2", schema="src")
         assert self.db.get_count("test_2", schema="src") == 79
+
+    def test_copy2ogr_pg2pg_no_geom(self):
+        sql = "CREATE TABLE test_no_geom AS SELECT 1::integer as id;"
+        self.db.execute_sql_statement(sql, fetch=False)
+        in_source = set_ogr_connection_pg_database(self.settings)
+        out_source = in_source
+        copy2ogr(in_source, "test_no_geom", out_source, "test_no_geom_2")
+        assert self.db.get_count("test_no_geom_2") == 1
 
     def test_02_copy2ogr_pg2gpkg(self):
         in_source = set_ogr_connection_pg_database(self.settings)

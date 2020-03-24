@@ -129,6 +129,15 @@ def try_fix_geometry(geometry):
     return geometry, geometry.IsValid()
 
 
+def correct_layer_name_length(layer_name):
+    logger.info("check - Name length")
+    if len(layer_name) + 10 > 64:
+        logger.warning("laagnaam te lang, 50 characters max.")
+        logger.warning("formatting naar 50 met deze naam: %s" % layer_name[:50])
+        layer_name = layer_name[:50]
+    return layer_name
+
+
 def correct_vector_layer(in_layer, layer_name="", epsg=3857):
     """
         This function standardizes a vector layer:
@@ -151,11 +160,7 @@ def correct_vector_layer(in_layer, layer_name="", epsg=3857):
     in_layer.ResetReading()
 
     layer_name = layer_name.lower()
-    logger.info("check - Name length")
-    if len(layer_name) + 10 > 64:
-        logger.warning("laagnaam te lang, 50 characters max.")
-        logger.warning("formatting naar 50 met deze naam: %s" % layer_name[:50])
-        layer_name = layer_name[:50]
+    layer_name = correct_layer_name_length(layer_name)
 
     # Create output dataset and force dataset to multiparts
     # variable output_geom_type, does it always work? if not add check
