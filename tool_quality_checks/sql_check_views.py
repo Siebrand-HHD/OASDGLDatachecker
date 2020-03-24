@@ -520,7 +520,7 @@ CREATE OR REPLACE VIEW {schema}.put_afmeting_kwaliteit AS
         (length * 1000)::double precision AS lengte,
         b.the_geom
     FROM v2_manhole a JOIN v2_connection_nodes b ON a.connection_node_id = b.id
-    WHERE manh_width = 0 OR manh_length = 0;
+    WHERE width = 0 OR length = 0;
 -- Check putten buiten de dem
 CREATE OR REPLACE VIEW {schema}.put_buiten_dem AS
     SELECT
@@ -531,23 +531,23 @@ CREATE OR REPLACE VIEW {schema}.put_buiten_dem AS
     LEFT JOIN v2_connection_nodes b
         ON a.connection_node_id = b.id
     LEFT JOIN src.manhole_maaiveld c
-        ON 	a.id = c.id_field
-    WHERE dem_field IS NULL or dem_field = -9999;
+        ON 	a.id = c.manh_id
+    WHERE maaiveld IS NULL or maaiveld = -9999;
 -- betrouwbaarheid maaiveldhoogte put tov AHN
 CREATE OR REPLACE VIEW {schema}.put_maaiveld_vs_ahn AS
     SELECT
         a.code AS rioolput,
         a.id AS threedi_id,
         round(surface_level::numeric,2) AS put_maaiveldhoogte,
-        dem_field AS ahn_maaiveldhoogte,
-        round((dem_field - surface_level)::numeric,2) AS hoogte_verschil,
+        maaiveld AS ahn_maaiveldhoogte,
+        round((maaiveld - surface_level)::numeric,2) AS hoogte_verschil,
         b.the_geom
     FROM v2_manhole a
     LEFT JOIN v2_connection_nodes b
         ON 	a.connection_node_id = b.id 
     LEFT JOIN src.manhole_maaiveld c
-        ON 	a.id = c.id_field
-    WHERE dem_field != -9999 AND abs(hoogte_verschil) > {hoogte_verschil};
+        ON 	a.id = c.manh_id
+    WHERE maaiveld != -9999 AND abs(maaiveld - surface_level) > {hoogte_verschil};
 -- Maaiveldhoogte > putbodem
 CREATE OR REPLACE VIEW {schema}.put_maaiveld_vs_z_coordinaat AS
     SELECT
@@ -562,7 +562,7 @@ CREATE OR REPLACE VIEW {schema}.put_maaiveld_vs_z_coordinaat AS
         bottom_level AS z_coordinaat,
         surface_level AS maaiveldhoogte,
         surface_level - bottom_level AS hoogte_verschil,
-        min_dekking AS minimale_dekking,
+        {min_dekking} AS minimale_dekking,
         b.the_geom
     FROM v2_manhole a JOIN v2_connection_nodes b ON a.connection_node_id = b.id
     WHERE surface_level < bottom_level + {min_dekking}
@@ -584,8 +584,8 @@ CREATE OR REPLACE VIEW {schema}.put_z_coordinaat_vs_bob AS
         bottom_level AS z_coordinaat,
         surface_level AS maaiveldhoogte,
 		CASE
-            WHEN a.manh_connection_node_id = c.connection_node_start_id::integer THEN c.invert_level_start_point
-			WHEN a.manh_connection_node_id = c.connection_node_end_id::integer THEN c.invert_level_end_point
+            WHEN a.connection_node_id = c.connection_node_start_id::integer THEN c.invert_level_start_point
+			WHEN a.connection_node_id = c.connection_node_end_id::integer THEN c.invert_level_end_point
             ELSE NULL
         END AS bob_hoogte,
         b.the_geom
@@ -596,8 +596,8 @@ CREATE OR REPLACE VIEW {schema}.put_z_coordinaat_vs_bob AS
         ON a.connection_node_id = c.connection_node_start_id::integer OR a.connection_node_id = c.connection_node_end_id::integer
     ORDER BY a.id, c.id
     )
-    SELECT DISTINCT ON (threedi_id) * FROM bob_invert_levels WHERE bottom_level > bob_hoogte
-    ORDER BY threedi_id, bob_level ASC;
+    SELECT DISTINCT ON (threedi_id) * FROM bob_invert_levels WHERE z_coordinaat > bob_hoogte
+    ORDER BY threedi_id, bob_hoogte ASC;
 -- Afmeting buis > grootste aangesloten diameter
 -- first join aangesloten diameters
 -- then select the lowest
@@ -613,7 +613,7 @@ CREATE OR REPLACE VIEW {schema}.put_afm_vs_afm_leiding AS
             ELSE 'overige'
  		END as typeknooppunt,
         (greatest(a.width, a.length) * 1000)::double precision AS grootste_put_afmeting,
-        (array_greatest(string_to_array(d.width,' ')) * 1000)::float AS grootste_leiding_afmeting,
+        (array_greatest(string_to_array(d.width,' '))::float * 1000)::float AS grootste_leiding_afmeting,
         b.the_geom
     FROM v2_manhole a
     LEFT JOIN v2_connection_nodes b
@@ -645,19 +645,20 @@ CREATE OR REPLACE VIEW {schema}.put_losliggend AS
         AND b.id NOT IN (SELECT connection_node_start_id FROM v2_channel WHERE connection_node_start_id IS NOT NULL)
         AND b.id NOT IN (SELECT connection_node_end_id FROM v2_channel WHERE connection_node_end_id  IS NOT NULL));
 -- Dubbele putten
-CREATE OR REPLACE VIEW {schema}.put_losliggend AS
+CREATE OR REPLACE VIEW {schema}.put_dubbel AS
     WITH dubbele_put AS (
         SELECT
             the_geom,
-            count(*)
+            count(*) as aantal
         FROM v2_connection_nodes
         GROUP BY the_geom
         HAVING count(*) > 1)
     SELECT
-            c.count(*) AS aantal_putten,
+            b.id as threedi_connection_node_id,
+            aantal,
             b.the_geom
     FROM v2_manhole a JOIN v2_connection_nodes b ON a.connection_node_id = b.id, dubbele_put c
-    WHERE a.the_geom && c.the_geom;
+    WHERE b.the_geom && c.the_geom;
 -- Putten binnen 20 cm van elkaar
 CREATE OR REPLACE VIEW {schema}.put_kleine_afstand AS
     SELECT
@@ -763,7 +764,7 @@ CREATE OR REPLACE VIEW {schema}.put_uitlaat_meerdere_verbindingen AS
             FROM v2_orifice orf JOIN v2_connection_nodes end_orf ON orf.connection_node_end_id = end_orf.id
         ) AS a
     GROUP BY point
-    HAVING count(*) > 1),
+    HAVING count(*) > 1)
 SELECT
     b.code AS rioolput,
     b.id AS threedi_id,
@@ -959,7 +960,7 @@ CREATE OR REPLACE VIEW {schema}.leiding_dekking_start AS
 			END
 		))::numeric,3) AS bovenkant_leiding,
         round(surface_level::numeric,3) AS put_maaiveldhoogte,
-        dem_field AS ahn_maaiveldhoogte,
+        maaiveld AS ahn_maaiveldhoogte,
         round((surface_level - invert_level_start_point -
         ( CASE
             WHEN def.shape = 2 THEN def.width::double precision
@@ -968,7 +969,7 @@ CREATE OR REPLACE VIEW {schema}.leiding_dekking_start AS
 			ELSE 0
 			END
 		))::numeric,3) AS dekking_put_maaiveldhoogte,
-        round((dem_field - invert_level_start_point -
+        round((maaiveld - invert_level_start_point -
 		( CASE
             WHEN def.shape = 2 THEN def.width::double precision
 			WHEN def.shape = 3 THEN def.height::double precision
@@ -984,7 +985,7 @@ CREATE OR REPLACE VIEW {schema}.leiding_dekking_start AS
         ON 	pipe.connection_node_end_id = end_node.id 
     LEFT JOIN v2_cross_section_definition def
         ON pipe.cross_section_definition_id = def.id,
-    src.manhole_maaiveld ahn JOIN v2_manhole manh ON manh.id = ahn.id_field
+    src.manhole_maaiveld ahn JOIN v2_manhole manh ON manh.id = ahn.manh_id
     WHERE round((surface_level - invert_level_start_point -
         round((surface_level - invert_level_start_point -
         ( CASE
@@ -994,7 +995,7 @@ CREATE OR REPLACE VIEW {schema}.leiding_dekking_start AS
 			ELSE 0
 			END
 		))::numeric,3) < {min_dekking}
-        AND ahn.id_field = pipe.connection_node_start_id
+        AND ahn.manh_id = pipe.connection_node_start_id
         AND pipe.invert_level_start_point IS NOT NULL
         AND manh.surface_level IS NOT NULL);
 -- Dekking minder dan een bepaalde dekking voor end_node
@@ -1020,7 +1021,7 @@ CREATE OR REPLACE VIEW {schema}.leiding_dekking_eind AS
 			END
 		))::numeric,3) AS bovenkant_leiding,
         round(surface_level::numeric,3) AS put_maaiveldhoogte,
-        dem_field AS ahn_maaiveldhoogte,
+        maaiveld AS ahn_maaiveldhoogte,
         round((surface_level - invert_level_end_point -
         ( CASE
             WHEN def.shape = 2 THEN def.width::double precision
@@ -1029,7 +1030,7 @@ CREATE OR REPLACE VIEW {schema}.leiding_dekking_eind AS
 			ELSE 0
 			END
 		))::numeric,3) AS dekking_put_maaiveldhoogte,
-        round((dem_field - invert_level_end_point -
+        round((maaiveld - invert_level_end_point -
 		( CASE
             WHEN def.shape = 2 THEN def.width::double precision
 			WHEN def.shape = 3 THEN def.height::double precision
@@ -1045,7 +1046,7 @@ CREATE OR REPLACE VIEW {schema}.leiding_dekking_eind AS
         ON 	pipe.connection_node_end_id = end_node.id 
     LEFT JOIN v2_cross_section_definition def
         ON pipe.cross_section_definition_id = def.id,
-    src.manhole_maaiveld ahn JOIN v2_manhole manh ON manh.id = ahn.id_field
+    src.manhole_maaiveld ahn JOIN v2_manhole manh ON manh.id = ahn.manh_id
     WHERE round((surface_level - invert_level_end_point -
         round((surface_level - invert_level_end_point -
         ( CASE
@@ -1055,7 +1056,7 @@ CREATE OR REPLACE VIEW {schema}.leiding_dekking_eind AS
 			ELSE 0
 			END
 		))::numeric,3) < {min_dekking}
-        AND ahn.id_field = pipe.connection_node_end_id
+        AND ahn.manh_id = pipe.connection_node_end_id
         AND pipe.invert_level_end_point IS NOT NULL
         AND manh.surface_level IS NOT NULL);
 -- Dwarsdoorsnede logisch
@@ -1073,8 +1074,8 @@ CREATE OR REPLACE VIEW {schema}.leiding_doorsnede_onlogisch AS
             WHEN shape = 6 THEN 'getabelleerd trapezium'
             ELSE 'overige'
  		END as vormprofiel,
-        (array_greatest(string_to_array(width,' ')) * 1000)::double precision AS breedte,
-        (array_greatest(string_to_array(height,' ')) * 1000)::double precision AS hoogte,
+        (array_greatest(string_to_array(width,' '))::float * 1000)::double precision AS breedte,
+        (array_greatest(string_to_array(height,' '))::float * 1000)::double precision AS hoogte,
         CASE
             WHEN width::double precision = 0 AND shape < 5 THEN 'breedte is nul'
             WHEN height::double precision = 0 AND shape < 5 THEN 'hoogte is nul'
@@ -1115,13 +1116,13 @@ CREATE OR REPLACE VIEW {schema}.overstort_drempel_boven_maaiveld AS
         end_node.code AS eindpunt,
         crest_level AS drempelniveau,
         CASE
-            WHEN weir.connection_node_start_id = ahn.id_field THEN 'begin_overstort'
-            WHEN weir.connection_node_end_id = ahn.id_field THEN 'eind_overstort'
+            WHEN weir.connection_node_start_id = ahn.manh_id THEN 'begin_overstort'
+            WHEN weir.connection_node_end_id = ahn.manh_id THEN 'eind_overstort'
         END AS locatie,
         CASE
             WHEN (weir.crest_level > manh.surface_level AND weir.crest_level > maaiveld) THEN 'boven ahn en put maaiveld'
             WHEN weir.crest_level > manh.surface_level THEN 'boven put maaiveld'
-            WHEN weir.crest_level > ahn.dem_field THEN 'boven ahn maaiveld'
+            WHEN weir.crest_level > ahn.maaiveld THEN 'boven ahn maaiveld'
         END AS maaiveld_check,
         st_makeline(start_node.the_geom, end_node.the_geom) AS the_geom
     FROM v2_weir weir
@@ -1130,10 +1131,10 @@ CREATE OR REPLACE VIEW {schema}.overstort_drempel_boven_maaiveld AS
     LEFT JOIN v2_connection_nodes end_node
         ON 	weir.connection_node_end_id = end_node.id
     LEFT JOIN src.manhole_maaiveld ahn
-        ON (weir.connection_node_start_id = ahn.id_field OR weir.connection_node_end_id = ahn.id_field)
+        ON (weir.connection_node_start_id = ahn.manh_id OR weir.connection_node_end_id = ahn.manh_id)
     LEFT JOIN v2_manhole manh
-        ON ahn.id_field = manh.connection_node_id
-    WHERE weir.crest_level > manh.surface_level OR (weir.crest_level > ahn.dem_field AND round((ahn.dem_field - manh.surface_level)::numeric,2) > {hoogte_verschil}) AND manhole_indicator != 1
+        ON ahn.manh_id = manh.connection_node_id
+    WHERE weir.crest_level > manh.surface_level OR (weir.crest_level > ahn.maaiveld AND round((ahn.maaiveld - manh.surface_level)::numeric,2) > {hoogte_verschil}) AND manhole_indicator != 1
     ORDER BY locatie DESC;
 -- Overstorthoogte < putbodem
 CREATE OR REPLACE VIEW {schema}.overstort_drempel_onder_putbodem AS
@@ -1240,13 +1241,13 @@ CREATE OR REPLACE VIEW {schema}.doorlaat_drempel_boven_maaiveld AS
         end_node.code AS eindpunt,
         crest_level AS doorlaatniveau,
         CASE
-            WHEN orf.connection_node_start_id = ahn.id_field THEN 'begin_doorlaat'
-            WHEN orf.connection_node_end_id = ahn.id_field THEN 'eind_doorlaat'
+            WHEN orf.connection_node_start_id = ahn.manh_id THEN 'begin_doorlaat'
+            WHEN orf.connection_node_end_id = ahn.manh_id THEN 'eind_doorlaat'
         END AS locatie,
         CASE
             WHEN (orf.crest_level > manh.surface_level AND orf.crest_level > maaiveld) THEN 'boven ahn en put maaiveld'
             WHEN orf.crest_level > manh.surface_level THEN 'boven put maaiveld'
-            WHEN orf.crest_level > ahn.dem_field THEN 'boven ahn maaiveld'
+            WHEN orf.crest_level > ahn.maaiveld THEN 'boven ahn maaiveld'
         END AS maaiveld_check,
         st_makeline(start_node.the_geom, end_node.the_geom) AS the_geom
     FROM v2_orifice orf
@@ -1255,10 +1256,10 @@ CREATE OR REPLACE VIEW {schema}.doorlaat_drempel_boven_maaiveld AS
     LEFT JOIN v2_connection_nodes end_node
         ON 	orf.connection_node_end_id = end_node.id
     LEFT JOIN src.manhole_maaiveld ahn
-        ON (orf.connection_node_start_id = ahn.id_field OR orf.connection_node_end_id = ahn.id_field)
+        ON (orf.connection_node_start_id = ahn.manh_id OR orf.connection_node_end_id = ahn.manh_id)
     LEFT JOIN v2_manhole manh
-        ON ahn.id_field = manh.connection_node_id
-    WHERE orf.crest_level > manh.surface_level OR (orf.crest_level > ahn.dem_field AND round((ahn.dem_field - manh.surface_level)::numeric,2) > {hoogte_verschil}) AND manhole_indicator != 1
+        ON ahn.manh_id = manh.connection_node_id
+    WHERE orf.crest_level > manh.surface_level OR (orf.crest_level > ahn.maaiveld AND round((ahn.maaiveld - manh.surface_level)::numeric,2) > {hoogte_verschil}) AND manhole_indicator != 1
     ORDER BY locatie DESC;
 -- Openingshoogte < putbodem
 CREATE OR REPLACE VIEW {schema}.doorlaat_drempel_onder_putbodem AS
@@ -1439,7 +1440,7 @@ CREATE OR REPLACE VIEW {schema}.pomp_aanslagpeil_vs_maaiveld AS
         pump.id AS threedi_id,
         start_node.code AS beginpuntpomp,
         round(surface_level::numeric,3) AS put_maaiveldhoogte,
-        dem_field AS ahn_maaiveldhoogte,
+        maaiveld AS ahn_maaiveldhoogte,
         pump.start_level AS aanslagniveaubovenstrooms,
         pump.lower_stop_level AS afslagniveaubovenstrooms,
         start_node.the_geom
@@ -1450,7 +1451,7 @@ CREATE OR REPLACE VIEW {schema}.pomp_aanslagpeil_vs_maaiveld AS
         ON 	pump.connection_node_end_id = end_node.id
     LEFT JOIN v2_manhole manh
         ON start_node.id = manh.connection_node_id,
-    src.manhole_maaiveld ahn JOIN v2_manhole manh ON manh.id = ahn.id_field
-    WHERE (start_level > dem_field OR start_level > surface_level) AND pump.type = 1;
+    src.manhole_maaiveld ahn JOIN v2_manhole manh ON manh.id = ahn.manh_id
+    WHERE (start_level > maaiveld OR start_level > surface_level) AND pump.type = 1;
 """
 }
