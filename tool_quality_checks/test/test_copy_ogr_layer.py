@@ -5,7 +5,7 @@ import pytest
 from osgeo import osr, ogr
 from os.path import basename
 
-from OASDGLDatachecker.tool_quality_checks.copy_ogr_file import (
+from OASDGLDatachecker.tool_quality_checks.copy_ogr_layer import (
     set_ogr_connection_pg_database,
     set_ogr_connection,
     copy2ogr,
