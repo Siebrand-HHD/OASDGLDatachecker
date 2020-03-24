@@ -24,7 +24,7 @@
 from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, Qt
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QAction,QFileDialog
-from qgis.core import QgsProject,QgsVectorLayer,QgsLayerTreeLayer
+from qgis.core import QgsProject,QgsVectorLayer,QgsLayerTreeLayer,QgsApplication,QgsTask,QgsMessageLog
 # Initialize Qt resources from file resources.py
 from .resources import *
 import os
@@ -227,21 +227,53 @@ class Datachecker:
     def pb_select_dc_folder(self):
         foldername = QFileDialog.getExistingDirectory()
         self.dockwidget.folderNaam.setText(foldername)
-        if foldername:
-            self.dockwidget.listChecks.clear()
+        self.dockwidget.folderNaam.setToolTip(foldername)
+        if foldername:      
             self.fill_checks_list()
     
     def fill_checks_list(self):
+        self.dockwidget.listChecks.clear()
         foldername= self.dockwidget.folderNaam.text()
         geopackageList =[]
         for file in os.listdir(foldername):
             if file.endswith(".gpkg"):
                 geopackageList.append(file)
         self.dockwidget.listChecks.addItems(geopackageList)
-    
+
+
+    def getConnectionDetails(self,value):
+        type = value.split()[0]
+        value = value.split()[1]
+
+        if type == 'Postgresql:':
+            password = self.s_postgresql.value(value+'/password')
+            username = self.s_postgresql.value(value+'/username')
+            port = self.s_postgresql.value(value+'/port')
+            host = self.s_postgresql.value(value+'/host')
+            self.threedi_db_settings = {
+                            "threedi_dbname": value,
+                            "threedi_host": host,
+                            "threedi_user": username,
+                            "threedi_password": password,
+                            "threedi_port": port,
+                            "type": "Postgresql"
+                        }
+
+        
+    def get_databases(self):
+        databases=[]
+        self.s_postgresql = QSettings()
+        self.s_postgresql.beginGroup("PostgreSQL/connections")
+        all_pgsql_dbkeys = self.s_postgresql.allKeys()
+        for key in all_pgsql_dbkeys:
+            databases.append('Postgresql: '+key.split("/")[0])
+        databases = list(dict.fromkeys(databases))
+        return databases    
+            
     def laad_gpkg(self):
         fileName= self.dockwidget.listChecks.selectedItems()
         # dictionary with layer_names of gpkg and potential group name in QGIS
+        # group_mapping = {'chk.leiding': 'leidingen', 'chk.put': 'putten', 'chk.profiel': 'profielen'}
         group_mapping = {'leiding': 'leidingen', 'put': 'putten', 'profiel': 'profielen'}
         
         if len(fileName)>0:
@@ -274,11 +306,12 @@ class Datachecker:
     def pb_select_exp_folder(self):
         foldername = QFileDialog.getExistingDirectory()
         self.dockwidget.folderNaam_export.setText(foldername)
-        if foldername:
-            self.dockwidget.listExport.clear()
+        self.dockwidget.folderNaam_export.setToolTip(foldername)
+        if foldername:            
             self.fill_export_list()  
                             
     def fill_export_list(self):
+        self.dockwidget.listExport.clear()
         foldername= self.dockwidget.folderNaam_export.text()
         exportList =[]
         for file in os.listdir(foldername):
@@ -286,12 +319,16 @@ class Datachecker:
                 exportList.append(file)
         self.dockwidget.listExport.addItems(exportList)                        
 
-    
+    def save_qml_styling(self):#,style_dir):
+        style_dir=r'C:\Users\onnoc\AppData\Roaming\QGIS\QGIS3\profiles\default\python\plugins\OASDGLDatachecker'
+        for layer in QgsProject.instance().mapLayers().values():
+            layer.saveNamedStyle(os.path.join(style_dir,layer.name()+'.qml'))
+
     def laad_qml_styling(self):
         if self.dockwidget.qmlBeheerderBox.checkState()==2:
-            folder = 'StylingBeheerder'
+            folder = 'styling\StylingBeheerder'
         elif self.dockwidget.qmlModelleurBox.checkState()==2:
-            folder = 'StylingModelleur'
+            folder = 'styling\StylingModelleur'
         else:
             return
             
@@ -305,6 +342,10 @@ class Datachecker:
     def save_folderchecks(self):
         folderchecks = os.path.realpath(self.dockwidget.folderNaam.text())              
         self.save_qsetting('paths', 'folderchecks',folderchecks)
+        
+    def save_folderbeheerexport(self):
+        folderchecks = os.path.realpath(self.dockwidget.folderNaam_export.text())              
+        self.save_qsetting('paths', 'folderbeheerexport',folderchecks)
             
     def save_leidingfile(self):
         leidingfile = os.path.realpath(self.dockwidget.leidingFile.filePath())              
@@ -316,20 +357,22 @@ class Datachecker:
         self.save_qsetting('paths', 'putfile',putfile)
               
         
-    def draai_de_checks(self):       
+    def get_settings(self):  #vul_settings     
         
         settings = SettingsObjectPlugin()
-        settings.s="localhost"
+        settings.s='localhost' #self.threedi_db_settings["threedi_host"]
         settings.host="localhost"
-        settings.database="work_test_quality_checks"
+        settings.database="work_checks_in_gui"
         settings.port="5432"
         settings.username="postgres"
         settings.password="postgres"
         settings.dropdb = True
         settings.createdb = True
-        settings.import_type = False
+        # settings.import_type = False
         settings.import_type = 'gbi'
+        # settings.export_type = 'gpkg'
         settings.checks = True
+        # settings.checks = False
         
         putfile = self.get_qsetting('paths', 'putfile')
         settings.manhole_layer = putfile
@@ -340,10 +383,31 @@ class Datachecker:
         self.instellingen_ophalen(settings)
         
         print(settings.__dict__)
-        run_scripts(settings)
-        settings.dropdb = False
-        settings.createdb = False
-       
+        #run_scripts(settings)
+        #settings.dropdb = False
+        #settings.createdb = False
+        return settings
+    
+    def completed(self,exception, result=None):
+        """This is called when doSomething is finished.
+        Exception is not None if doSomething raises an exception.
+        result is the return value of doSomething."""
+        if exception is None:
+            if result is None:
+                QgsMessageLog.logMessage(
+                    'Completed with no exception and no result '\
+                    '(probably manually canceled by the user)',
+                    MESSAGE_CATEGORY, Qgis.Warning)
+            else:
+                QMessageBox.information(
+                None,
+                "Checks outcome",
+                "Your checks have ran succesfully",
+                )
+        else:
+            QgsMessageLog.logMessage("Exception: {}".format(exception),
+                                     MESSAGE_CATEGORY, Qgis.Critical)
+            raise exception     
         
     def slider_function(self,value):
         layer = self.iface.mapCanvas().currentLayer()        
@@ -353,10 +417,12 @@ class Datachecker:
             #layer.renderer().symbol().symbolLayer(0).setSize(value)
         if layer.renderer().symbol().type()==1: # Lijnen
             layer.renderer().symbol().symbolLayer(0).setWidth(value)
-            #print(layer.renderer().symbol().type())
+            print(layer.renderer().symbol().symbolLayer(0).width())
             
         elif layer.renderer().symbol().type()==0:  # symbolen  
+            #newsize = layer.renderer().symbol().symbolLayer(0).size()*5/value
             layer.renderer().symbol().symbolLayer(0).setSize(value)
+            print(layer.renderer().symbol().symbolLayer(0).size())
         layer.triggerRepaint()
         print(layer.name())
         #print(value)
@@ -393,8 +459,20 @@ class Datachecker:
         if foldernaam:
             foldernaam=Path(foldernaam)
             self.dockwidget.folderNaam.setText(str(foldernaam))
+            self.dockwidget.folderNaam.setToolTip(str(foldernaam))
             self.fill_checks_list()
+            
+        foldernaam_export = self.get_qsetting('paths', 'folderbeheerexport')
+        if foldernaam_export:
+            foldernaam_export=Path(foldernaam_export)
+            self.dockwidget.folderNaam_export.setText(str(foldernaam_export))
+            self.dockwidget.folderNaam_export.setToolTip(str(foldernaam_export))
+            self.fill_export_list()
         
+    def draai_de_checks(self):
+        settings = self.get_settings()
+        task1 = QgsTask.fromFunction('Draai checks',run_scripts,on_finished=self.completed,settings=settings)
+        QgsApplication.taskManager().addTask(task1)
         
     def run(self):
         """Run method that loads and starts the plugin"""
@@ -409,19 +487,24 @@ class Datachecker:
             if self.dockwidget == None:
                 # Create the dockwidget (after translation) and keep reference
                 self.dockwidget = DatacheckerDockWidget()
-            
+            databases=self.get_databases()
+            self.dockwidget.bestaandeDatabases.addItems(databases)
+            self.dockwidget.bestaandeDatabases.currentTextChanged.connect(self.getConnectionDetails)
             self.dockwidget.ObjectSlider.valueChanged.connect(self.slider_function)
             self.dockwidget.applyStylingButton.clicked.connect(self.laad_qml_styling)
             self.dockwidget.selectFolderButton.clicked.connect(self.pb_select_dc_folder)            
-            self.dockwidget.folderNaam.textChanged.connect(self.save_folderchecks)
+            self.dockwidget.folderNaam.textChanged.connect(self.save_folderchecks) 
+            self.dockwidget.folderNaam_export.textChanged.connect(self.save_folderbeheerexport)
             #self.dockwidget.folderNaam.editingFinished.connect(self.fill_checks_list)
             self.dockwidget.InladenGpkgButton.clicked.connect(self.laad_gpkg)
-            
+            self.dockwidget.savelayer.clicked.connect(self.save_qml_styling)
             self.dockwidget.selectFolderButton_export.clicked.connect(self.pb_select_exp_folder)
             ##self.dockwidget.linePutten.dropevent.connect(over
             
             self.dockwidget.leidingFile.fileChanged.connect(self.save_leidingfile)
-            self.dockwidget.putFile.fileChanged.connect(self.save_putfile)            
+            self.dockwidget.putFile.fileChanged.connect(self.save_putfile)  
+            
+            
             self.dockwidget.DatachecksButton.clicked.connect(self.draai_de_checks)
             self.dockwidget.instellingenopslaan.clicked.connect(self.instellingen_opslaan)
             

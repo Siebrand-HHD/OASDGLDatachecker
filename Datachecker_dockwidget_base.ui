@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>592</width>
-    <height>650</height>
+    <height>761</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -33,7 +33,7 @@
        <bool>true</bool>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>3</number>
       </property>
       <property name="documentMode">
        <bool>true</bool>
@@ -77,11 +77,26 @@
            </item>
            <item>
             <widget class="QListWidget" name="listChecks">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>16777215</height>
+              </size>
+             </property>
              <property name="showDropIndicator" stdset="0">
               <bool>false</bool>
              </property>
              <property name="dragEnabled">
               <bool>false</bool>
+             </property>
+             <property name="alternatingRowColors">
+              <bool>true</bool>
              </property>
              <property name="selectionMode">
               <enum>QAbstractItemView::MultiSelection</enum>
@@ -97,6 +112,19 @@
               <string>Resultaten Datachecks laden</string>
              </property>
             </widget>
+           </item>
+           <item>
+            <spacer name="verticalSpacer">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
            </item>
           </layout>
          </widget>
@@ -120,6 +148,54 @@
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">
            <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_5">
+             <item>
+              <widget class="QLineEdit" name="folderNaam_export"/>
+             </item>
+             <item>
+              <widget class="QPushButton" name="selectFolderButton_export">
+               <property name="text">
+                <string>Select Folder</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <widget class="QListWidget" name="listExport">
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>100</height>
+              </size>
+             </property>
+             <property name="focusPolicy">
+              <enum>Qt::WheelFocus</enum>
+             </property>
+             <property name="acceptDrops">
+              <bool>true</bool>
+             </property>
+             <property name="showDropIndicator" stdset="0">
+              <bool>false</bool>
+             </property>
+             <property name="dragEnabled">
+              <bool>true</bool>
+             </property>
+             <property name="dragDropOverwriteMode">
+              <bool>true</bool>
+             </property>
+             <property name="dragDropMode">
+              <enum>QAbstractItemView::DragOnly</enum>
+             </property>
+             <property name="defaultDropAction">
+              <enum>Qt::CopyAction</enum>
+             </property>
+             <property name="selectionMode">
+              <enum>QAbstractItemView::SingleSelection</enum>
+             </property>
+            </widget>
+           </item>
+           <item>
             <layout class="QHBoxLayout" name="horizontalLayout">
              <item>
               <widget class="QLabel" name="label_23">
@@ -129,7 +205,11 @@
               </widget>
              </item>
              <item>
-              <widget class="QgsFileWidget" name="putFile"/>
+              <widget class="QgsFileWidget" name="putFile">
+               <property name="acceptDrops">
+                <bool>true</bool>
+               </property>
+              </widget>
              </item>
             </layout>
            </item>
@@ -144,6 +224,9 @@
              </item>
              <item>
               <widget class="QgsFileWidget" name="leidingFile">
+               <property name="acceptDrops">
+                <bool>true</bool>
+               </property>
                <property name="useLink">
                 <bool>false</bool>
                </property>
@@ -205,50 +288,7 @@
             <height>40</height>
            </size>
           </property>
-          <layout class="QVBoxLayout" name="verticalLayout_8">
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_5">
-             <item>
-              <widget class="QLineEdit" name="folderNaam_export"/>
-             </item>
-             <item>
-              <widget class="QPushButton" name="selectFolderButton_export">
-               <property name="text">
-                <string>Select Folder</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-           <item>
-            <widget class="QListWidget" name="listExport">
-             <property name="focusPolicy">
-              <enum>Qt::WheelFocus</enum>
-             </property>
-             <property name="acceptDrops">
-              <bool>true</bool>
-             </property>
-             <property name="showDropIndicator" stdset="0">
-              <bool>false</bool>
-             </property>
-             <property name="dragEnabled">
-              <bool>true</bool>
-             </property>
-             <property name="dragDropOverwriteMode">
-              <bool>true</bool>
-             </property>
-             <property name="dragDropMode">
-              <enum>QAbstractItemView::DragOnly</enum>
-             </property>
-             <property name="defaultDropAction">
-              <enum>Qt::CopyAction</enum>
-             </property>
-             <property name="selectionMode">
-              <enum>QAbstractItemView::SingleSelection</enum>
-             </property>
-            </widget>
-           </item>
-          </layout>
+          <layout class="QVBoxLayout" name="verticalLayout_8"/>
          </widget>
         </item>
         <item>
@@ -365,6 +405,13 @@
              </widget>
             </item>
             <item>
+             <widget class="QPushButton" name="savelayer">
+              <property name="text">
+               <string>PushButton</string>
+              </property>
+             </widget>
+            </item>
+            <item>
              <spacer name="verticalSpacer_2">
               <property name="orientation">
                <enum>Qt::Vertical</enum>
@@ -455,7 +502,11 @@
            </widget>
           </item>
           <item>
-           <widget class="QgsFileWidget" name="dem"/>
+           <widget class="QgsFileWidget" name="dem">
+            <property name="toolTip">
+             <string>=gettattr(value)</string>
+            </property>
+           </widget>
           </item>
          </layout>
         </item>
@@ -708,160 +759,42 @@
        <attribute name="title">
         <string>Page</string>
        </attribute>
-      </widget>
-      <widget class="QWidget" name="tab_3">
-       <attribute name="title">
-        <string>Page</string>
-       </attribute>
-       <layout class="QGridLayout" name="gridLayout_2">
-        <item row="0" column="0">
-         <widget class="QStackedWidget" name="stackedWidget">
-          <property name="currentIndex">
-           <number>0</number>
-          </property>
-          <widget class="QWidget" name="page">
-           <layout class="QGridLayout" name="gridLayout">
-            <item row="2" column="0">
-             <widget class="QLineEdit" name="lineEdit_2"/>
-            </item>
-            <item row="0" column="0">
-             <widget class="QPushButton" name="pushButton_4">
-              <property name="text">
-               <string>PushButton</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="0">
-             <spacer name="verticalSpacer">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>20</width>
-                <height>40</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-           </layout>
-          </widget>
-          <widget class="QWidget" name="page_2">
-           <widget class="QCheckBox" name="checkBox_2">
-            <property name="geometry">
-             <rect>
-              <x>130</x>
-              <y>100</y>
-              <width>113</width>
-              <height>29</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>CheckBox</string>
-            </property>
-           </widget>
-           <widget class="QCheckBox" name="checkBox_3">
-            <property name="geometry">
-             <rect>
-              <x>440</x>
-              <y>100</y>
-              <width>113</width>
-              <height>29</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>CheckBox</string>
-            </property>
-           </widget>
-          </widget>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QDockWidget" name="dockWidget">
-          <widget class="QWidget" name="dockWidgetContents_3">
-           <layout class="QVBoxLayout" name="verticalLayout_10">
-            <item>
-             <widget class="QPushButton" name="pushButton_5">
-              <property name="text">
-               <string>PushButton</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLineEdit" name="lineEdit"/>
-            </item>
-            <item>
-             <widget class="QToolBox" name="toolBox">
-              <property name="frameShadow">
-               <enum>QFrame::Sunken</enum>
-              </property>
-              <property name="currentIndex">
-               <number>1</number>
-              </property>
-              <widget class="QWidget" name="page_3">
-               <property name="geometry">
-                <rect>
-                 <x>0</x>
-                 <y>0</y>
-                 <width>93</width>
-                 <height>66</height>
-                </rect>
-               </property>
-               <attribute name="label">
-                <string>Page 1</string>
-               </attribute>
-               <layout class="QVBoxLayout" name="verticalLayout_12">
-                <item>
-                 <widget class="QPushButton" name="pushButton_7">
-                  <property name="text">
-                   <string>PushButton</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QLineEdit" name="lineEdit_3"/>
-                </item>
-               </layout>
-              </widget>
-              <widget class="QWidget" name="page_4">
-               <property name="geometry">
-                <rect>
-                 <x>0</x>
-                 <y>0</y>
-                 <width>538</width>
-                 <height>239</height>
-                </rect>
-               </property>
-               <attribute name="label">
-                <string>Page 2</string>
-               </attribute>
-               <layout class="QVBoxLayout" name="verticalLayout_11">
-                <item>
-                 <widget class="QPushButton" name="pushButton_8">
-                  <property name="text">
-                   <string>PushButton</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QTextEdit" name="textEdit"/>
-                </item>
-               </layout>
-              </widget>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-         </widget>
-        </item>
-        <item row="2" column="0">
-         <widget class="QPushButton" name="pushButton_6">
-          <property name="text">
-           <string>PushButton</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
+       <widget class="QPushButton" name="pushButton_2">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>80</y>
+          <width>75</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>create db</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="pushButton_4">
+        <property name="geometry">
+         <rect>
+          <x>100</x>
+          <y>80</y>
+          <width>75</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>remove db</string>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="bestaandeDatabases">
+        <property name="geometry">
+         <rect>
+          <x>39</x>
+          <y>20</y>
+          <width>351</width>
+          <height>31</height>
+         </rect>
+        </property>
+       </widget>
       </widget>
       <widget class="QWidget" name="tab_5">
        <attribute name="title">
