@@ -123,6 +123,14 @@ class TestDB(TestCase):
         with pytest.raises(AttributeError):
             copy2ogr(in_source, "not_existing", out_source, "test_2", schema="src")
 
+    def test_copy2pg_database_no_features(self):
+        sql = "CREATE TABLE test_no_count AS SELECT 1::integer as id LIMIT 0;"
+        self.db.execute_sql_statement(sql, fetch=False)
+        in_source = set_ogr_connection_pg_database(self.settings)
+        out_source = in_source
+        copy2ogr(in_source, "test_no_count", out_source, "test_no_count_2")
+        assert self.db.get_count("test_no_count_2") == 0
+
     def test_get_projection_not_good(self):
         proj = """PROJCS["Amersfoort_RD_New",GEOGCS["GCS_Amersfoort",DATUM["D_Amersfoort",SPHEROID["Bessel_1841",6377397.155,299.1528128]],PRIMEM["Greenwich",0],UNIT["Degree",0.017453292519943295]],PROJECTION["Double_Stereographic"],PARAMETER["latitude_of_origin",52.15616055555555],PARAMETER["central_meridian",5.38763888888889],PARAMETER["scale_factor",0.9999079],PARAMETER["false_easting",155000],PARAMETER["false_northing",463000],UNIT["Meter",1]]"""
         sr = osr.SpatialReference()

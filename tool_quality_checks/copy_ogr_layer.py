@@ -7,7 +7,7 @@ import logging
 from osgeo import ogr
 from OASDGLDatachecker.tool_quality_checks.correct_import_file import (
     correct_vector_layer,
-    correct_layer_name_length
+    correct_layer_name_length,
 )
 
 logger = logging.getLogger(__name__)
@@ -29,6 +29,10 @@ def copy2ogr(in_source, in_name, out_source, out_name, schema="public"):
     in_srid = in_layer.GetSpatialRef()
 
     if in_srid is None:
+        logger.info("Input layer has no geometry column:", in_name)
+        has_geom = False
+    elif in_layer.GetFeatureCount() == 0:
+        logger.warning("Input feature count is 0 for layer:", in_name)
         has_geom = False
     else:
         has_geom = True
@@ -78,7 +82,7 @@ def copy2ogr(in_source, in_name, out_source, out_name, schema="public"):
     else:
         corrected_layer_name = correct_layer_name_length(out_name)
         corrected_in_layer = in_layer
-        
+
         options = [
             "OVERWRITE=YES",
             "SCHEMA={}".format(schema),
@@ -112,8 +116,8 @@ def copy2ogr(in_source, in_name, out_source, out_name, schema="public"):
             new_layer.StartTransaction()
     new_layer.CommitTransaction()
 
-    if new_layer.GetFeatureCount() == 0:
-        raise ValueError("Postgres vector feature count is 0")
+    if new_layer.GetFeatureCount() == 0 and in_layer.GetFeatureCount() > 0:
+        raise ValueError("output feature count is 0, while input is not")
 
     new_layer = None
 
