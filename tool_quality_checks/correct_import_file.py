@@ -8,7 +8,6 @@ import osr
 import logging
 
 DRIVER_OGR_MEM = ogr.GetDriverByName("Memory")
-DRIVER_OGR_SHP = ogr.GetDriverByName("ESRI Shapefile")
 _mem_num = 0
 
 logger = logging.getLogger(__name__)
@@ -18,7 +17,7 @@ ogr.UseExceptions()
 def create_mem_ds():
     """ Creating an ogr datasource in memory"""
     global _mem_num
-    mem_datasource = DRIVER_OGR_SHP.CreateDataSource("/vsimem/mem{}".format(_mem_num))
+    mem_datasource = DRIVER_OGR_MEM.CreateDataSource("/vsimem/mem{}".format(_mem_num))
     _mem_num = _mem_num + 1
     return mem_datasource
 
@@ -216,7 +215,6 @@ def correct_vector_layer(in_layer, layer_name="", epsg=3857):
     reproject = osr.CoordinateTransformation(in_spatial_ref, spatial_ref_out)
     for out_feat in mem_layer:
         out_geom = out_feat.GetGeometryRef()
-
         out_geom, valid = try_fix_geometry(out_geom)
 
         if not valid:

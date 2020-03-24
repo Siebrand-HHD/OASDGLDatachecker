@@ -2,18 +2,18 @@
 # TODO aanlegjaar toevoegen        year AS begindatum,
 # TODO putmateriaal toevoegen      material AS materiaalput,
 
-sql_background_views = {
-"put": """CREATE OR REPLACE VIEW {schema}.put AS
+sql_understandable_model_views = {
+    "put": """CREATE OR REPLACE VIEW {schema}.put AS
     SELECT
         a.code AS rioolput,
         a.id AS threedi_id,
         CASE
-            WHEN shape = '00' OR shape = '02' THEN 'rechthoekig'
+            WHEN shape = '00' or shape = '02' THEN 'rechthoekig'
             WHEN shape = '01' THEN 'rond'
             ELSE 'overige'
  		END as vormput,
-        (width * 1000)::double precision AS breedteput,
-        (length * 1000)::double precision AS lengteput,
+        width AS breedteput,
+        length AS lengteput,
         CASE
             WHEN manhole_indicator = 0 THEN 'inspectieput'
             WHEN manhole_indicator = 1 THEN 'uitlaat'
@@ -24,7 +24,7 @@ sql_background_views = {
         surface_level AS maaiveldhoogte,
         b.the_geom
     FROM v2_manhole a JOIN v2_connection_nodes b ON a.connection_node_id = b.id;""",
-"leiding": """CREATE OR REPLACE VIEW {schema}.leiding AS
+    "leiding": """CREATE OR REPLACE VIEW {schema}.leiding AS
     SELECT
         pipe.code AS leiding,
         pipe.id AS threedi_id,
@@ -51,23 +51,15 @@ sql_background_views = {
             ELSE 'overige'
  		END as materiaalleiding,
         CASE
-            WHEN shape = 1 THEN 'rechthoekig'
+            WHEN shape = 1 THEN 'rechthoekig (open)'
             WHEN shape = 2 THEN 'rond'
             WHEN shape = 3 THEN 'eivormig'
-            WHEN shape = 5 THEN 'tabulated'
-            WHEN shape = 6 THEN 'trapezium'
+            WHEN shape = 5 THEN 'rechthoekig (getabelleerd)'
+            WHEN shape = 6 THEN 'getabelleerd trapezium'
             ELSE 'overige'
  		END as vormprofiel,
-        CASE
-            WHEN shape < 5 THEN (width * 1000)::double precision
-            WHEN shape > 4 THEN (array_greatest(string_to_array(width,' ')) * 1000)::double precision
-            ELSE 'onbekend'
-        END AS breedteleiding,
-        CASE
-            WHEN shape < 5 THEN (height * 1000)::double precision
-            WHEN shape > 4 THEN (array_greatest(string_to_array(height,' ')) * 1000)::double precision
-            ELSE 'onbekend'
-        END AS hoogteleiding,
+        array_greatest(string_to_array(width,' ')) AS breedteleiding,
+        array_greatest(string_to_array(height,' ')) AS hoogteleiding,
         st_makeline(start_node.the_geom, end_node.the_geom) AS the_geom
     FROM v2_pipe pipe
     LEFT JOIN v2_connection_nodes start_node
@@ -76,7 +68,7 @@ sql_background_views = {
         ON 	pipe.connection_node_end_id = end_node.id 
     LEFT JOIN v2_cross_section_definition def
         ON pipe.cross_section_definition_id = def.id;""",
-"overstort": """CREATE OR REPLACE VIEW {schema}.overstort AS
+    "overstort": """CREATE OR REPLACE VIEW {schema}.overstort AS
     SELECT
         weir.code AS overstort,
         weir.id AS threedi_id,
@@ -96,16 +88,8 @@ sql_background_views = {
             ELSE NULL
         END AS afvoercoefficient,
         crest_level AS drempelniveau,
-        CASE
-            WHEN shape < 5 THEN (width * 1000)::double precision
-            WHEN shape > 4 THEN (array_greatest(string_to_array(width,' ')) * 1000)::double precision
-            ELSE 'onbekend'
-        END AS drempelbreedte,
-        CASE
-            WHEN shape < 5 THEN (height * 1000)::double precision
-            WHEN shape > 4 THEN (array_greatest(string_to_array(height,' ')) * 1000)::double precision
-            ELSE 'onbekend'
-        END AS vrijeoverstorthoogte,
+        width AS drempelbreedte,
+        height AS vrijeoverstorthoogte,
         st_makeline(start_node.the_geom, end_node.the_geom) AS the_geom
     FROM v2_weir weir
     LEFT JOIN v2_connection_nodes start_node
@@ -114,7 +98,7 @@ sql_background_views = {
         ON 	weir.connection_node_end_id = end_node.id 
     LEFT JOIN v2_cross_section_definition def
         ON weir.cross_section_definition_id = def.id;""",
-"doorlaat": """CREATE OR REPLACE VIEW {schema}.doorlaat AS
+    "doorlaat": """CREATE OR REPLACE VIEW {schema}.doorlaat AS
     SELECT
         orf.code AS doorlaat,
         orf.id AS threedi_id,
@@ -137,23 +121,15 @@ sql_background_views = {
         discharge_coefficient_positive AS contractiecoefficientdoorlaatprofiel,
         crest_level AS doorlaatniveau,
         CASE
-            WHEN shape = 1 THEN 'rechthoekig'
+            WHEN shape = 1 THEN 'rechthoekig (open)'
             WHEN shape = 2 THEN 'rond'
             WHEN shape = 3 THEN 'eivormig'
-            WHEN shape = 5 THEN 'tabulated'
-            WHEN shape = 6 THEN 'trapezium'
+            WHEN shape = 5 THEN 'rechthoekig (getabelleerd)'
+            WHEN shape = 6 THEN 'getabelleerd trapezium'
             ELSE 'overige'
  		END AS vormprofiel,
-        CASE
-            WHEN shape < 5 THEN (width * 1000)::double precision
-            WHEN shape > 4 THEN (array_greatest(string_to_array(width,' ')) * 1000)::double precision
-            ELSE 'onbekend'
-        END AS breedteleiding,
-        CASE
-            WHEN shape < 5 THEN (height * 1000)::double precision
-            WHEN shape > 4 THEN (array_greatest(string_to_array(height,' ')) * 1000)::double precision
-            ELSE 'onbekend'
-        END AS hoogteleiding,
+        array_greatest(string_to_array(width,' ')) AS breedtedoorlaat,
+        array_greatest(string_to_array(height,' ')) AS hoogtedoorlaat,
         st_makeline(start_node.the_geom, end_node.the_geom) AS the_geom
     FROM v2_orifice orf
     LEFT JOIN v2_connection_nodes start_node
@@ -162,7 +138,7 @@ sql_background_views = {
         ON 	orf.connection_node_end_id = end_node.id 
     LEFT JOIN v2_cross_section_definition def
         ON orf.cross_section_definition_id = def.id;""",
-"pomp": """CREATE OR REPLACE VIEW {schema}.pomp AS
+    "pomp": """CREATE OR REPLACE VIEW {schema}.pomp AS
     SELECT
         pump.code AS pomp,
         pump.id AS threedi_id,
@@ -189,10 +165,10 @@ sql_background_views = {
             WHEN type = 2 THEN lower_stop_level
             ELSE NULL
  		END AS afslagniveaubenedenstrooms,
-        start_node.the_geom
+        st_makeline(start_node.the_geom, end_node.the_geom) AS the_geom
     FROM v2_pumpstation pump
     LEFT JOIN v2_connection_nodes start_node
         ON 	pump.connection_node_start_id = start_node.id 
     LEFT JOIN v2_connection_nodes end_node
-        ON 	pump.connection_node_end_id = end_node.id;"""
+        ON 	pump.connection_node_end_id = end_node.id;""",
 }

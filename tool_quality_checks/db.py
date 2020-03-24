@@ -4,7 +4,7 @@ import os
 import psycopg2
 import logging
 
-
+OUR_DIR = os.path.dirname(__file__)
 logger = logging.getLogger(__name__)
 
 
@@ -29,7 +29,7 @@ def _connect_to_server(settings, sql_statement):
 
 def drop_database(settings):
     """drops a database"""
-    drop_database_statement = """DROP DATABASE {database_name};""".format(
+    drop_database_statement = """DROP DATABASE IF EXISTS {database_name};""".format(
         database_name=settings.database
     )
     _connect_to_server(settings, drop_database_statement)
@@ -81,9 +81,7 @@ class ThreediDatabase(object):
         sql_relpath = os.path.join(
             "threedi_database_schema", "work_empty_schema_2020-01-15.sql"
         )
-        sql_abspath = os.path.join(
-            os.path.abspath(os.path.dirname(__file__)), sql_relpath
-        )
+        sql_abspath = os.path.join(os.path.abspath(OUR_DIR), sql_relpath)
         self.execute_sql_file(sql_abspath)
 
     def get_count(self, table_name, schema="public"):
@@ -201,13 +199,6 @@ class ThreediDatabase(object):
         sql_file = open(filename, "r").read()
         self.execute_sql_statement(sql_statement=sql_file, fetch=False)
         logger.debug("Execute sql file with function:" + filename)
-
-    def execute_sql_dir(self, dirname):
-        for root, subdirs, files in sorted(os.walk(dirname)):
-            for f in sorted(files):
-                file_path = os.path.join(root, f)
-                if file_path.endswith(".sql"):
-                    self.execute_sql_file(file_path)
 
     def commit_values(self, table_name, field_names, data, schema="public"):
         """

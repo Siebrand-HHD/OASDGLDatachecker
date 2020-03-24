@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Tests for quality_checks.py"""
+"""Tests for check_sewerage.py"""
 import os
 from unittest import TestCase
 import pytest
@@ -10,13 +10,16 @@ from OASDGLDatachecker.tool_quality_checks.db import (
     create_database,
     drop_database,
 )
-from OASDGLDatachecker.tool_quality_checks.quality_checks import (
+from OASDGLDatachecker.tool_quality_checks.importer import import_sewerage_data_into_db
+from OASDGLDatachecker.tool_quality_checks.check_sewerage import (
     initialize_db_checks,
     perform_checks_with_sql,
+    check_sewerage,
 )
 
+OUR_DIR = os.path.dirname(__file__)
 _ini_relpath = "data/instellingen_test.ini"
-INI_ABSPATH = os.path.join(os.path.dirname(__file__), _ini_relpath)
+INI_ABSPATH = os.path.join(OUR_DIR, _ini_relpath)
 
 """
 This test file assumes that the checks will be run in particular order.
@@ -37,11 +40,18 @@ class TestDB(TestCase):
         cls.db = ThreediDatabase(cls.settings)
         cls.db.create_extension(extension_name="postgis")
         cls.db.initialize_db_threedi()
+        # load GBI data set into tester
+        manhole_layer_rel_path = "data\schiedam-test\schiedam-putten-test.shp"
+        cls.settings.manhole_layer = os.path.join(OUR_DIR, manhole_layer_rel_path)
+        pipe_layer_rel_path = "data\schiedam-test\schiedam-leidingen-test.shp"
+        cls.settings.pipe_layer = os.path.join(OUR_DIR, pipe_layer_rel_path)
+        cls.settings.import_type = "gbi"
+        import_sewerage_data_into_db(cls.db, cls.settings)
 
     @classmethod
     def tearDownClass(cls):
         cls.db.conn.close()
-        drop_database(cls.settings)
+        # drop_database(cls.settings)
 
     def test_initialize_db_checks(self):
         initialize_db_checks(self.db)
@@ -51,13 +61,25 @@ class TestDB(TestCase):
 
     def test_perform_checks_with_sql_raise(self):
         ini_relpath_key_missing = "data/instellingen_test_missing_key.ini"
-        ini_abspath_key_missing = os.path.join(
-            os.path.dirname(__file__), ini_relpath_key_missing
-        )
+        ini_abspath_key_missing = os.path.join(OUR_DIR, ini_relpath_key_missing)
         test_settings = SettingsObject(ini_abspath_key_missing)
         with pytest.raises(Exception):
             self.db.perform_checks_with_sql(
                 self.db, test_settings, "v2_manhole", "completeness"
             )
 
-    # TODO add quality checks test
+    def test_01_check_sewerage_no_dem(self):
+        check_sewerage(self.db, self.settings)
+        assert self.db.get_count("put_shape", "chk") == 1
+        assert self.db.get_count("put_maaiveld_check", "chk") == 0
+
+    def test_02_check_sewerage(self):
+        raster_rel_path = "data\schiedam-test\dem_schiedam_test.tif"
+        self.settings.dem = os.path.join(OUR_DIR, raster_rel_path)
+        check_sewerage(self.db, self.settings)
+        assert self.db.get_count("put_shape", "chk") == 1
+        assert "-8847.45" in str(
+            self.db.execute_sql_statement(
+                "SELECT hoogte_verschil FROM chk.put_maaiveld_check"
+            )[0][0]
+        )

@@ -1,20 +1,57 @@
 # -*- coding: utf-8 -*-
-""" TODO Docstring. """
+""" Provide a list of checks regarding the sewerage system in a postgres db """
 import os
 import logging
 
 from OASDGLDatachecker.tool_quality_checks import sql_checks
 from OASDGLDatachecker.tool_quality_checks.sql_views import sql_views
-from OASDGLDatachecker.tool_quality_checks.sql_background_views import sql_background_views
+from OASDGLDatachecker.tool_quality_checks.sql_model_views import (
+    sql_understandable_model_views,
+)
+from OASDGLDatachecker.tool_quality_checks.point_sampling import (
+    sample_points_and_create_pg_layer,
+    create_point_sample_layer,
+)
+from OASDGLDatachecker.tool_quality_checks.importer import (
+    set_ogr_connection_pg_database,
+)
 
+OUR_DIR = os.path.dirname(__file__)
 logger = logging.getLogger(__name__)
 
 
-def quality_checks(db, settings):
-    """Overall function for checking our model data"""
+def check_sewerage(db, settings):
+    """
+    Overall function for checking our sewerage model data
+    
+    Result: list of check-tables in the postgres database in 'chk' schema
+    """
 
-    # TODO always run this settings?
+    # Now the checks always run - option make it variable
     initialize_db_checks(db)
+
+    # load dtm values
+    if os.path.isfile(settings.dem):
+        sample_points_and_create_pg_layer(
+            settings,
+            settings.dem,
+            "v2_manhole_view",
+            "manhole_maaiveld",
+            "src",
+            "maaiveld",
+        )
+    else:
+        # create empty layer to make sure that sql does not crash on table unknown
+        conn = set_ogr_connection_pg_database(settings)
+        create_point_sample_layer(
+            settings,
+            conn,
+            input_point_layer="v2_manhole_view",
+            output_point_layer="manhole_maaiveld",
+            output_schema="src",
+            output_raster_column="maaiveld",
+        )
+        conn.Destroy()
 
     # get v2_table_names
     v2_table_names = db.select_table_names("v2%")
@@ -31,6 +68,12 @@ def initialize_db_checks(db):
 
     db.create_schema(schema_name="chk")
     db.create_schema(schema_name="model")
+
+    # install necessary functions out of folder "sql_functions"
+    sql_relpath = os.path.join("sql", "sql_function_array_greatest_or_smallest.sql")
+    sql_abspath = os.path.join(OUR_DIR, sql_relpath)
+    db.execute_sql_file(sql_abspath)
+
     for schema, table in [
         ["public", "v2_1d_boundary_conditions_view"],
         ["public", "v2_pumpstation_point_view"],
@@ -52,13 +95,10 @@ def initialize_db_checks(db):
         ["model", "pomp"],
     ]:
         db.create_preset_view_from_dictionary(
-            view_dictionary=sql_background_views, view_table=table, view_schema=schema
+            view_dictionary=sql_understandable_model_views,
+            view_table=table,
+            view_schema=schema,
         )
-
-    # install all functions out of folder "sql_functions"
-    sql_reldir = "sql_functions"
-    sql_absdir = os.path.join(os.path.dirname(__file__), sql_reldir)
-    db.execute_sql_dir(sql_absdir)
 
 
 def perform_checks_with_sql(db, settings, check_table, check_type):
