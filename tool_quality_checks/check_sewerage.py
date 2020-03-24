@@ -112,11 +112,11 @@ def perform_checks_with_sql(db, settings, check_table, check_type):
         """
     check_table = check_table.replace("v2_", "")
     sql_template_name = "sql_" + check_type + "_" + check_table
-    
+
     if sql_template_name in sql_checks:
         try:
             statement = sql_checks[sql_template_name].format(
-                schema = "chk", **settings.__dict__
+                schema="chk", **settings.__dict__
             )
         except KeyError as e:
             raise KeyError("Setting %s is missing in the ini-file" % e)

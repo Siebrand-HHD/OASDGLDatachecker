@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 sql_checks = {
-     "sql_completeness_manhole": """
+    "sql_completeness_manhole": """
 ------------------- Putten -------------------------
 ----------------------------------------------------
 -- Maaiveldhoogte aanwezig
@@ -480,7 +480,6 @@ CREATE OR REPLACE VIEW {schema}.pomp_capaciteit_compleet AS
         ON 	pump.connection_node_end_id = end_node.id
     WHERE capacity IS NULL OR capacity IS 0 OR capacity < 0;
 """,
-
     # ---------------------------------------------------
     # ----------- Kwaliteitchecks Riolering -------------
     # ---------------------------------------------------
@@ -1453,5 +1452,5 @@ CREATE OR REPLACE VIEW {schema}.pomp_aanslagpeil_vs_maaiveld AS
         ON start_node.id = manh.connection_node_id,
     src.manhole_maaiveld ahn JOIN v2_manhole manh ON manh.id = ahn.manh_id
     WHERE (start_level > maaiveld OR start_level > surface_level) AND pump.type = 1;
-"""
+""",
 }
