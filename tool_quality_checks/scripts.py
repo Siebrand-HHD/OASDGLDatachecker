@@ -9,7 +9,7 @@ from OASDGLDatachecker.tool_quality_checks.check_sewerage import check_sewerage
 from OASDGLDatachecker.tool_quality_checks.db import (
     ThreediDatabase,
     create_database,
-    drop_database,
+    drop_database
 )
 from OASDGLDatachecker.tool_quality_checks.importer import import_sewerage_data_into_db
 from OASDGLDatachecker.tool_quality_checks.exporter import export_checks_from_db_to_gpkg
@@ -40,6 +40,10 @@ def run_scripts(settings):
     if settings.createdb:
         logger.info("Initialize the Citybuilder database")
         db.initialize_db_threedi()
+
+    if settings.emptydb:
+        logger.info("Empty the Citybuilder database")
+        db.empty_database()
 
     if settings.import_type:
         logger.info("Import your sewerage data of %s" % settings.import_type)
@@ -124,6 +128,13 @@ def get_parser():
         default=False,
         help="Drop CityBuilder database",
         dest="dropdb",
+        action="store_true",
+    )
+    parser.add_argument(
+        "--emptydb",
+        default=False,
+        help="Empty CityBuilder database",
+        dest="emptydb",
         action="store_true",
     )
     parser.add_argument(

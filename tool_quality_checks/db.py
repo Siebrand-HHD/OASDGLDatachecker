@@ -222,3 +222,7 @@ class ThreediDatabase(object):
         with self.conn:
             with self.conn.cursor() as cur:
                 cur.execute(insert_query, data)
+
+    def empty_database(self):
+        sql_abspath = os.path.join(OUR_DIR, "sql", "sql_empty_3di_database.sql")
+        self.execute_sql_file(sql_abspath)

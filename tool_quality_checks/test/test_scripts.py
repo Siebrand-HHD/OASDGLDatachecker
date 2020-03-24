@@ -76,6 +76,7 @@ geopackage_abs_path = os.path.join(OUR_DIR, "data\schiedam-test\export_scripts.g
         ini_abspath_full_check,
         "--createdb",
         "--dropdb",
+        "--emptydb",
         "--import",
         "gbi",
         "-m",
