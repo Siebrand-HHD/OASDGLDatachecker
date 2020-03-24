@@ -45,7 +45,7 @@ class TestDB(TestCase):
     @classmethod
     def tearDownClass(cls):
         cls.db.conn.close()
-        # drop_database(cls.settings)
+        drop_database(cls.settings)
 
     def test_ogr_connection_pg_database(self):
         set_ogr_connection_pg_database(self.settings)
@@ -63,12 +63,12 @@ class TestDB(TestCase):
         filename, file_extension = os.path.splitext(file_with_extention)
         in_source = set_ogr_connection(SHP_ABSPATH)
         copy2pg_database(self.settings, in_source, filename, "test")
-        assert self.db.get_count("test") == 78
+        assert self.db.get_count("test") == 79
 
     def test_02_copy2pg_database_pg(self):
         in_source = set_ogr_connection_pg_database(self.settings)
         copy2pg_database(self.settings, in_source, "test", "test_2", schema="src")
-        assert self.db.get_count("test_2", schema="src") == 78
+        assert self.db.get_count("test_2", schema="src") == 79
 
     def test_copy2pg_database_no_ds_raise(self):
         in_source = set_ogr_connection_pg_database(self.settings)
@@ -93,7 +93,7 @@ class TestDB(TestCase):
         import_file_based_on_filetype(
             self.db, self.settings, SHP_ABSPATH, out_name="putten_test"
         )
-        assert self.db.get_count("putten_test", "src") == 78
+        assert self.db.get_count("putten_test", "src") == 79
 
     def test_import_filetype_file_does_not_exists(self):
         with pytest.raises(FileNotFoundError):

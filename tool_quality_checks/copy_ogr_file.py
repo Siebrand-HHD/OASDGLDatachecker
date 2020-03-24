@@ -8,7 +8,6 @@ from osgeo import ogr
 from OASDGLDatachecker.tool_quality_checks.correct_import_file import (
     correct_vector_layer,
 )
-import subprocess
 
 logger = logging.getLogger(__name__)
 ogr.UseExceptions()

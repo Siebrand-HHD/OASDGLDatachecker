@@ -135,7 +135,7 @@ def test_transform_multipart_to_singlepart():
 def test_correct_vector_layer_manholes_3D_point(caplog):
     out_datasource, layer_name = correct_vector_layer(SHP_IN_LAYER, "test", epsg=28992)
     assert "3D Point" in caplog.text
-    assert out_datasource[layer_name].GetFeatureCount() == 78
+    assert out_datasource[layer_name].GetFeatureCount() == 79
 
 
 def test_correct_vector_layer_multipoly(caplog):
