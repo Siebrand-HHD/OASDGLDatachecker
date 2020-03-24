@@ -9,7 +9,7 @@ from OASDGLDatachecker.tool_quality_checks.check_sewerage import check_sewerage
 from OASDGLDatachecker.tool_quality_checks.db import (
     ThreediDatabase,
     create_database,
-    drop_database
+    drop_database,
 )
 from OASDGLDatachecker.tool_quality_checks.importer import import_sewerage_data_into_db
 from OASDGLDatachecker.tool_quality_checks.exporter import export_checks_from_db_to_gpkg
@@ -34,7 +34,7 @@ def run_scripts(settings):
         create_database(settings)
 
     # block with database connection
-    if settings.createdb or settings.import_type or settings.checks:
+    if settings.createdb or settings.import_type or settings.checks or settings.emptydb:
         db = ThreediDatabase(settings)
 
     if settings.createdb:
