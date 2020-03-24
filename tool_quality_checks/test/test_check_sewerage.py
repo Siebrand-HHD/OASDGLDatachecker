@@ -51,7 +51,7 @@ class TestDB(TestCase):
     @classmethod
     def tearDownClass(cls):
         cls.db.conn.close()
-        # drop_database(cls.settings)
+        drop_database(cls.settings)
 
     def test_initialize_db_checks(self):
         initialize_db_checks(self.db)

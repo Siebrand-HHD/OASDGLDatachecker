@@ -47,7 +47,7 @@ class TestDB(TestCase):
     @classmethod
     def tearDownClass(cls):
         cls.db.conn.close()
-        # drop_database(cls.settings)
+        drop_database(cls.settings)
 
     def test_get_inverse(self):
         inverse = get_inverse(1, 2, 3, 4)
