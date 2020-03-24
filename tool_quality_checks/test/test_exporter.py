@@ -11,6 +11,7 @@ from OASDGLDatachecker.tool_quality_checks.db import (
 )
 from OASDGLDatachecker.tool_quality_checks.importer import import_sewerage_data_into_db
 from OASDGLDatachecker.tool_quality_checks.check_sewerage import check_sewerage
+from OASDGLDatachecker.tool_quality_checks.copy_ogr_layer import set_ogr_connection
 from unittest import TestCase
 
 OUR_DIR = os.path.dirname(__file__)
@@ -53,4 +54,5 @@ class TestDB(TestCase):
             OUR_DIR, "data\schiedam-test\export.gpkg"
         )
         export_checks_from_db_to_gpkg(self.settings)
-        assert 0 == 1
+        in_source = set_ogr_connection(self.settings.gpkg_output_layer)
+        assert in_source.GetLayerCount() == 50
