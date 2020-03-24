@@ -24,15 +24,15 @@ def copy2ogr(in_source, in_name, out_source, out_name, schema="public"):
     # TODO change naming to also include sqlite and gpkg
     in_layer = in_source.GetLayerByName(in_name)
     if in_layer is None:
-        logger.error("I could not find the table in your datasource:", in_name)
+        logger.error("I could not find the table in your datasource: %s" % in_name)
         raise AttributeError()
     in_srid = in_layer.GetSpatialRef()
 
     if in_srid is None:
-        logger.info("Input layer has no geometry column:", in_name)
+        logger.info("Input layer has no geometry column: %s" % in_name)
         has_geom = False
     elif in_layer.GetFeatureCount() == 0:
-        logger.warning("Input feature count is 0 for layer:", in_name)
+        logger.warning("Input feature count is 0 for layer: %s" % in_name)
         has_geom = False
     else:
         has_geom = True
