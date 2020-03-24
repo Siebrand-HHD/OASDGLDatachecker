@@ -165,7 +165,7 @@ sql_understandable_model_views = {
             WHEN type = 2 THEN lower_stop_level
             ELSE NULL
  		END AS afslagniveaubenedenstrooms,
-        st_makeline(start_node.the_geom, end_node.the_geom) AS the_geom
+        start_node.the_geom AS the_geom
     FROM v2_pumpstation pump
     LEFT JOIN v2_connection_nodes start_node
         ON 	pump.connection_node_start_id = start_node.id 
