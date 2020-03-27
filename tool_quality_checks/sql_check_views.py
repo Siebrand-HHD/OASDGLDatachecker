@@ -33,7 +33,7 @@ CREATE OR REPLACE VIEW {schema}.put_vorm_leeg AS
     FROM v2_manhole a JOIN v2_connection_nodes b ON a.connection_node_id = b.id
     WHERE shape IS NULL;
 -- putten zonder afmeting
-CREATE OR REPLACE VIEW {schema}.put_afmeting_leeg_incorrect AS
+CREATE OR REPLACE VIEW {schema}.put_afmeting_leeg_onlogisch AS
     SELECT
         a.code AS rioolput,
         a.id AS threedi_id,
@@ -108,6 +108,38 @@ CREATE OR REPLACE VIEW {schema}.leiding_vorm_leeg AS
     LEFT JOIN v2_connection_nodes end_node
         ON 	pipe.connection_node_end_id = end_node.id
     WHERE cross_section_definition_id IS NULL;
+-- Riooltype ontbreekt
+CREATE OR REPLACE VIEW {schema}.leiding_riooltype_leeg AS
+    SELECT
+        pipe.code AS leiding,
+        pipe.id AS threedi_id,
+        pipe.connection_node_start_id AS threedi_start_id,
+        pipe.connection_node_end_id AS threedi_end_id,
+        start_node.code AS beginpunt,
+        end_node.code AS eindpunt,
+        'riooltype ontbreekt'::text AS bericht,
+        st_makeline(start_node.the_geom, end_node.the_geom) AS the_geom
+    FROM v2_pipe pipe
+    LEFT JOIN v2_connection_nodes start_node
+        ON 	pipe.connection_node_start_id = start_node.id
+    LEFT JOIN v2_connection_nodes end_node
+        ON 	pipe.connection_node_end_id = end_node.id
+    WHERE sewerage_type IS NULL;
+-- Materiaal ontbreekt
+CREATE OR REPLACE VIEW {schema}.leiding_materiaal_leeg AS
+    SELECT
+        pipe.code AS leiding,
+        pipe.id AS threedi_id,
+        start_node.code AS beginpunt,
+        end_node.code AS eindpunt,
+        'materiaal ontbreekt'::text AS bericht,
+        st_makeline(start_node.the_geom, end_node.the_geom) AS the_geom
+    FROM v2_pipe pipe
+    LEFT JOIN v2_connection_nodes start_node
+        ON 	pipe.connection_node_start_id = start_node.id
+    LEFT JOIN v2_connection_nodes end_node
+        ON 	pipe.connection_node_end_id = end_node.id
+    WHERE material IS NULL;
 -- Dwarsdoorsnede compleet
 CREATE OR REPLACE VIEW {schema}.leiding_afmeting_leeg AS
     SELECT
@@ -806,6 +838,44 @@ CREATE OR REPLACE VIEW {schema}.uitlaat_op_eindpunt_gemaal AS
     "sql_quality_pipe": """
 ----------------- Leidingen ------------------------
 ----------------------------------------------------
+
+-- Materiaal ontbreekt
+CREATE OR REPLACE VIEW {schema}.leiding_materiaal_onlogisch AS
+    SELECT
+        pipe.code AS leiding,
+        pipe.id AS threedi_id,
+        start_node.code AS beginpunt,
+        end_node.code AS eindpunt,
+        'materiaal type onlogisch'::text AS bericht,
+        st_makeline(start_node.the_geom, end_node.the_geom) AS the_geom
+    FROM v2_pipe pipe
+    LEFT JOIN v2_connection_nodes start_node
+        ON 	pipe.connection_node_start_id = start_node.id
+    LEFT JOIN v2_connection_nodes end_node
+        ON 	pipe.connection_node_end_id = end_node.id
+    WHERE material > 8;
+-- BOB's aanwezig
+CREATE OR REPLACE VIEW {schema}.leiding_bob_onlogisch AS
+    SELECT
+        pipe.code AS leiding,
+        pipe.id AS threedi_id,
+        start_node.code AS beginpunt,
+        end_node.code AS eindpunt,
+        pipe.invert_level_start_point AS bob_beginpunt,
+        pipe.invert_level_end_point AS bob_eindpunt,
+        'bob beginpunt en/of eindpunt onlogsich'::text AS bericht,
+        st_makeline(start_node.the_geom, end_node.the_geom) AS the_geom
+    FROM v2_pipe pipe
+    LEFT JOIN v2_connection_nodes start_node
+        ON 	pipe.connection_node_start_id = start_node.id
+    LEFT JOIN v2_connection_nodes end_node
+        ON 	pipe.connection_node_end_id = end_node.id
+    WHERE pipe.invert_level_start_point = 0
+				OR pipe.invert_level_start_point < {min_levels}
+				or pipe.invert_level_start_point > {max_levels}
+				OR pipe.invert_level_end_point = 0
+				OR pipe.invert_level_end_point < {min_levels}
+				or pipe.invert_level_end_point > {max_levels}L;
 -- Zeer korte leidingen (< x m)
 CREATE OR REPLACE VIEW {schema}.leiding_kort AS
     SELECT
