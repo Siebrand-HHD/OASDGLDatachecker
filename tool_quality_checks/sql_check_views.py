@@ -875,7 +875,7 @@ CREATE OR REPLACE VIEW {schema}.leiding_bob_onlogisch AS
 				or pipe.invert_level_start_point > {max_levels}
 				OR pipe.invert_level_end_point = 0
 				OR pipe.invert_level_end_point < {min_levels}
-				or pipe.invert_level_end_point > {max_levels}L;
+				or pipe.invert_level_end_point > {max_levels};
 -- Zeer korte leidingen (< x m)
 CREATE OR REPLACE VIEW {schema}.leiding_kort AS
     SELECT
