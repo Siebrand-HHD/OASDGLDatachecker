@@ -68,18 +68,18 @@ class TestDB(TestCase):
                 self.db, test_settings, "v2_manhole", "completeness"
             )
 
-    def test_01_check_sewerage_no_dem(self):
+    def test_01_check_sewerage(self):
         check_sewerage(self.db, self.settings)
-        assert self.db.get_count("put_shape", "chk") == 1
-        assert self.db.get_count("put_maaiveld_check", "chk") == 0
+        assert self.db.get_count("put_vorm_leeg", "chk") == 1
+        assert self.db.get_count("put_maaiveldniveau_onlogisch", "chk") == 1
 
     def test_02_check_sewerage(self):
-        raster_rel_path = "data\schiedam-test\dem_schiedam_test.tif"
+        raster_rel_path = "data\dem_DS.tif"
         self.settings.dem = os.path.join(OUR_DIR, raster_rel_path)
         check_sewerage(self.db, self.settings)
-        assert self.db.get_count("put_shape", "chk") == 1
-        assert "-8847.45" in str(
+        assert self.db.get_count("put_vorm_leeg", "chk") == 1
+        assert "0.34" in str(
             self.db.execute_sql_statement(
-                "SELECT hoogte_verschil FROM chk.put_maaiveld_check"
+                "SELECT hoogte_verschil FROM chk.put_maaiveld_vs_ahn"
             )[0][0]
         )
