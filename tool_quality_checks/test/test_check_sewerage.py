@@ -74,12 +74,19 @@ class TestDB(TestCase):
         assert self.db.get_count("put_maaiveldniveau_onlogisch", "chk") == 1
 
     def test_02_check_sewerage(self):
-        raster_rel_path = "data\dem_DS.tif"
+        raster_rel_path = "data\schiedam-test\dem_schiedam_test.tif"
         self.settings.dem = os.path.join(OUR_DIR, raster_rel_path)
         check_sewerage(self.db, self.settings)
         assert self.db.get_count("put_vorm_leeg", "chk") == 1
-        assert "0.34" in str(
+        assert (
+            self.db.execute_sql_statement("SELECT maaiveld FROM src.manhole_maaiveld;")[
+                0
+            ][0]
+            == 0.31
+        )
+        assert (
             self.db.execute_sql_statement(
-                "SELECT hoogte_verschil FROM chk.put_maaiveld_vs_ahn"
+                "SELECT hoogte_verschil::float FROM chk.put_maaiveld_vs_ahn"
             )[0][0]
+            == -8847.45
         )
