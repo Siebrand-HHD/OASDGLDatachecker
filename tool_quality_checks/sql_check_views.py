@@ -14,11 +14,11 @@ CREATE OR REPLACE VIEW {schema}.put_maaiveldniveau_leeg AS
     FROM v2_manhole a JOIN v2_connection_nodes b ON a.connection_node_id = b.id
     WHERE surface_level IS NULL;
 -- putbodem aanwezig
-CREATE OR REPLACE VIEW {schema}.put_z_coordinaat_leeg AS
+CREATE OR REPLACE VIEW {schema}.put_bodemhoogte_leeg AS
     SELECT
         a.code AS rioolput,
         a.id AS threedi_id,
-        bottom_level AS z_coordinaat,
+        bottom_level AS bodemhoogte,
         b.the_geom
     FROM v2_manhole a JOIN v2_connection_nodes b ON a.connection_node_id = b.id
     WHERE bottom_level IS NULL;
@@ -33,7 +33,7 @@ CREATE OR REPLACE VIEW {schema}.put_vorm_leeg AS
     FROM v2_manhole a JOIN v2_connection_nodes b ON a.connection_node_id = b.id
     WHERE shape IS NULL;
 -- putten zonder afmeting
-CREATE OR REPLACE VIEW {schema}.put_afmeting_leeg AS
+CREATE OR REPLACE VIEW {schema}.put_afmeting_leeg_incorrect AS
     SELECT
         a.code AS rioolput,
         a.id AS threedi_id,
@@ -502,11 +502,11 @@ CREATE OR REPLACE VIEW {schema}.put_maaiveldniveau_onlogisch AS
 		OR surface_level < {min_levels}
 		OR surface_level > {max_levels};
 -- putbodem logisch
-CREATE OR REPLACE VIEW {schema}.put_z_coordinaat_onlogisch AS
+CREATE OR REPLACE VIEW {schema}.put_bodemhoogte_onlogisch AS
     SELECT
         a.code AS rioolput,
         a.id AS threedi_id,
-        bottom_level AS z_coordinaat,
+        bottom_level AS bodemhoogte,
         b.the_geom
     FROM v2_manhole a JOIN v2_connection_nodes b ON a.connection_node_id = b.id
     WHERE bottom_level = 0
@@ -552,7 +552,7 @@ CREATE OR REPLACE VIEW {schema}.put_maaiveld_vs_ahn AS
         ON 	a.id = c.manh_id
     WHERE maaiveld != -9999 AND abs(maaiveld - surface_level) > {hoogte_verschil};
 -- Maaiveldhoogte > putbodem
-CREATE OR REPLACE VIEW {schema}.put_maaiveld_vs_z_coordinaat AS
+CREATE OR REPLACE VIEW {schema}.put_maaiveld_vs_bodemhoogte AS
     SELECT
         a.code AS rioolput,
         a.id AS threedi_id,
@@ -562,7 +562,7 @@ CREATE OR REPLACE VIEW {schema}.put_maaiveld_vs_z_coordinaat AS
             WHEN manhole_indicator = 2 THEN 'pomp'
             ELSE 'overige'
  		END as typeknooppunt,
-        bottom_level AS z_coordinaat,
+        bottom_level AS bodemhoogte,
         surface_level AS maaiveldhoogte,
         surface_level - bottom_level AS hoogte_verschil,
         {min_dekking} AS minimale_dekking,
@@ -573,7 +573,7 @@ CREATE OR REPLACE VIEW {schema}.put_maaiveld_vs_z_coordinaat AS
 -- BOK > laagste bob
 -- first join the start bob's
 -- then select the lowest
-CREATE OR REPLACE VIEW {schema}.put_z_coordinaat_vs_bob AS
+CREATE OR REPLACE VIEW {schema}.put_bodemhoogte_vs_bob AS
     WITH bob_invert_levels AS(
     SELECT
         a.code AS rioolput,
@@ -584,7 +584,7 @@ CREATE OR REPLACE VIEW {schema}.put_z_coordinaat_vs_bob AS
             WHEN manhole_indicator = 2 THEN 'pomp'
             ELSE 'overige'
  		END as typeknooppunt,
-        bottom_level AS z_coordinaat,
+        bottom_level AS bodemhoogte,
         surface_level AS maaiveldhoogte,
 		CASE
             WHEN a.connection_node_id = c.connection_node_start_id::integer THEN c.invert_level_start_point
@@ -599,7 +599,7 @@ CREATE OR REPLACE VIEW {schema}.put_z_coordinaat_vs_bob AS
         ON a.connection_node_id = c.connection_node_start_id::integer OR a.connection_node_id = c.connection_node_end_id::integer
     ORDER BY a.id, c.id
     )
-    SELECT DISTINCT ON (threedi_id) * FROM bob_invert_levels WHERE z_coordinaat > bob_hoogte
+    SELECT DISTINCT ON (threedi_id) * FROM bob_invert_levels WHERE bodemhoogte > bob_hoogte
     ORDER BY threedi_id, bob_hoogte ASC;
 -- Afmeting buis > grootste aangesloten diameter
 -- first join aangesloten diameters
@@ -1144,7 +1144,7 @@ CREATE OR REPLACE VIEW {schema}.overstort_drempel_onder_putbodem AS
         weir.id AS threedi_id,
         start_node.code AS beginpunt,
         crest_level AS drempelniveau,
-        manh.bottom_level AS z_coordinaat,
+        manh.bottom_level AS bodemhoogte,
         st_makeline(start_node.the_geom, end_node.the_geom) AS the_geom
     FROM v2_weir weir
     LEFT JOIN v2_connection_nodes start_node
@@ -1269,7 +1269,7 @@ CREATE OR REPLACE VIEW {schema}.doorlaat_drempel_onder_putbodem AS
         orf.id AS threedi_id,
         start_node.code AS beginpunt,
         crest_level AS doorlaatniveau,
-        manh.bottom_level AS z_coordinaat,
+        manh.bottom_level AS bodemhoogte,
         st_makeline(start_node.the_geom, end_node.the_geom) AS the_geom
     FROM v2_orifice orf
     LEFT JOIN v2_connection_nodes start_node
@@ -1422,7 +1422,7 @@ CREATE OR REPLACE VIEW {schema}.pomp_afslagpeil_vs_bodemkelder AS
         pump.code AS pomp,
         pump.id AS threedi_id,
         start_node.code AS beginpuntpomp,
-        manh.bottom_level AS z_coordinaat,
+        manh.bottom_level AS bodemhoogte,
         pump.start_level AS aanslagniveaubovenstrooms,
         pump.lower_stop_level AS afslagniveaubovenstrooms,
         start_node.the_geom
