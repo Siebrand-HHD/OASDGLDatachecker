@@ -604,7 +604,7 @@ CREATE OR REPLACE VIEW {schema}.put_bodemhoogte_vs_bob AS
 -- Afmeting buis > grootste aangesloten diameter
 -- first join aangesloten diameters
 -- then select the lowest
-CREATE OR REPLACE VIEW {schema}.put_afm_vs_afm_leiding AS
+CREATE OR REPLACE VIEW {schema}.put_afm_vs_leiding_afm AS
     WITH aangesloten_diameters AS(
     SELECT
         a.code AS rioolput,
@@ -627,7 +627,9 @@ CREATE OR REPLACE VIEW {schema}.put_afm_vs_afm_leiding AS
         ON c.cross_section_definition_id = d.id
     ORDER BY a.id, c.id
     )
-    SELECT DISTINCT ON (threedi_id) * FROM aangesloten_diameters WHERE grootste_put_afmeting < grootste_leiding_afmeting + {padding_manhole}
+    SELECT DISTINCT ON (threedi_id) * 
+    FROM aangesloten_diameters 
+    WHERE grootste_put_afmeting < grootste_leiding_afmeting + {padding_manhole}
     ORDER BY threedi_id, grootste_leiding_afmeting DESC;
 -- Losliggende putten
 CREATE OR REPLACE VIEW {schema}.put_losliggend AS
