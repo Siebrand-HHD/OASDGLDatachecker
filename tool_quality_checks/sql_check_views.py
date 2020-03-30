@@ -154,7 +154,7 @@ CREATE OR REPLACE VIEW {schema}.leiding_afmeting_leeg AS
             WHEN shape = 5 THEN 'rechthoekig (getabelleerd)'::text
             WHEN shape = 6 THEN 'getabelleerd trapezium'::text
             ELSE 'overige'
- 		END as vormprofiel,
+	END as vormprofiel,
         (array_greatest(string_to_array(width,' '))::float * 1000)::double precision AS breedte,
         (array_greatest(string_to_array(height,' '))::float * 1000)::double precision AS hoogte,
         CASE
@@ -207,7 +207,7 @@ CREATE OR REPLACE VIEW {schema}.overstort_niveau_leeg_onlogisch AS
         weir.id AS threedi_id,
         start_node.code AS beginpunt,
         end_node.code AS eindpunt,
-        'drempelniveau ontbreekt'::text AS drempelniveau,
+        'drempelniveau ontbreekt'::text AS bericht,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_weir weir
     LEFT JOIN v2_connection_nodes start_node
@@ -239,7 +239,7 @@ CREATE OR REPLACE VIEW {schema}.overstort_breedte_leeg AS
         weir.id AS threedi_id,
         start_node.code AS beginpunt,
         end_node.code AS eindpunt,
-        'drempelbreedte ontbreekt'::text AS drempelbreedte,
+        'drempelbreedte ontbreekt'::text AS bericht,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_weir weir
     LEFT JOIN v2_connection_nodes start_node
@@ -320,7 +320,7 @@ CREATE OR REPLACE VIEW {schema}.doorlaat_niveau_leeg AS
         orf.id AS threedi_id,
         start_node.code AS beginpunt,
         end_node.code AS eindpunt,
-        'doorlaatniveau ontbreekt'::text AS doorlaatniveau,
+        'doorlaatniveau ontbreekt'::text AS bericht,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_orifice orf
     LEFT JOIN v2_connection_nodes start_node
@@ -352,7 +352,7 @@ CREATE OR REPLACE VIEW {schema}.doorlaat_breedte_leeg AS
         orf.id AS threedi_id,
         start_node.code AS beginpunt,
         end_node.code AS eindpunt,
-        'drempelbreedte ontbreekt'::text AS breedte,
+        'drempelbreedte ontbreekt'::text AS bericht,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_orifice orf
     LEFT JOIN v2_connection_nodes start_node
@@ -465,7 +465,7 @@ CREATE OR REPLACE VIEW {schema}.pomp_capaciteit_leeg AS
         pump.id AS threedi_id,
         start_node.code AS beginpuntpomp,
         end_node.code AS eindpuntpomp,
-        'pompcapaciteit ontbreekt'::text AS pompcapaciteit,
+        'pompcapaciteit ontbreekt'::text AS bericht,
         start_node.the_geom::geometry(Point, 28992)
     FROM v2_pumpstation pump
     LEFT JOIN v2_connection_nodes start_node
@@ -551,7 +551,7 @@ CREATE OR REPLACE VIEW {schema}.put_maaiveld_vs_bodemhoogte AS
             WHEN manhole_indicator = 1 THEN 'uitlaat'
             WHEN manhole_indicator = 2 THEN 'pomp'
             ELSE 'overige'
- 		END as typeknooppunt,
+	END as typeknooppunt,
         bottom_level AS bodemhoogte,
         surface_level AS maaiveldhoogte,
         surface_level - bottom_level AS hoogte_verschil,
@@ -576,9 +576,9 @@ CREATE OR REPLACE VIEW {schema}.put_bodemhoogte_vs_bob AS
  		END as typeknooppunt,
         bottom_level AS bodemhoogte,
         surface_level AS maaiveldhoogte,
-		CASE
+	CASE
             WHEN a.connection_node_id = c.connection_node_start_id::integer THEN c.invert_level_start_point
-			WHEN a.connection_node_id = c.connection_node_end_id::integer THEN c.invert_level_end_point
+	    WHEN a.connection_node_id = c.connection_node_end_id::integer THEN c.invert_level_end_point
             ELSE NULL
         END AS bob_hoogte,
         b.the_geom::geometry(Point, 28992)
@@ -604,7 +604,7 @@ CREATE OR REPLACE VIEW {schema}.put_afm_vs_leiding_afm AS
             WHEN manhole_indicator = 1 THEN 'uitlaat'
             WHEN manhole_indicator = 2 THEN 'pomp'
             ELSE 'overige'
- 		END as typeknooppunt,
+	END as typeknooppunt,
         (greatest(a.width, a.length) * 1000)::double precision AS grootste_put_afmeting,
         (array_greatest(string_to_array(d.width,' '))::float * 1000)::float AS grootste_leiding_afmeting,
         b.the_geom::geometry(Point, 28992)
@@ -784,7 +784,7 @@ CREATE OR REPLACE VIEW {schema}.put_uitlaat_op_eindpunt_gemaal AS
             WHEN b.manhole_indicator = 1 THEN 'uitlaat'
             WHEN b.manhole_indicator = 2 THEN 'pomp'
             ELSE 'overige'
- 		END as typeknooppunt,
+	END as typeknooppunt,
         a.the_geom::geometry(Point, 28992)
     FROM v2_connection_nodes a
     LEFT JOIN v2_manhole b
@@ -829,11 +829,11 @@ CREATE OR REPLACE VIEW {schema}.leiding_bob_onlogisch AS
     LEFT JOIN v2_connection_nodes end_node
         ON 	pipe.connection_node_end_id = end_node.id
     WHERE pipe.invert_level_start_point = 0
-				OR pipe.invert_level_start_point < {min_levels}
-				or pipe.invert_level_start_point > {max_levels}
-				OR pipe.invert_level_end_point = 0
-				OR pipe.invert_level_end_point < {min_levels}
-				or pipe.invert_level_end_point > {max_levels};
+	OR pipe.invert_level_start_point < {min_levels}
+	OR pipe.invert_level_start_point > {max_levels}
+	OR pipe.invert_level_end_point = 0
+	OR pipe.invert_level_end_point < {min_levels}
+	OR pipe.invert_level_end_point > {max_levels};
 -- Zeer korte leidingen (< x m)
 CREATE OR REPLACE VIEW {schema}.leiding_kort AS
     SELECT
@@ -868,6 +868,8 @@ CREATE OR REPLACE VIEW {schema}.leiding_lang AS
 CREATE OR REPLACE VIEW {schema}.kunstwerken_dubbel AS
     SELECT
         string_agg(line_id::text, ', ' ORDER BY line_type) AS threedi_ids,
+        string_agg(start_point::text, ', ' ORDER BY line_type) AS beginpunt,
+        string_agg(end_point::text, ', ' ORDER BY line_type) AS eindpunt,
         string_agg(display_name::text, ', ' ORDER BY line_type) AS leidingen,
         string_agg(line_type::text, ', ' ORDER BY line_type) AS type_leidingen,
         count(*) AS aantal_leidingen,
@@ -889,7 +891,7 @@ CREATE OR REPLACE VIEW {schema}.kunstwerken_dubbel AS
         SELECT
             weir.id AS line_id,
             weir.code AS display_name,
-            'leiding' AS line_type,
+            'overstort' AS line_type,
             start_node.code AS start_point,
             end_node.code AS end_point,
             st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
@@ -902,7 +904,7 @@ CREATE OR REPLACE VIEW {schema}.kunstwerken_dubbel AS
         SELECT
             orf.id AS line_id,
             orf.code AS display_name,
-            'leiding' AS line_type,
+            'doorlaat' AS line_type,
             start_node.code AS start_point,
             end_node.code AS end_point,
             st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
@@ -956,8 +958,8 @@ CREATE OR REPLACE VIEW {schema}.leiding_groot_verhang AS
         pipe.id AS threedi_id,
         start_node.code AS beginpunt,
         end_node.code AS eindpunt,
-        invert_level_start_point AS bobbeginpunt,
-        invert_level_end_point AS bobeindpunt,
+        invert_level_start_point AS bob_beginpunt,
+        invert_level_end_point AS bob_eindpunt,
         (invert_level_start_point - invert_level_end_point) AS hoogte_verschil_bob,
         ST_Length(st_makeline(start_node.the_geom, end_node.the_geom)) AS lengte_leiding,
         ST_Length(st_makeline(start_node.the_geom, end_node.the_geom))/abs(invert_level_start_point - invert_level_end_point) AS verhang
@@ -974,7 +976,7 @@ CREATE OR REPLACE VIEW {schema}.leiding_dekking_start AS
         pipe.code AS leiding,
         pipe.id AS threedi_id,
         manh.code AS beginpunt,
-        invert_level_start_point AS bobbeginpunt,
+        invert_level_start_point AS bob_beginpunt,
 		( CASE
             WHEN def.shape = 2 THEN def.width::double precision
 			WHEN def.shape = 3 THEN def.height::double precision
@@ -1035,7 +1037,7 @@ CREATE OR REPLACE VIEW {schema}.leiding_dekking_eind AS
         pipe.code AS leiding,
         pipe.id AS threedi_id,
         manh.code AS beginpunt,
-        invert_level_end_point AS bobbeginpunt,
+        invert_level_end_point AS bob_eindpunt,
 		( CASE
             WHEN def.shape = 2 THEN def.width::double precision
 			WHEN def.shape = 3 THEN def.height::double precision
@@ -1263,7 +1265,7 @@ CREATE OR REPLACE VIEW {schema}.overstort_doorsnede_onlogisch AS
             WHEN shape = 5 THEN 'rechthoekig (getabelleerd)'
             WHEN shape = 6 THEN 'getabelleerd trapezium'
             ELSE 'overige'
- 		END as vormprofiel,
+	END as vormprofiel,
         (array_greatest(string_to_array(width,' '))::float * 1000)::double precision AS breedte,
         (array_greatest(string_to_array(height,' '))::float * 1000)::double precision AS hoogte,
         CASE
@@ -1405,7 +1407,7 @@ CREATE OR REPLACE VIEW {schema}.doorlaat_doorsnede_onlogisch AS
             WHEN shape = 5 THEN 'rechthoekig (getabelleerd)'
             WHEN shape = 6 THEN 'getabelleerd trapezium'
             ELSE 'overige'
- 		END as vormprofiel,
+	END as vormprofiel,
         (array_greatest(string_to_array(width,' '))::float * 1000)::double precision AS breedte,
         (array_greatest(string_to_array(height,' '))::float * 1000)::double precision AS hoogte,
         CASE
@@ -1452,8 +1454,8 @@ CREATE OR REPLACE VIEW {schema}.pomp_capaciteit_onlogisch AS
     SELECT
         pump.code AS pomp,
         pump.id AS threedi_id,
-        start_node.code AS beginpuntpomp,
-        end_node.code AS eindpuntpomp,
+        start_node.code AS beginpunt,
+        end_node.code AS eindpunt,
         capacity AS pompcapaciteit,
         CASE
             WHEN capacity = 0 THEN 'pompcapaciteit = 0'::text
@@ -1472,28 +1474,28 @@ CREATE OR REPLACE VIEW {schema}.pomp_aan_afslagpeil_onlogisch AS
     SELECT
         pump.code AS pomp,
         pump.id AS threedi_id,
-        start_node.code AS beginpuntpomp,
-        end_node.code AS eindpuntpomp,
+        start_node.code AS beginpunt,
+        end_node.code AS eindpunt,
         CASE
             WHEN type = 1 THEN start_level
             WHEN type = 2 THEN NULL
             ELSE NULL
- 		END AS aanslagniveaubovenstrooms,
+	END AS aanslagniveau_bovenstrooms,
         CASE
             WHEN type = 1 THEN lower_stop_level
             WHEN type = 2 THEN NULL
             ELSE NULL
- 		END AS afslagniveaubovenstrooms,
+	END AS afslagniveau_bovenstrooms,
         CASE
             WHEN type = 1 THEN NULL
             WHEN type = 2 THEN start_level
             ELSE NULL
- 		END AS aanslagniveaubenedenstrooms,
+	END AS aanslagniveau_benedenstrooms,
         CASE
             WHEN type = 1 THEN NULL
             WHEN type = 2 THEN lower_stop_level
             ELSE NULL
- 		END AS afslagniveaubenedenstrooms,
+	END AS afslagniveau_benedenstrooms,
         CASE
             WHEN (start_level = 0 OR start_level < {min_levels} OR start_level > {max_levels})
                 AND (lower_stop_level != 0 AND lower_stop_level > {min_levels} AND lower_stop_level < {max_levels})
@@ -1531,9 +1533,9 @@ CREATE OR REPLACE VIEW {schema}.pomp_aan_vs_afslagpeil AS
     SELECT
         pump.code AS pomp,
         pump.id AS threedi_id,
-        start_node.code AS beginpuntpomp,
-        pump.start_level AS aanslagniveaubovenstrooms,
-        pump.lower_stop_level AS afslagniveaubovenstrooms,
+        start_node.code AS beginpunt,
+        pump.start_level AS aanslagniveau_bovenstrooms,
+        pump.lower_stop_level AS afslagniveau_bovenstrooms,
         start_node.the_geom::geometry(Point, 28992)
     FROM v2_pumpstation pump
     LEFT JOIN v2_connection_nodes start_node
@@ -1546,10 +1548,10 @@ CREATE OR REPLACE VIEW {schema}.pomp_afslagpeil_vs_bodemkelder AS
     SELECT
         pump.code AS pomp,
         pump.id AS threedi_id,
-        start_node.code AS beginpuntpomp,
+        start_node.code AS beginpunt,
         manh.bottom_level AS bodemhoogte,
-        pump.start_level AS aanslagniveaubovenstrooms,
-        pump.lower_stop_level AS afslagniveaubovenstrooms,
+        pump.start_level AS aanslagniveau_bovenstrooms,
+        pump.lower_stop_level AS afslagniveau_bovenstrooms,
         start_node.the_geom::geometry(Point, 28992)
     FROM v2_pumpstation pump
     LEFT JOIN v2_connection_nodes start_node
@@ -1564,11 +1566,11 @@ CREATE OR REPLACE VIEW {schema}.pomp_aanslagpeil_vs_maaiveld AS
     SELECT
         pump.code AS pomp,
         pump.id AS threedi_id,
-        start_node.code AS beginpuntpomp,
+        start_node.code AS beginpunt,
         round(surface_level::numeric,3) AS put_maaiveldhoogte,
         maaiveld AS ahn_maaiveldhoogte,
-        pump.start_level AS aanslagniveaubovenstrooms,
-        pump.lower_stop_level AS afslagniveaubovenstrooms,
+        pump.start_level AS aanslagniveau_bovenstrooms,
+        pump.lower_stop_level AS afslagniveau_bovenstrooms,
         start_node.the_geom::geometry(Point, 28992)
     FROM v2_pumpstation pump
     LEFT JOIN v2_connection_nodes start_node
