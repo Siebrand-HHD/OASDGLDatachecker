@@ -22,7 +22,7 @@ sql_understandable_model_views = {
  		END as typeknooppunt,
         bottom_level AS z_coordinaat,
         surface_level AS maaiveldhoogte,
-        b.the_geom
+        b.the_geom::geometry(Point, 28992)
     FROM v2_manhole a JOIN v2_connection_nodes b ON a.connection_node_id = b.id;""",
     "leiding": """CREATE OR REPLACE VIEW {schema}.leiding AS
     SELECT
@@ -60,7 +60,7 @@ sql_understandable_model_views = {
  		END as vormprofiel,
         array_greatest(string_to_array(width,' ')) AS breedteleiding,
         array_greatest(string_to_array(height,' ')) AS hoogteleiding,
-        st_makeline(start_node.the_geom, end_node.the_geom) AS the_geom
+        st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_pipe pipe
     LEFT JOIN v2_connection_nodes start_node
         ON 	pipe.connection_node_start_id = start_node.id 
@@ -90,7 +90,7 @@ sql_understandable_model_views = {
         crest_level AS drempelniveau,
         width AS drempelbreedte,
         height AS vrijeoverstorthoogte,
-        st_makeline(start_node.the_geom, end_node.the_geom) AS the_geom
+        st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_weir weir
     LEFT JOIN v2_connection_nodes start_node
         ON 	weir.connection_node_start_id = start_node.id 
@@ -130,7 +130,7 @@ sql_understandable_model_views = {
  		END AS vormprofiel,
         array_greatest(string_to_array(width,' ')) AS breedtedoorlaat,
         array_greatest(string_to_array(height,' ')) AS hoogtedoorlaat,
-        st_makeline(start_node.the_geom, end_node.the_geom) AS the_geom
+        st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_orifice orf
     LEFT JOIN v2_connection_nodes start_node
         ON 	orf.connection_node_start_id = start_node.id 
@@ -165,7 +165,7 @@ sql_understandable_model_views = {
             WHEN type = 2 THEN lower_stop_level
             ELSE NULL
  		END AS afslagniveaubenedenstrooms,
-        start_node.the_geom AS the_geom
+        start_node.the_geom::geometry(Point, 28992) AS the_geom
     FROM v2_pumpstation pump
     LEFT JOIN v2_connection_nodes start_node
         ON 	pump.connection_node_start_id = start_node.id 
