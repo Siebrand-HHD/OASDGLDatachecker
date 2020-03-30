@@ -70,6 +70,7 @@ def initialize_db_checks(db):
 
     db.create_schema(schema_name="chk")
     db.create_schema(schema_name="model")
+    db.create_schema(schema_name="src")
 
     # install necessary functions out of folder "sql_functions"
     sql_relpath = os.path.join("sql", "sql_function_array_greatest_or_smallest.sql")

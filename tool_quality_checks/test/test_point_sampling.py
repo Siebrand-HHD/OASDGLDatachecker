@@ -39,7 +39,7 @@ class TestDB(TestCase):
         cls.db.create_extension(extension_name="postgis")
         cls.db.initialize_db_threedi()
         # load GBI manholes only into tester
-        manhole_layer_rel_path = "data\schiedam-test\schiedam-putten-test.shp"
+        manhole_layer_rel_path = "data/schiedam-test/schiedam-putten-test.shp"
         cls.settings.manhole_layer = os.path.join(OUR_DIR, manhole_layer_rel_path)
         cls.settings.import_type = "gbi"
         import_sewerage_data_into_db(cls.db, cls.settings)
@@ -47,7 +47,7 @@ class TestDB(TestCase):
     @classmethod
     def tearDownClass(cls):
         cls.db.conn.close()
-        # drop_database(cls.settings)
+        drop_database(cls.settings)
 
     def test_get_inverse(self):
         inverse = get_inverse(1, 2, 3, 4)
@@ -67,7 +67,7 @@ class TestDB(TestCase):
         conn.Destroy()
 
     def test_point_sampling(self):
-        raster_rel_path = "data\schiedam-test\dem_schiedam_test.tif"
+        raster_rel_path = "data/schiedam-test/dem_schiedam_test.tif"
         raster_abs_path = os.path.join(OUR_DIR, raster_rel_path)
         sample_points_and_create_pg_layer(
             self.settings,

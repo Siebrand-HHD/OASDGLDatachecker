@@ -48,7 +48,7 @@ sql_views = {
             def.width AS def_width,
             def.height AS def_height,
             def.code AS def_code,
-            st_makeline(start_node.the_geom, end_node.the_geom) AS the_geom
+            st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
             FROM v2_pipe pipe
         LEFT JOIN v2_connection_nodes start_node
         ON 	pipe.connection_node_start_id = start_node.id 
@@ -78,7 +78,7 @@ sql_views = {
             def.width AS def_width,
             def.height AS def_height,
             def.code AS def_code,
-            st_makeline(start_node.the_geom, end_node.the_geom) AS the_geom
+            st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
         FROM v2_orifice orf
         LEFT JOIN	v2_cross_section_definition def
         ON			orf.cross_section_definition_id = def.id
@@ -110,7 +110,7 @@ sql_views = {
             def.width AS def_width,
             def.height AS def_height,
             def.code AS def_code,
-            st_makeline(start_node.the_geom, end_node.the_geom) AS the_geom
+            st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
         FROM v2_weir weir
         LEFT JOIN	v2_cross_section_definition def
         ON			weir.cross_section_definition_id = def.id
