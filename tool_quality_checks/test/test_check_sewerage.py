@@ -41,9 +41,9 @@ class TestDB(TestCase):
         cls.db.create_extension(extension_name="postgis")
         cls.db.initialize_db_threedi()
         # load GBI data set into tester
-        manhole_layer_rel_path = "data\schiedam-test\schiedam-putten-test.shp"
+        manhole_layer_rel_path = "data/schiedam-test/schiedam-putten-test.shp"
         cls.settings.manhole_layer = os.path.join(OUR_DIR, manhole_layer_rel_path)
-        pipe_layer_rel_path = "data\schiedam-test\schiedam-leidingen-test.shp"
+        pipe_layer_rel_path = "data/schiedam-test/schiedam-leidingen-test.shp"
         cls.settings.pipe_layer = os.path.join(OUR_DIR, pipe_layer_rel_path)
         cls.settings.import_type = "gbi"
         import_sewerage_data_into_db(cls.db, cls.settings)
@@ -51,7 +51,7 @@ class TestDB(TestCase):
     @classmethod
     def tearDownClass(cls):
         cls.db.conn.close()
-        # drop_database(cls.settings)
+        drop_database(cls.settings)
 
     def test_initialize_db_checks(self):
         initialize_db_checks(self.db)
@@ -74,7 +74,7 @@ class TestDB(TestCase):
         assert self.db.get_count("put_maaiveld_check", "chk") == 0
 
     def test_02_check_sewerage(self):
-        raster_rel_path = "data\schiedam-test\dem_schiedam_test.tif"
+        raster_rel_path = "data/schiedam-test/dem_schiedam_test.tif"
         self.settings.dem = os.path.join(OUR_DIR, raster_rel_path)
         check_sewerage(self.db, self.settings)
         assert self.db.get_count("put_shape", "chk") == 1

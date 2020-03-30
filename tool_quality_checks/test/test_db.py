@@ -85,6 +85,9 @@ class TestDB(TestCase):
         cls.db.conn.close()
         drop_database(cls.settings)
 
+    def test_00_empty_database(self):
+        self.db.empty_database()
+
     def test_01_create_schema(self):
         self.db.create_schema(schema_name="chk", drop_schema=True)
 

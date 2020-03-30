@@ -3,6 +3,9 @@
 --- Input: 3Di model in work_db
 --- Output: empty 3Di model in work_db
 -------------------------------------------------------------------------------------------
+DROP SCHEMA IF EXISTS src CASCADE;
+DROP SCHEMA IF EXISTS chk CASCADE;
+DROP SCHEMA IF EXISTS model CASCADE;
 DELETE FROM v2_global_settings;
 DELETE FROM v2_manhole;
 DELETE FROM v2_pipe;
