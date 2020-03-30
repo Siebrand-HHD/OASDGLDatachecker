@@ -24,8 +24,8 @@ def copy2ogr(in_source, in_name, out_source, out_name, schema="public"):
     # TODO change naming to also include sqlite and gpkg
     in_layer = in_source.GetLayerByName(in_name)
     if in_layer is None:
-        logger.error("I could not find the table in your datasource: %s" % in_name)
-        raise AttributeError()
+        msg = "I could not find the table in your datasource: %s" % in_name
+        raise ValueError(msg)
     in_srid = in_layer.GetSpatialRef()
 
     if in_srid is None:
