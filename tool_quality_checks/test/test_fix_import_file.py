@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
-"""Tests for correct_import_file.py"""
+"""Tests for fix_import_file.py"""
 import os
 import ogr, osr
 import pytest
 
-from OASDGLDatachecker.tool_quality_checks.correct_import_file import (
+from OASDGLDatachecker.tool_quality_checks.fix_import_file import (
     create_mem_ds,
     create_geom_transform,
     try_fix_geometry,
     add_singlepart_geometry,
     transform_multipart_to_singlepart,
-    correct_vector_layer,
-    correct_layer_name_length,
+    fix_vector_layer,
+    fix_layer_name_length,
 )
 from OASDGLDatachecker.tool_quality_checks.importer import set_ogr_connection
 
@@ -133,27 +133,27 @@ def test_transform_multipart_to_singlepart():
     assert lost_feat == [2]
 
 
-def test_correct_layer_name_length_long():
+def test_fix_layer_name_length_long():
     layer_name = "this_is_much_longer_than_what_should_be_the_length_of_the_layer"
-    new_layer_name = correct_layer_name_length(layer_name)
+    new_layer_name = fix_layer_name_length(layer_name)
     assert new_layer_name == "this_is_much_longer_than_what_should_be_the_length"
 
 
-def test_correct_layer_name_length_short():
+def test_fix_layer_name_length_short():
     layer_name = "this_is_short"
-    new_layer_name = correct_layer_name_length(layer_name)
+    new_layer_name = fix_layer_name_length(layer_name)
     assert new_layer_name == "this_is_short"
 
 
-def test_correct_vector_layer_manholes_3D_point(caplog):
-    out_datasource, layer_name = correct_vector_layer(SHP_IN_LAYER, "test", epsg=28992)
+def test_fix_vector_layer_manholes_3D_point(caplog):
+    out_datasource, layer_name = fix_vector_layer(SHP_IN_LAYER, "test", epsg=28992)
     assert "3D Point" in caplog.text
     assert out_datasource[layer_name].GetFeatureCount() == 79
 
 
-def test_correct_vector_layer_multipoly(caplog):
+def test_fix_vector_layer_multipoly(caplog):
     multipoly_in_layer = GPKG_IN_DS["multipolygon_4326"]
-    out_datasource, layer_name = correct_vector_layer(
+    out_datasource, layer_name = fix_vector_layer(
         multipoly_in_layer,
         "test_multi_met_veel_te_veel_tekens_in_de_naam_namelijk_meer_dan_vijftig_enzost_multi",
     )
@@ -165,34 +165,34 @@ def test_correct_vector_layer_multipoly(caplog):
     assert '{"type": "Polygon", "coordinates": [[[485' in test_dump
 
 
-def test_correct_vector_layer_empty_result(caplog):
+def test_fix_vector_layer_empty_result(caplog):
     multipoly_in_layer = GPKG_IN_DS["no_geom_layer"]
     with pytest.raises(TypeError):
-        correct_vector_layer(multipoly_in_layer, "test_empty", epsg=28992)
+        fix_vector_layer(multipoly_in_layer, "test_empty", epsg=28992)
 
 
-def test_correct_vector_layer_unknown_geom_type(caplog):
+def test_fix_vector_layer_unknown_geom_type(caplog):
     multipoly_in_layer = GPKG_IN_DS["multipoint_in_geometrycollection"]
     with pytest.raises(TypeError):
-        correct_vector_layer(
+        fix_vector_layer(
             multipoly_in_layer, "multipoint_in_geometrycollection", epsg=28992
         )
 
 
-def test_correct_vector_layer_multipoints(caplog):
+def test_fix_vector_layer_multipoints(caplog):
     # this test has a z-dimension
     multipoly_in_layer = GPKG_IN_DS["multipoint_28992"]
-    out_datasource, layer_name = correct_vector_layer(
+    out_datasource, layer_name = fix_vector_layer(
         multipoly_in_layer, "test_multipoint_28992", epsg=28992
     )
     test_dump = out_datasource["test_multipoint_28992"].GetFeature(1).ExportToJson()
     assert '{"type": "Point", "coordinates": [842' in test_dump
 
 
-def test_correct_vector_layer_multilinestring(caplog):
+def test_fix_vector_layer_multilinestring(caplog):
     # this test has a z- and m-dimension and to be removed column name ogc_fid
     multipoly_in_layer = GPKG_IN_DS["multilinestring_zm_4326"]
-    out_datasource, layer_name = correct_vector_layer(
+    out_datasource, layer_name = fix_vector_layer(
         multipoly_in_layer, "test_multilinestring_zm_4326", epsg=28992
     )
     test_dump = (
@@ -201,9 +201,9 @@ def test_correct_vector_layer_multilinestring(caplog):
     assert '"type": "LineString", "coordinates": [[84' in test_dump
 
 
-def test_correct_vector_layer_more_in_than_out(caplog):
+def test_fix_vector_layer_more_in_than_out(caplog):
     multipoly_in_layer = GPKG_IN_DS["more_in_than_out_polygon"]
-    out_datasource, layer_name = correct_vector_layer(
+    out_datasource, layer_name = fix_vector_layer(
         multipoly_in_layer, "more_in_than_out_polygon", epsg=28992
     )
     assert "In feature count greater than out" in caplog.text

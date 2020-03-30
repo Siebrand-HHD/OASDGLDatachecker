@@ -74,7 +74,7 @@ class TestDB(TestCase):
 
     def test_02_importer_manhole_only(self):
         # extra check is to check loading of date-types (2011-10-28) into the database
-        manhole_layer_rel_path = "data\schiedam-test\schiedam-putten-test.shp"
+        manhole_layer_rel_path = "data/schiedam-test/schiedam-putten-test.shp"
         self.settings.manhole_layer = os.path.join(OUR_DIR, manhole_layer_rel_path)
         self.settings.import_type = "gbi"
         import_sewerage_data_into_db(self.db, self.settings)
@@ -88,9 +88,9 @@ class TestDB(TestCase):
 
     def test_03_importer_manholes_and_pipes(self):
         # extra check is to check loading of date-types (2011-10-28) into the database
-        manhole_layer_rel_path = "data\schiedam-test\schiedam-putten-test.shp"
+        manhole_layer_rel_path = "data/schiedam-test/schiedam-putten-test.shp"
         self.settings.manhole_layer = os.path.join(OUR_DIR, manhole_layer_rel_path)
-        pipe_layer_rel_path = "data\schiedam-test\schiedam-leidingen-test.shp"
+        pipe_layer_rel_path = "data/schiedam-test/schiedam-leidingen-test.shp"
         self.settings.pipe_layer = os.path.join(OUR_DIR, pipe_layer_rel_path)
         self.settings.import_type = "gbi"
         import_sewerage_data_into_db(self.db, self.settings)

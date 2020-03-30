@@ -24,14 +24,14 @@ def test_get_parser():
 
 
 def test_settingsobject():
-    ini_path = "data//instellingen_test.ini"
+    ini_path = "data/instellingen_test.ini"
     ini_path = os.path.join(OUR_DIR, ini_path)
     settings = SettingsObject(ini_path)
     assert settings.__dict__["hoogte_verschil"] == "0.2"
 
 
 def test_settingsobject_raise():
-    ini_path = "data//instellingen_test_missing_db.ini"
+    ini_path = "data/instellingen_test_missing_db.ini"
     ini_path = os.path.join(OUR_DIR, ini_path)
     settings = SettingsObject(ini_path)
     with pytest.raises(Exception):
@@ -39,10 +39,9 @@ def test_settingsobject_raise():
 
 
 def test_resolve_ini_custom():
-    ini_path = "data\\dummy.ini"
-    ini_path = os.path.join(OUR_DIR, ini_path)
+    ini_path = os.path.join(OUR_DIR, "data", "dummy.ini")
     ini_path = resolve_ini(ini_path)
-    assert "\\test\\data\\dummy.ini" in ini_path
+    assert "test\\data\\dummy.ini" in ini_path
 
 
 def test_resolve_ini_default():
@@ -59,13 +58,13 @@ def test_resolve_ini_error():
 # create absolute path to ini
 _ini_relpath = "data/instellingen_mini_schiedam.ini"
 ini_abspath_full_check = os.path.join(OUR_DIR, _ini_relpath)
-_manhole_layer_rel_path = "data\schiedam-test\schiedam-putten-test.shp"
+_manhole_layer_rel_path = "data/schiedam-test/schiedam-putten-test.shp"
 manhole_layer_abs_path = os.path.join(OUR_DIR, _manhole_layer_rel_path)
-_pipe_layer_rel_path = "data\schiedam-test\schiedam-leidingen-test.shp"
+_pipe_layer_rel_path = "data/schiedam-test/schiedam-leidingen-test.shp"
 pipe_layer_abs_path = os.path.join(OUR_DIR, _pipe_layer_rel_path)
-_raster_rel_path = "data\schiedam-test\dem_schiedam_test.tif"
+_raster_rel_path = "data/schiedam-test/dem_schiedam_test.tif"
 raster_abs_path = os.path.join(OUR_DIR, _raster_rel_path)
-geopackage_abs_path = os.path.join(OUR_DIR, "data\schiedam-test\export_scripts.gpkg")
+geopackage_abs_path = os.path.join(OUR_DIR, "data/schiedam-test/export_scripts.gpkg")
 
 
 @mock.patch(

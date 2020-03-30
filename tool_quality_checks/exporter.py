@@ -24,7 +24,7 @@ def export_checks_from_db_to_gpkg(settings):
     # Create output geopackage datasource
     if os.path.isfile(settings.gpkg_output_layer):
         os.remove(settings.gpkg_output_layer)
-    gpkg_out_source = None
+    gpkg_out_source = None  # create variable for datasource creation later
     gpkg_out_source = DRIVER_OGR_GPKG.CreateDataSource(settings.gpkg_output_layer)
 
     # Create link with database
@@ -36,10 +36,10 @@ def export_checks_from_db_to_gpkg(settings):
         if not layer_name in all_layers_in_source:
             all_layers_in_source.append(layer_name)
 
-    chk_layers_in_source = [
+    available_chk_layers_in_source = [
         l for l in all_layers_in_source if ("chk." in l or "model." in l)
     ]
 
-    for in_layer_name in chk_layers_in_source:
+    for in_layer_name in available_chk_layers_in_source:
         print(in_layer_name)
         copy2ogr(in_source, in_layer_name, gpkg_out_source, in_layer_name)
