@@ -403,7 +403,7 @@ class Datachecker:
             QSettings().setValue('/Map/identifyAutoFeatureForm','true')
 
     def get_stylingfolders(self): 
-        folder = r'C:\Users\onnoc\AppData\Roaming\QGIS\QGIS3\profiles\default\python\plugins\OASDGLDatachecker\styling'
+        folder = r'C:\Users\arnold.vantveld\AppData\Roaming\QGIS\QGIS3\profiles\default\python\plugins\OASDGLDatachecker\styling'
         subfolders = [ f.name for f in os.scandir(folder) if f.is_dir() ]
         return subfolders
             
@@ -423,16 +423,6 @@ class Datachecker:
         # putfile = os.path.dirname(os.path.realpath(self.dockwidget.putFile.filePath()))   
         putfile = os.path.realpath(self.dockwidget.putFile.filePath())
         self.save_qsetting('paths', 'putfile',putfile)
-              
-    def create_db_from_qgis(self):
-        settings = SettingsObjectPlugin()
-        settings.createdb = True 
-        settings.host = self.dockwidget.?
-        settings.port = self.dockwidget.?
-        settings.username = self.dockwidget.?
-        settings.password = self.dockwidget.?
-        settings.s = self.dockwidget.?
-        run_scripts(settings)
         
     def get_settings(self):  #vul_settings     
         
