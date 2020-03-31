@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>592</width>
-    <height>761</height>
+    <width>503</width>
+    <height>649</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -33,7 +33,7 @@
        <bool>true</bool>
       </property>
       <property name="currentIndex">
-       <number>3</number>
+       <number>1</number>
       </property>
       <property name="documentMode">
        <bool>true</bool>
@@ -96,7 +96,7 @@
               <bool>false</bool>
              </property>
              <property name="alternatingRowColors">
-              <bool>true</bool>
+              <bool>false</bool>
              </property>
              <property name="selectionMode">
               <enum>QAbstractItemView::MultiSelection</enum>
@@ -313,7 +313,7 @@
        <attribute name="title">
         <string>Layer Tools</string>
        </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_5">
+       <layout class="QVBoxLayout" name="verticalLayout_5" stretch="2,0,0,0,0,0">
         <item>
          <widget class="QgsDockWidget" name="mDockWidget">
           <property name="maximumSize">
@@ -326,39 +326,130 @@
            <set>QDockWidget::AllDockWidgetFeatures</set>
           </property>
           <widget class="QWidget" name="dockWidgetContents_2">
-           <layout class="QVBoxLayout" name="verticalLayout_7">
+           <layout class="QVBoxLayout" name="verticalLayout_7" stretch="0,0,0">
+            <property name="sizeConstraint">
+             <enum>QLayout::SetDefaultConstraint</enum>
+            </property>
             <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_3">
+             <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="3,0,0,1,1">
               <item>
-               <widget class="QCheckBox" name="qmlModelleurBox">
-                <property name="text">
-                 <string>Modelleur</string>
-                </property>
-                <property name="autoExclusive">
-                 <bool>true</bool>
-                </property>
-                <property name="tristate">
+               <widget class="QComboBox" name="stylingbox">
+                <property name="editable">
                  <bool>false</bool>
+                </property>
+                <property name="currentText">
+                 <string/>
                 </property>
                </widget>
               </item>
               <item>
-               <widget class="QCheckBox" name="qmlBeheerderBox">
+               <widget class="QPushButton" name="pushButton_6">
+                <property name="maximumSize">
+                 <size>
+                  <width>17</width>
+                  <height>1600</height>
+                 </size>
+                </property>
+                <property name="palette">
+                 <palette>
+                  <active>
+                   <colorrole role="Text">
+                    <brush brushstyle="SolidPattern">
+                     <color alpha="255">
+                      <red>41</red>
+                      <green>248</green>
+                      <blue>9</blue>
+                     </color>
+                    </brush>
+                   </colorrole>
+                   <colorrole role="ButtonText">
+                    <brush brushstyle="SolidPattern">
+                     <color alpha="255">
+                      <red>0</red>
+                      <green>255</green>
+                      <blue>0</blue>
+                     </color>
+                    </brush>
+                   </colorrole>
+                  </active>
+                  <inactive>
+                   <colorrole role="Text">
+                    <brush brushstyle="SolidPattern">
+                     <color alpha="255">
+                      <red>41</red>
+                      <green>248</green>
+                      <blue>9</blue>
+                     </color>
+                    </brush>
+                   </colorrole>
+                   <colorrole role="ButtonText">
+                    <brush brushstyle="SolidPattern">
+                     <color alpha="255">
+                      <red>0</red>
+                      <green>255</green>
+                      <blue>0</blue>
+                     </color>
+                    </brush>
+                   </colorrole>
+                  </inactive>
+                  <disabled>
+                   <colorrole role="Text">
+                    <brush brushstyle="SolidPattern">
+                     <color alpha="255">
+                      <red>120</red>
+                      <green>120</green>
+                      <blue>120</blue>
+                     </color>
+                    </brush>
+                   </colorrole>
+                   <colorrole role="ButtonText">
+                    <brush brushstyle="SolidPattern">
+                     <color alpha="255">
+                      <red>120</red>
+                      <green>120</green>
+                      <blue>120</blue>
+                     </color>
+                    </brush>
+                   </colorrole>
+                  </disabled>
+                 </palette>
+                </property>
+                <property name="font">
+                 <font>
+                  <pointsize>12</pointsize>
+                  <weight>50</weight>
+                  <bold>false</bold>
+                 </font>
+                </property>
                 <property name="text">
-                 <string>Beheerder</string>
+                 <string>+</string>
                 </property>
-                <property name="checked">
-                 <bool>true</bool>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="pushButton_8">
+                <property name="maximumSize">
+                 <size>
+                  <width>16</width>
+                  <height>1600</height>
+                 </size>
                 </property>
-                <property name="autoExclusive">
-                 <bool>true</bool>
+                <property name="text">
+                 <string>-</string>
                 </property>
                </widget>
               </item>
               <item>
                <widget class="QPushButton" name="applyStylingButton">
                 <property name="text">
-                 <string>Apply</string>
+                 <string>Laad styling</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="savelayer">
+                <property name="text">
+                 <string>Save styling</string>
                 </property>
                </widget>
               </item>
@@ -405,13 +496,6 @@
              </widget>
             </item>
             <item>
-             <widget class="QPushButton" name="savelayer">
-              <property name="text">
-               <string>PushButton</string>
-              </property>
-             </widget>
-            </item>
-            <item>
              <spacer name="verticalSpacer_2">
               <property name="orientation">
                <enum>Qt::Vertical</enum>
@@ -420,6 +504,69 @@
                <size>
                 <width>20</width>
                 <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+         </widget>
+        </item>
+        <item>
+         <widget class="QgsCollapsibleGroupBox" name="mGroupBox_6">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>80</height>
+           </size>
+          </property>
+          <widget class="QWidget" name="gridLayoutWidget">
+           <property name="geometry">
+            <rect>
+             <x>19</x>
+             <y>9</y>
+             <width>441</width>
+             <height>61</height>
+            </rect>
+           </property>
+           <layout class="QGridLayout" name="gridLayout">
+            <item row="0" column="1">
+             <widget class="QCheckBox" name="cbgecontroleerd">
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QCheckBox" name="cbverwerkt">
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QPushButton" name="pverwerkt">
+              <property name="text">
+               <string>verwerkt</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0">
+             <widget class="QPushButton" name="pgecontroleerd">
+              <property name="text">
+               <string>gecontroleerd</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="2">
+             <spacer name="horizontalSpacer_2">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
                </size>
               </property>
              </spacer>
@@ -470,6 +617,32 @@
             <widget class="QTreeView" name="treeView"/>
            </item>
           </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="qmlModelleurBox">
+          <property name="text">
+           <string>Modelleur</string>
+          </property>
+          <property name="autoExclusive">
+           <bool>true</bool>
+          </property>
+          <property name="tristate">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="qmlBeheerderBox">
+          <property name="text">
+           <string>Beheerder</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+          <property name="autoExclusive">
+           <bool>true</bool>
+          </property>
          </widget>
         </item>
         <item>
@@ -794,6 +967,68 @@
           <height>31</height>
          </rect>
         </property>
+       </widget>
+       <widget class="QgsCollapsibleGroupBox" name="mGroupBox_5">
+        <property name="geometry">
+         <rect>
+          <x>19</x>
+          <y>300</y>
+          <width>361</width>
+          <height>71</height>
+         </rect>
+        </property>
+        <widget class="QPushButton" name="pushButton_12">
+         <property name="geometry">
+          <rect>
+           <x>30</x>
+           <y>10</y>
+           <width>75</width>
+           <height>23</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>gecontroleerd</string>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="pushButton_13">
+         <property name="geometry">
+          <rect>
+           <x>30</x>
+           <y>40</y>
+           <width>75</width>
+           <height>23</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>verwerkt</string>
+         </property>
+        </widget>
+        <widget class="QCheckBox" name="checkBox_6">
+         <property name="geometry">
+          <rect>
+           <x>120</x>
+           <y>10</y>
+           <width>70</width>
+           <height>18</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+        <widget class="QCheckBox" name="checkBox_7">
+         <property name="geometry">
+          <rect>
+           <x>120</x>
+           <y>40</y>
+           <width>70</width>
+           <height>18</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
        </widget>
       </widget>
       <widget class="QWidget" name="tab_5">

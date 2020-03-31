@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 OUR_DIR = os.path.dirname(__file__)
 
 
-def run_scripts(settings):
+def run_scripts(task,settings):
     """
     background program for running all functionalities
     """
@@ -44,12 +44,15 @@ def run_scripts(settings):
         db.initialize_db_threedi()
 
     if settings.import_type:
+        print("import")
         logger.info("Import your sewerage data of %s" % settings.import_type)
         import_sewerage_data_into_db(db, settings)
 
     if settings.checks:
+        print('checks')
         logger.info("Check your sewerage system")
         check_sewerage(db, settings)
+        print('einde')
 
 
 def resolve_ini(custom_ini_file):

@@ -24,7 +24,8 @@
 from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, Qt
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QAction,QFileDialog
-from qgis.core import QgsProject,QgsVectorLayer,QgsLayerTreeLayer,QgsApplication,QgsTask,QgsMessageLog
+from qgis.core import QgsProject,QgsVectorLayer,QgsLayerTreeLayer,QgsApplication,QgsTask,QgsMessageLog, QgsEditorWidgetSetup, QgsMapLayer
+from qgis.utils import iface
 # Initialize Qt resources from file resources.py
 from .resources import *
 import os
@@ -184,7 +185,7 @@ class Datachecker:
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
 
-        icon_path = ':/plugins/oas-dgl-datachecker/icon.png'
+        icon_path = ':/plugins/Datachecker/icon.png'
         self.add_action(
             icon_path,
             text=self.tr(u'Riooldatachecker'),
@@ -320,24 +321,86 @@ class Datachecker:
         self.dockwidget.listExport.addItems(exportList)                        
 
     def save_qml_styling(self):#,style_dir):
-        style_dir=r'C:\Users\onnoc\AppData\Roaming\QGIS\QGIS3\profiles\default\python\plugins\OASDGLDatachecker'
+        style_dir=r'C:\Users\onnoc\AppData\Roaming\QGIS\QGIS3\profiles\default\python\plugins\OASDGLDatachecker\styling\Stylingbeheerder'
         for layer in QgsProject.instance().mapLayers().values():
             layer.saveNamedStyle(os.path.join(style_dir,layer.name()+'.qml'))
 
     def laad_qml_styling(self):
-        if self.dockwidget.qmlBeheerderBox.checkState()==2:
-            folder = 'styling\StylingBeheerder'
-        elif self.dockwidget.qmlModelleurBox.checkState()==2:
-            folder = 'styling\StylingModelleur'
-        else:
-            return
+        folder = 'styling\\' +self.dockwidget.stylingbox.currentText()
+        print(folder)
+        # if self.dockwidget.qmlBeheerderBox.checkState()==2:
+            # folder = 'styling\StylingBeheerder'
+        # elif self.dockwidget.qmlModelleurBox.checkState()==2:
+            # folder = 'styling\StylingModelleur'
+        # else:
+            # return
             
         for layer in QgsProject.instance().mapLayers().values():
-
             scriptLocatie =os.path.dirname(os.path.realpath(__file__))
             qmlpad = os.path.join(scriptLocatie, folder, layer.name())+'.qml'
             layer.loadNamedStyle(qmlpad)
             layer.triggerRepaint()
+            print(layer.name())
+            print(qmlpad)
+        self.configure_dropdown()
+    
+    def update_status(self, waarde):
+        # waarde='verwerkt' 
+        lyr = iface.activeLayer()
+        lyr.startEditing()
+        features = lyr.selectedFeatures()
+        lyr.updateFields()
+        idx = lyr.fields().indexFromName("status")
+        for f in features:
+            print(f)
+            lyr.changeAttributeValue(f.id(),idx,waarde)
+        lyr.commitChanges()
+        # self.filter_status()
+        
+    def filter_status(self, waarde):
+        filter = True
+        statement = "status is null or status IN ()"
+        basis = "status is null or status IN ("
+        if filter:
+            try:
+                oldstatement = iface.activeLayer().subsetString()           
+                # statement = oldstatement[-len(oldstatement)-oldstatement.find('(')]
+                if not basis in oldstatement:
+                    statement = basis + "'" + waarde + "')"                  
+                elif oldstatement.find(waarde)==-1:
+                    statement=oldstatement.replace(basis, "")
+                    statement=statement.replace(")","")                                        
+                    if len(statement) == 0:
+                        statement = basis + "'" + waarde + "')"
+                    elif len(statement) > 2:
+                        statement= basis + statement + ",'" + waarde + "')"
+                else:
+                    statement = oldstatement                
+            except:
+                pass
+
+        else:
+            print('test')
+        for layer in QgsProject.instance().mapLayers().values():          
+            layer.setSubsetString(statement)
+            # layer.setSubsetString("status = 'gecontroleerd'")
+            # layer.setSubsetString('')        
+
+
+    def configure_dropdown(self):    
+        for layer in QgsProject.instance().mapLayers().values():
+
+            idx = layer.fields().indexFromName("status")
+            editor_widget_setup = QgsEditorWidgetSetup(
+                "ValueMap", {"map": {u"gecontroleerd": u"gecontroleerd", u"verwerkt": u"verwerkt"}}
+            )
+            layer.setEditorWidgetSetup(idx, editor_widget_setup)
+            QSettings().setValue('/Map/identifyAutoFeatureForm','true')
+
+    def get_stylingfolders(self): 
+        folder = r'C:\Users\onnoc\AppData\Roaming\QGIS\QGIS3\profiles\default\python\plugins\OASDGLDatachecker\styling'
+        subfolders = [ f.name for f in os.scandir(folder) if f.is_dir() ]
+        return subfolders
             
     def save_folderchecks(self):
         folderchecks = os.path.realpath(self.dockwidget.folderNaam.text())              
@@ -489,6 +552,9 @@ class Datachecker:
                 self.dockwidget = DatacheckerDockWidget()
             databases=self.get_databases()
             self.dockwidget.bestaandeDatabases.addItems(databases)
+            stylingfolders = self.get_stylingfolders()
+            self.dockwidget.stylingbox.addItems(stylingfolders)
+
             self.dockwidget.bestaandeDatabases.currentTextChanged.connect(self.getConnectionDetails)
             self.dockwidget.ObjectSlider.valueChanged.connect(self.slider_function)
             self.dockwidget.applyStylingButton.clicked.connect(self.laad_qml_styling)
@@ -500,6 +566,10 @@ class Datachecker:
             self.dockwidget.savelayer.clicked.connect(self.save_qml_styling)
             self.dockwidget.selectFolderButton_export.clicked.connect(self.pb_select_exp_folder)
             ##self.dockwidget.linePutten.dropevent.connect(over
+            self.dockwidget.pgecontroleerd.clicked.connect(lambda:self.update_status(waarde ='gecontroleerd'))
+            self.dockwidget.pverwerkt.clicked.connect(lambda:self.update_status(waarde ='verwerkt'))
+            self.dockwidget.cbgecontroleerd.stateChanged.connect(lambda:self.filter_status(waarde ='gecontroleerd'))
+            self.dockwidget.cbverwerkt.stateChanged.connect(lambda:self.filter_status(waarde ='verwerkt'))
             
             self.dockwidget.leidingFile.fileChanged.connect(self.save_leidingfile)
             self.dockwidget.putFile.fileChanged.connect(self.save_putfile)  
