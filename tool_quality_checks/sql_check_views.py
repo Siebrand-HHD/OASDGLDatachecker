@@ -1286,23 +1286,6 @@ CREATE OR REPLACE VIEW {schema}.overstort_korte_lengte AS
     LEFT JOIN v2_connection_nodes end_node
         ON 	weir.connection_node_end_id = end_node.id
     WHERE ST_Length(st_makeline(start_node.the_geom, end_node.the_geom)) < {min_length};
--- dit zijn alle overstorten die door de import sufhyd tool zijn gecreeerd. Van deze overstorten ontbreekt er een eindknoop in het sufhyd.
--- is dit relevant voor de datachecker?
-CREATE OR REPLACE VIEW {schema}.overstort_verkeerd_uit_sufhyd AS
-    SELECT
-        weir.code AS overstort,
-        weir.id AS threedi_id,
-        start_node.code AS beginpunt,
-        end_node.code AS eindpunt,
-        ST_Length(st_makeline(start_node.the_geom, end_node.the_geom)) AS lengte_overstort,
-	NULL::text AS status,
-        st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
-    FROM v2_weir weir
-    LEFT JOIN v2_connection_nodes start_node
-        ON 	weir.connection_node_start_id = start_node.id
-    LEFT JOIN v2_connection_nodes end_node
-        ON 	weir.connection_node_end_id = end_node.id
-    WHERE ST_Length(st_makeline(start_node.the_geom, end_node.the_geom)) = 1;
 -- Dwarsdoorsnede logisch
 CREATE OR REPLACE VIEW {schema}.overstort_doorsnede_onlogisch AS
     SELECT
