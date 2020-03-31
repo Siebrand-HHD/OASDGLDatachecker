@@ -1,6 +1,6 @@
 Plugin Builder Results
 
-Your plugin OASdglDatachecker was created in:
+Your plugin Datachecker was created in:
     C:/Users/onnoc/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins\datachecker
 
 Your QGIS plugin directory is located at:
@@ -21,7 +21,7 @@ What's Next:
 
   * Create your own custom icon, replacing the default icon.png
 
-  * Modify your user interface by opening OASdglDatachecker_dialog_base.ui in Qt Designer
+  * Modify your user interface by opening Datachecker_dockwidget_base.ui in Qt Designer
 
   * You can use the Makefile to compile your Ui and resource files when
     you make changes. This requires GNU make (gmake)

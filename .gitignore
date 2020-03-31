@@ -1,8 +1,8 @@
-
+__pycache__/*
+.vs
 .vscode/settings.json
 *.pyc
 .coverage
-*.pyc
 __pycache__
 *-shm
 *.gpkg-wal
