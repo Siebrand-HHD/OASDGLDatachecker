@@ -2,7 +2,7 @@
 """Tests for point_sampling.py"""
 import os
 
-from OASDGLDatachecker.tool_quality_checks.importer import (
+from OASDGLDatachecker.tool_quality_checks.import_management_database import (
     import_sewerage_data_into_db,
     set_ogr_connection_pg_database,
 )

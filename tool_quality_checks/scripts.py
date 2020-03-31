@@ -11,7 +11,9 @@ from OASDGLDatachecker.tool_quality_checks.db import (
     create_database,
     drop_database,
 )
-from OASDGLDatachecker.tool_quality_checks.importer import import_sewerage_data_into_db
+from OASDGLDatachecker.tool_quality_checks.import_management_database import (
+    import_sewerage_data_into_db,
+)
 from OASDGLDatachecker.tool_quality_checks.exporter import export_checks_from_db_to_gpkg
 
 
@@ -29,11 +31,13 @@ def run_scripts(settings):
         print("Drop the Citybuilder database")
         logger.info("Drop the Citybuilder database")
         drop_database(settings)
+        logger.info("Completed - Drop the Citybuilder database")
 
     if settings.createdb:
         print("Create the Citybuilder database")
         logger.info("Create the Citybuilder database")
         create_database(settings)
+        logger.info("Completed - Create the Citybuilder database")
 
     # block with database connection
     if settings.createdb or settings.import_type or settings.checks or settings.emptydb:
@@ -43,25 +47,29 @@ def run_scripts(settings):
         print("Initialize the Citybuilder database")
         logger.info("Initialize the Citybuilder database")
         db.initialize_db_threedi()
+        logger.info("Completed - Initialize the Citybuilder database")
 
     if settings.emptydb:
         logger.info("Empty the Citybuilder database")
         db.empty_database()
+        logger.info("Completed - Empty the Citybuilder database")
 
     if settings.import_type:
         print("import")
         logger.info("Import your sewerage data of %s" % settings.import_type)
         import_sewerage_data_into_db(db, settings)
+        logger.info("Completed - Import your sewerage data of %s" % settings.import_type)
 
     if settings.checks:
         print('checks')
         logger.info("Check your sewerage system")
         check_sewerage(db, settings)
-        print('einde')
+        logger.info("Completed - Check your sewerage system")
 
     if settings.export:
         logger.info("Export database to geopackage")
         export_checks_from_db_to_gpkg(settings)
+        logger.info("Completed - Export database to geopackage")
 
 
 def resolve_ini(custom_ini_file):
@@ -184,7 +192,7 @@ def get_parser():
         action="store_true",
     )
     parser.add_argument(
-        "-g",
+        "-e",
         "--gpkg",
         metavar="GPKG_OUTPUT_FILE",
         dest="gpkg_output_layer",

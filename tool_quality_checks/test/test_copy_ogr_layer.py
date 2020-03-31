@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Tests for importer.py"""
+"""Tests for copy OGR layer.py"""
 import os
 import pytest
 from osgeo import osr, ogr

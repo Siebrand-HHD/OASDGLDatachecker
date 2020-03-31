@@ -134,7 +134,7 @@ create_definitions as (
 	THEN  '0 ' || height || ' ' || height
 	ELSE height::text
 	END as height,
-	buistype as code
+	COALESCE(buistype,'leeg') as code
 	FROM gather_data
 	ORDER BY id
 	RETURNING *

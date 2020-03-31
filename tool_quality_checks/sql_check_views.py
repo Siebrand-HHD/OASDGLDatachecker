@@ -81,10 +81,13 @@ CREATE OR REPLACE VIEW {schema}.leiding_bob_leeg AS
     SELECT
         pipe.code AS leiding,
         pipe.id AS threedi_id,
+        pipe.connection_node_start_id AS threedi_start_id,
+        pipe.connection_node_end_id AS threedi_end_id,
         start_node.code AS beginpunt,
         end_node.code AS eindpunt,
         pipe.invert_level_start_point AS bob_beginpunt,
         pipe.invert_level_end_point AS bob_eindpunt,
+        (array_greatest(string_to_array(height,' '))::float * 1000)::double precision AS hoogte_profiel,
         CASE
             WHEN pipe.invert_level_start_point IS NULL AND pipe.invert_level_end_point != NULL THEN 'bob beginpunt ontbreekt'::text
             WHEN pipe.invert_level_start_point != NULL AND pipe.invert_level_end_point IS NULL THEN 'bob eindpunt ontbreekt'::text
@@ -98,6 +101,8 @@ CREATE OR REPLACE VIEW {schema}.leiding_bob_leeg AS
         ON 	pipe.connection_node_start_id = start_node.id
     LEFT JOIN v2_connection_nodes end_node
         ON 	pipe.connection_node_end_id = end_node.id
+    LEFT JOIN v2_cross_section_definition def
+        ON pipe.cross_section_definition_id = def.id
     WHERE pipe.invert_level_start_point IS NULL OR pipe.invert_level_end_point IS NULL;
 -- Dwarsdoorsnede ontbreekt
 CREATE OR REPLACE VIEW {schema}.leiding_vorm_leeg AS
@@ -854,10 +859,13 @@ CREATE OR REPLACE VIEW {schema}.leiding_bob_onlogisch AS
     SELECT
         pipe.code AS leiding,
         pipe.id AS threedi_id,
+        pipe.connection_node_start_id AS threedi_start_id,
+        pipe.connection_node_end_id AS threedi_end_id,
         start_node.code AS beginpunt,
         end_node.code AS eindpunt,
         pipe.invert_level_start_point AS bob_beginpunt,
         pipe.invert_level_end_point AS bob_eindpunt,
+        (array_greatest(string_to_array(height,' '))::float * 1000)::double precision AS hoogte_profiel,
         'bob beginpunt en/of eindpunt onlogsich'::text AS bericht,
 	NULL::text AS status,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
@@ -866,6 +874,8 @@ CREATE OR REPLACE VIEW {schema}.leiding_bob_onlogisch AS
         ON 	pipe.connection_node_start_id = start_node.id
     LEFT JOIN v2_connection_nodes end_node
         ON 	pipe.connection_node_end_id = end_node.id
+    LEFT JOIN v2_cross_section_definition def
+        ON pipe.cross_section_definition_id = def.id
     WHERE pipe.invert_level_start_point = 0
 	OR pipe.invert_level_start_point < {min_levels}
 	OR pipe.invert_level_start_point > {max_levels}
@@ -1140,6 +1150,17 @@ CREATE OR REPLACE VIEW {schema}.leiding_dekking_eind AS
         AND manh.surface_level IS NOT NULL;
 -- Dwarsdoorsnede logisch
 CREATE OR REPLACE VIEW {schema}.leiding_doorsnede_onlogisch AS
+    with xsecs as (
+        SELECT
+            id,
+            shape,
+            array_greatest(string_to_array(width,' '))::float as width,
+			width as width_original,
+            array_greatest(string_to_array(height,' '))::float as height,
+			height as height_original,
+            code
+        from v2_cross_section_definition
+    )
     SELECT
         pipe.code AS leiding,
         pipe.id AS threedi_id,
@@ -1153,44 +1174,41 @@ CREATE OR REPLACE VIEW {schema}.leiding_doorsnede_onlogisch AS
             WHEN shape = 6 THEN 'getabelleerd trapezium'
             ELSE 'overige'
  		END as vormprofiel,
-        (array_greatest(string_to_array(width,' '))::float * 1000)::double precision AS breedte,
-        (array_greatest(string_to_array(height,' '))::float * 1000)::double precision AS hoogte,
+        width * 1000 AS breedte,
+        height * 1000 AS hoogte,
         CASE
-            WHEN width::double precision = 0 AND shape < 5 THEN 'breedte is nul'
-            WHEN height::double precision = 0 AND shape < 5 THEN 'hoogte is nul'
+            WHEN width = 0 AND shape < 5 THEN 'breedte is nul'
+            WHEN height = 0 AND shape < 5 THEN 'hoogte is nul'
             WHEN width != height AND height IS NOT NULL AND shape = 2 THEN 'breedte ongelijk aan hoogte in ronde buis'
             WHEN round(1.5*width::numeric,4) != round(height::numeric,4) AND shape = 3 THEN 'afmetingen in ei-buis onlogisch'
             WHEN height IS NULL AND (shape = 5 OR shape = 6) THEN 'getabelleerde hoogte ontbreekt'
-            WHEN (NOT width LIKE '% %' OR NOT height LIKE '% %') AND (shape = 5 OR shape = 6) THEN 'parameters ontbreken in getabelleerde vorm'
-            WHEN (width::float < {min_dimensions}::float AND shape < 5) OR (array_greatest(string_to_array(width,' '))::float < {min_dimensions}::float AND shape > 4) THEN 'breedte is zeer klein'
-            WHEN (height::float < {min_dimensions}::float AND shape < 5) OR (array_greatest(string_to_array(height,' '))::float < {min_dimensions}::float AND shape > 4) THEN 'hoogte is zeer klein'
-            WHEN (width::float < {max_dimensions}::float AND shape < 5) OR (array_greatest(string_to_array(width,' '))::float < {max_dimensions}::float AND shape > 4) THEN 'breedte is zeer groot'
-            WHEN (height::float < {max_dimensions}::float AND shape < 5) OR (array_greatest(string_to_array(height,' '))::float < {max_dimensions}::float AND shape > 4) THEN 'hoogte is zeer groot'
+            WHEN (NOT width_original LIKE '% %' OR NOT height_original LIKE '% %') AND (shape = 5 OR shape = 6) THEN 'parameters ontbreken in getabelleerde vorm'
+            WHEN width < {min_dimensions} THEN 'breedte is zeer klein'
+            WHEN height < {min_dimensions} THEN 'hoogte is zeer klein'
+            WHEN width > {max_dimensions} THEN 'breedte is zeer groot'
+            WHEN height > {max_dimensions} THEN 'hoogte is zeer groot'
             ELSE NULL
         END AS bericht,
 	NULL::text AS status,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
-    FROM v2_pipe pipe
+    --SELECT DISTINCT shape, width, height, def.code 
+	FROM v2_pipe pipe
     LEFT JOIN v2_connection_nodes start_node
         ON 	pipe.connection_node_start_id = start_node.id 
     LEFT JOIN v2_connection_nodes end_node
         ON 	pipe.connection_node_end_id = end_node.id 
-    LEFT JOIN v2_cross_section_definition def
+    LEFT JOIN xsecs def
         ON pipe.cross_section_definition_id = def.id
-    WHERE (width::double precision = 0 AND shape < 5)
-        OR (height::double precision = 0 AND shape < 5)
+    WHERE (width = 0 AND shape < 5)
+        OR (height = 0 AND shape < 5)
         OR (width != height AND height IS NOT NULL AND shape = 2)
         OR (round(1.5*width::numeric,4) != round(height::numeric,4) AND shape = 3)
         OR (height IS NULL AND (shape = 5 OR shape = 6))
-        OR ((NOT width LIKE '% %' OR NOT height LIKE '% %') AND shape > 4)
-	OR (width::float < {min_dimensions}::float AND shape < 5)
-	OR (array_greatest(string_to_array(width,' '))::float < {min_dimensions}::float AND shape > 4)
-	OR (height::float < {min_dimensions}::float AND shape < 5)
-	OR (array_greatest(string_to_array(height,' '))::float < {min_dimensions}::float AND shape > 4)
-    	OR (width::float < {max_dimensions}::float AND shape < 5)
-    	OR (array_greatest(string_to_array(width,' '))::float < {max_dimensions}::float AND shape > 4)
-    	OR (height::float < {max_dimensions}::float AND shape < 5)
-    	OR (array_greatest(string_to_array(height,' '))::float < {max_dimensions}::float AND shape > 4);
+        OR ((NOT width_original LIKE '% %' OR NOT height_original LIKE '% %') AND shape > 4)
+        OR width < {min_dimensions}
+        OR height < {min_dimensions}
+    	OR width > {max_dimensions}
+    	OR height > {max_dimensions};
 """,
     "sql_quality_weir": """
 ----------------- Overstorten ----------------------

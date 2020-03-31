@@ -13,7 +13,9 @@ from OASDGLDatachecker.tool_quality_checks.fix_import_file import (
     fix_vector_layer,
     fix_layer_name_length,
 )
-from OASDGLDatachecker.tool_quality_checks.importer import set_ogr_connection
+from OASDGLDatachecker.tool_quality_checks.import_management_database import (
+    set_ogr_connection,
+)
 
 OUR_DIR = os.path.dirname(__file__)
 _shp_relpath = "data/rioolput.shp"

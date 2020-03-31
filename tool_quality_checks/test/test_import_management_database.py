@@ -3,7 +3,7 @@
 import os
 import pytest
 
-from OASDGLDatachecker.tool_quality_checks.importer import (
+from OASDGLDatachecker.tool_quality_checks.import_management_database import (
     import_file_based_on_filetype,
     import_sewerage_data_into_db,
 )
@@ -67,12 +67,12 @@ class TestDB(TestCase):
         )
         self.db.execute_sql_file(sql_abspath)
 
-    def test_01_importer_relevant_settings_are_missing(self):
+    def test_01_import_relevant_settings_are_missing(self):
         # run before others with 01
         with pytest.raises(AttributeError):
             import_sewerage_data_into_db(self.db, self.settings)
 
-    def test_02_importer_manhole_only(self):
+    def test_02_import_manhole_only(self):
         # extra check is to check loading of date-types (2011-10-28) into the database
         manhole_layer_rel_path = "data/schiedam-test/schiedam-putten-test.shp"
         self.settings.manhole_layer = os.path.join(OUR_DIR, manhole_layer_rel_path)
@@ -86,7 +86,7 @@ class TestDB(TestCase):
         )
         self.db.execute_sql_file(sql_abspath)
 
-    def test_03_importer_manholes_and_pipes(self):
+    def test_03_import_manholes_and_pipes(self):
         # extra check is to check loading of date-types (2011-10-28) into the database
         manhole_layer_rel_path = "data/schiedam-test/schiedam-putten-test.shp"
         self.settings.manhole_layer = os.path.join(OUR_DIR, manhole_layer_rel_path)
