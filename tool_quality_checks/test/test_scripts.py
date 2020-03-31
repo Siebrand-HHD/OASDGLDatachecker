@@ -85,7 +85,7 @@ geopackage_abs_path = os.path.join(OUR_DIR, "data/schiedam-test/export_scripts.g
         "-d",
         raster_abs_path,
         "--checks",
-        "-g",
+        "-e",
         geopackage_abs_path,
         "--export",
     ],

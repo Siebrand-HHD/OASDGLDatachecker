@@ -180,7 +180,7 @@ def get_parser():
         action="store_true",
     )
     parser.add_argument(
-        "-g",
+        "-e",
         "--gpkg",
         metavar="GPKG_OUTPUT_FILE",
         dest="gpkg_output_layer",
