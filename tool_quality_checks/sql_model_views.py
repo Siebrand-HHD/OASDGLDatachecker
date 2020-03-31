@@ -118,7 +118,6 @@ sql_understandable_model_views = {
             ELSE NULL
         END AS contractiecoefficient_doorlaatprofiel,
         -- max_capacity AS maximalecapaciteit_doorlaat,
-        discharge_coefficient_positive AS contractiecoefficient_doorlaatprofiel,
         crest_level AS doorlaatniveau,
         CASE
             WHEN shape = 1 THEN 'rechthoekig (open)'
