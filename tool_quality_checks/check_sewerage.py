@@ -12,7 +12,7 @@ from OASDGLDatachecker.tool_quality_checks.point_sampling import (
     sample_points_and_create_pg_layer,
     create_point_sample_layer,
 )
-from OASDGLDatachecker.tool_quality_checks.importer import (
+from OASDGLDatachecker.tool_quality_checks.import_management_database import (
     set_ogr_connection_pg_database,
 )
 

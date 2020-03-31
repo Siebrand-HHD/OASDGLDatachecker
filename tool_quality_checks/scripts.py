@@ -11,7 +11,9 @@ from OASDGLDatachecker.tool_quality_checks.db import (
     create_database,
     drop_database,
 )
-from OASDGLDatachecker.tool_quality_checks.importer import import_sewerage_data_into_db
+from OASDGLDatachecker.tool_quality_checks.import_management_database import (
+    import_sewerage_data_into_db,
+)
 from OASDGLDatachecker.tool_quality_checks.exporter import export_checks_from_db_to_gpkg
 
 

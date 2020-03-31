@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Tests for importer.py"""
+"""Tests for copy OGR layer.py"""
 import os
 import pytest
 from osgeo import osr, ogr
@@ -120,7 +120,7 @@ class TestDB(TestCase):
     def test_copy2pg_database_no_ds_raise(self):
         in_source = set_ogr_connection_pg_database(self.settings)
         out_source = in_source
-        with pytest.raises(AttributeError):
+        with pytest.raises(ValueError):
             copy2ogr(in_source, "not_existing", out_source, "test_2", schema="src")
 
     def test_copy2pg_database_no_features(self):
