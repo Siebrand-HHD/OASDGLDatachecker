@@ -55,4 +55,4 @@ class TestDB(TestCase):
         )
         export_checks_from_db_to_gpkg(self.settings)
         in_source = set_ogr_connection(self.settings.gpkg_output_layer)
-        assert in_source.GetLayerCount() == 40
+        assert in_source.GetLayerCount() == 41
