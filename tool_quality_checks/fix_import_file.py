@@ -165,7 +165,7 @@ def fix_vector_layer(in_layer, layer_name="", epsg=3857):
     # Create output dataset and force dataset to multiparts
     # variable output_geom_type, does it always work? if not add check
     geom_name = ogr.GeometryTypeToName(geom_type)
-    print(layer_name, geom_name)
+
     if "polygon" in geom_name.lower():
         output_geom_type = 3  # polygon
     elif "line" in geom_name.lower():
