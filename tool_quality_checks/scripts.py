@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 OUR_DIR = os.path.dirname(__file__)
 
 
-def run_scripts(task,settings):
+def run_scripts(settings):
     """
     background program for running all functionalities
     """

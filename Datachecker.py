@@ -274,8 +274,8 @@ class Datachecker:
     def laad_gpkg(self):
         fileName= self.dockwidget.listChecks.selectedItems()
         # dictionary with layer_names of gpkg and potential group name in QGIS
-        # group_mapping = {'chk.leiding': 'leidingen', 'chk.put': 'putten', 'chk.profiel': 'profielen'}
-        group_mapping = {'leiding': 'leidingen', 'put': 'putten', 'profiel': 'profielen'}
+        group_mapping = {'chk.leiding': 'leidingen', 'chk.put': 'putten', 'chk.profiel': 'profielen'}
+        # group_mapping = {'leiding': 'leidingen', 'put': 'putten', 'profiel': 'profielen'}
         
         if len(fileName)>0:
             root=QgsProject.instance().layerTreeRoot()
@@ -424,6 +424,15 @@ class Datachecker:
         putfile = os.path.realpath(self.dockwidget.putFile.filePath())
         self.save_qsetting('paths', 'putfile',putfile)
               
+    def create_db_from_qgis(self):
+        settings = SettingsObjectPlugin()
+        settings.createdb = True 
+        settings.host = self.dockwidget.?
+        settings.port = self.dockwidget.?
+        settings.username = self.dockwidget.?
+        settings.password = self.dockwidget.?
+        settings.s = self.dockwidget.?
+        run_scripts(settings)
         
     def get_settings(self):  #vul_settings     
         
@@ -436,11 +445,14 @@ class Datachecker:
         settings.password="postgres"
         settings.dropdb = True
         settings.createdb = True
+        settings.emptydb = True
         # settings.import_type = False
         settings.import_type = 'gbi'
-        # settings.export_type = 'gpkg'
+        settings.export = True
+        settings.gpkg_output_layer= self.dockwidget.outputFileName.text()
         settings.checks = True
         # settings.checks = False
+        settings.max_connections = 8
         
         putfile = self.get_qsetting('paths', 'putfile')
         settings.manhole_layer = putfile
@@ -536,11 +548,16 @@ class Datachecker:
             self.dockwidget.folderNaam_export.setText(str(foldernaam_export))
             self.dockwidget.folderNaam_export.setToolTip(str(foldernaam_export))
             self.fill_export_list()
+    
+    def select_output_file(self):
+        file_name=QFileDialog.getSaveFileName(filter='*.gpkg')
+        self.dockwidget.outputFileName.setText(str(file_name[0]))
         
     def draai_de_checks(self):
         settings = self.get_settings()
-        task1 = QgsTask.fromFunction('Draai checks',run_scripts,on_finished=self.completed,settings=settings)
-        QgsApplication.taskManager().addTask(task1)
+        # task1 = QgsTask.fromFunction('Draai checks',run_scripts,on_finished=self.completed,settings=settings)
+        # QgsApplication.taskManager().addTask(task1)
+        run_scripts(settings)
         
     def run(self):
         """Run method that loads and starts the plugin"""
@@ -563,7 +580,8 @@ class Datachecker:
             self.dockwidget.bestaandeDatabases.currentTextChanged.connect(self.getConnectionDetails)
             self.dockwidget.ObjectSlider.valueChanged.connect(self.slider_function)
             self.dockwidget.applyStylingButton.clicked.connect(self.laad_qml_styling)
-            self.dockwidget.selectFolderButton.clicked.connect(self.pb_select_dc_folder)            
+            self.dockwidget.selectFolderButton.clicked.connect(self.pb_select_dc_folder) 
+            self.dockwidget.outputFileButton.clicked.connect(self.select_output_file)            
             self.dockwidget.folderNaam.textChanged.connect(self.save_folderchecks) 
             self.dockwidget.folderNaam_export.textChanged.connect(self.save_folderbeheerexport)
             #self.dockwidget.folderNaam.editingFinished.connect(self.fill_checks_list)

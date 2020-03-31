@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>503</width>
-    <height>649</height>
+    <width>495</width>
+    <height>620</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -33,7 +33,7 @@
        <bool>true</bool>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>3</number>
       </property>
       <property name="documentMode">
        <bool>true</bool>
@@ -244,16 +244,30 @@
             </layout>
            </item>
            <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_10">
+             <item>
+              <widget class="QLabel" name="label_24">
+               <property name="text">
+                <string>Output</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="outputFileName"/>
+             </item>
+             <item>
+              <widget class="QPushButton" name="outputFileButton">
+               <property name="text">
+                <string>..</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
             <widget class="QPushButton" name="DatachecksButton">
              <property name="text">
               <string>Datachecks uitvoeren</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QProgressBar" name="progressBar">
-             <property name="value">
-              <number>24</number>
              </property>
             </widget>
            </item>
@@ -968,67 +982,38 @@
          </rect>
         </property>
        </widget>
-       <widget class="QgsCollapsibleGroupBox" name="mGroupBox_5">
+       <widget class="QLineEdit" name="lineEdit">
         <property name="geometry">
          <rect>
-          <x>19</x>
-          <y>300</y>
-          <width>361</width>
-          <height>71</height>
+          <x>100</x>
+          <y>130</y>
+          <width>113</width>
+          <height>20</height>
          </rect>
         </property>
-        <widget class="QPushButton" name="pushButton_12">
-         <property name="geometry">
-          <rect>
-           <x>30</x>
-           <y>10</y>
-           <width>75</width>
-           <height>23</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>gecontroleerd</string>
-         </property>
-        </widget>
-        <widget class="QPushButton" name="pushButton_13">
-         <property name="geometry">
-          <rect>
-           <x>30</x>
-           <y>40</y>
-           <width>75</width>
-           <height>23</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>verwerkt</string>
-         </property>
-        </widget>
-        <widget class="QCheckBox" name="checkBox_6">
-         <property name="geometry">
-          <rect>
-           <x>120</x>
-           <y>10</y>
-           <width>70</width>
-           <height>18</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
-        <widget class="QCheckBox" name="checkBox_7">
-         <property name="geometry">
-          <rect>
-           <x>120</x>
-           <y>40</y>
-           <width>70</width>
-           <height>18</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
+       </widget>
+       <widget class="QLineEdit" name="lineEdit_2">
+        <property name="geometry">
+         <rect>
+          <x>100</x>
+          <y>160</y>
+          <width>113</width>
+          <height>20</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_25">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>130</y>
+          <width>47</width>
+          <height>14</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>host</string>
+        </property>
        </widget>
       </widget>
       <widget class="QWidget" name="tab_5">
