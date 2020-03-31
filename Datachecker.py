@@ -380,6 +380,11 @@ class Datachecker:
                 pass
 
         else:
+            try:
+                oldstatement = iface.activeLayer().subsetString() 
+            except:
+                pass
+            
             print('test')
         for layer in QgsProject.instance().mapLayers().values():          
             layer.setSubsetString(statement)
