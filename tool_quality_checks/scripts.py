@@ -12,6 +12,8 @@ from OASDGLDatachecker.tool_quality_checks.db import (
     drop_database,
 )
 from OASDGLDatachecker.tool_quality_checks.importer import import_sewerage_data_into_db
+from OASDGLDatachecker.tool_quality_checks.exporter import export_checks_from_db_to_gpkg
+
 
 logger = logging.getLogger(__name__)
 OUR_DIR = os.path.dirname(__file__)
@@ -34,14 +36,17 @@ def run_scripts(task,settings):
         create_database(settings)
 
     # block with database connection
-    if settings.createdb or settings.import_type or settings.checks:
-        print("Hier ben ik")
+    if settings.createdb or settings.import_type or settings.checks or settings.emptydb:
         db = ThreediDatabase(settings)
 
     if settings.createdb:
         print("Initialize the Citybuilder database")
         logger.info("Initialize the Citybuilder database")
         db.initialize_db_threedi()
+
+    if settings.emptydb:
+        logger.info("Empty the Citybuilder database")
+        db.empty_database()
 
     if settings.import_type:
         print("import")
@@ -53,6 +58,10 @@ def run_scripts(task,settings):
         logger.info("Check your sewerage system")
         check_sewerage(db, settings)
         print('einde')
+
+    if settings.export:
+        logger.info("Export database to geopackage")
+        export_checks_from_db_to_gpkg(settings)
 
 
 def resolve_ini(custom_ini_file):
@@ -128,6 +137,13 @@ def get_parser():
         action="store_true",
     )
     parser.add_argument(
+        "--emptydb",
+        default=False,
+        help="Empty CityBuilder database",
+        dest="emptydb",
+        action="store_true",
+    )
+    parser.add_argument(
         "--import",
         dest="import_type",
         default=False,
@@ -159,6 +175,20 @@ def get_parser():
         metavar="DEM_FILE",
         dest="dem",
         help="Optional: define path to raster with DEM values.",
+    )
+    parser.add_argument(
+        "--export",
+        default=False,
+        help="Export quality checks to geopackage",
+        dest="export",
+        action="store_true",
+    )
+    parser.add_argument(
+        "-g",
+        "--gpkg",
+        metavar="GPKG_OUTPUT_FILE",
+        dest="gpkg_output_layer",
+        help="Optional: define path to geopackage output file",
     )
     parser.add_argument(
         "-i",

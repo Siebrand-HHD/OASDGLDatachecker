@@ -7,3 +7,6 @@ __pycache__
 *-shm
 *.gpkg-wal
 *.xml
+tool_quality_checks/test/data/test_copy_ogr.*
+tool_quality_checks/test/data/schiedam-test/export_exporter.gpkg
+tool_quality_checks/test/data/schiedam-test/export_scripts.gpkg

@@ -9,9 +9,9 @@ import logging
 from osgeo import gdal, ogr
 import numpy as np
 
-from OASDGLDatachecker.tool_quality_checks.importer import (
+from OASDGLDatachecker.tool_quality_checks.copy_ogr_layer import (
     set_ogr_connection_pg_database,
-    copy2pg_database,
+    copy2ogr,
 )
 
 logger = logging.getLogger(__name__)
@@ -109,10 +109,8 @@ def create_point_sample_layer(
     output_schema,
     output_raster_column,
 ):
-    copy2pg_database(
-        settings, conn, input_point_layer, output_point_layer, schema=output_schema
-    )
-    target_layer = conn.GetLayerByName("src." + output_point_layer)
+    copy2ogr(conn, input_point_layer, conn, output_point_layer, schema=output_schema)
+    target_layer = conn.GetLayerByName(output_schema + "." + output_point_layer)
 
     target_field = ogr.FieldDefn(str(output_raster_column), ogr.OFTReal)
     target_layer.CreateField(target_field)
