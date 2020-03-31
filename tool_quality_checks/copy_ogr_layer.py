@@ -28,6 +28,7 @@ def copy2ogr(in_source, in_name, out_source, out_name, schema="public"):
         raise ValueError(msg)
     in_srid = in_layer.GetSpatialRef()
 
+    # TODO insert check if layer has a geometry inside, maybe this is not needed due to featurecount added
     # if in_srid is None:
     #     logger.warning("Input layer has no geometry column: %s" % in_name)
     #     has_geom = False
