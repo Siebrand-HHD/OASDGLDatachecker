@@ -3,7 +3,7 @@
 import os
 import logging
 
-from OASDGLDatachecker.tool_quality_checks import sql_checks
+from OASDGLDatachecker.tool_quality_checks.sql_check_views import sql_checks
 from OASDGLDatachecker.tool_quality_checks.sql_views import sql_views
 from OASDGLDatachecker.tool_quality_checks.sql_model_views import (
     sql_understandable_model_views,
@@ -111,10 +111,11 @@ def perform_checks_with_sql(db, settings, check_table, check_type):
         """
     check_table = check_table.replace("v2_", "")
     sql_template_name = "sql_" + check_type + "_" + check_table
-    if sql_template_name in sql_checks.sql_checks:
+
+    if sql_template_name in sql_checks:
         try:
-            statement = sql_checks.sql_checks[sql_template_name].format(
-                **settings.__dict__
+            statement = sql_checks[sql_template_name].format(
+                schema="chk", **settings.__dict__
             )
         except KeyError as e:
             raise KeyError("Setting %s is missing in the ini-file" % e)
