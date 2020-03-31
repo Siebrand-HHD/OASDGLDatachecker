@@ -38,13 +38,6 @@ def copy2ogr(in_source, in_name, out_source, out_name, schema="public"):
         has_geom = True
 
     if has_geom:
-        # correct vector layer to solve issues and stuff
-        # fix_in_source, fix_layer_name = in_layer, out_name
-        fixed_in_source, fixed_layer_name = fix_vector_layer(
-            in_layer, out_name, epsg=28992
-        )
-        fixed_in_layer = fixed_in_source.GetLayerByName(fixed_layer_name)
-
         # check projection of input file
         check_sr = get_projection(in_srid)
         if check_sr is None:
