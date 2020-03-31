@@ -42,6 +42,7 @@ def check_sewerage(db, settings):
         )
     else:
         # create empty layer to make sure that sql does not crash on table unknown
+        logger.warning("No DEM file is provided during sewerage checks")
         conn = set_ogr_connection_pg_database(settings)
         create_point_sample_layer(
             settings,

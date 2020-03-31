@@ -30,10 +30,12 @@ def run_scripts(settings):
     if settings.dropdb:
         logger.info("Drop the Citybuilder database")
         drop_database(settings)
+        logger.info("Completed - Drop the Citybuilder database")
 
     if settings.createdb:
         logger.info("Create the Citybuilder database")
         create_database(settings)
+        logger.info("Completed - Create the Citybuilder database")
 
     # block with database connection
     if settings.createdb or settings.import_type or settings.checks or settings.emptydb:
@@ -42,22 +44,27 @@ def run_scripts(settings):
     if settings.createdb:
         logger.info("Initialize the Citybuilder database")
         db.initialize_db_threedi()
+        logger.info("Completed - Initialize the Citybuilder database")
 
     if settings.emptydb:
         logger.info("Empty the Citybuilder database")
         db.empty_database()
+        logger.info("Completed - Empty the Citybuilder database")
 
     if settings.import_type:
         logger.info("Import your sewerage data of %s" % settings.import_type)
         import_sewerage_data_into_db(db, settings)
+        logger.info("Completed - Import your sewerage data of %s" % settings.import_type)
 
     if settings.checks:
         logger.info("Check your sewerage system")
         check_sewerage(db, settings)
+        logger.info("Completed - Check your sewerage system")
 
     if settings.export:
         logger.info("Export database to geopackage")
         export_checks_from_db_to_gpkg(settings)
+        logger.info("Completed - Export database to geopackage")
 
 
 def resolve_ini(custom_ini_file):
