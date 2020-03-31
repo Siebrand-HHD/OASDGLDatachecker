@@ -28,10 +28,10 @@ def copy2ogr(in_source, in_name, out_source, out_name, schema="public"):
         raise ValueError(msg)
     in_srid = in_layer.GetSpatialRef()
 
-    if in_srid is None:
-        logger.info("Input layer has no geometry column: %s" % in_name)
-        has_geom = False
-    elif in_layer.GetFeatureCount() == 0:
+    # if in_srid is None:
+    #     logger.warning("Input layer has no geometry column: %s" % in_name)
+    #     has_geom = False
+    if in_layer.GetFeatureCount() == 0:
         logger.warning("Input feature count is 0 for layer: %s" % in_name)
         has_geom = False
     else:

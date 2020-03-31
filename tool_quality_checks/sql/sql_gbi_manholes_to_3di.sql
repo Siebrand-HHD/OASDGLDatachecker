@@ -29,7 +29,7 @@ INSERT INTO v2_connection_nodes (id, storage_area, code, the_geom)
 	SELECT
 		id,
 		NULL as storage_area, -- use guess_indicators
-		putcode as code,
+		COALESCE(putcode,'leeg') as code,
 		ST_SetSRID(st_force2d(geom), 28992) as the_geom
 	FROM src.putten_gbi;
 
@@ -54,7 +54,7 @@ INSERT INTO v2_manhole(
 SELECT
 	id as id,
 	putcode AS display_name,
-	putcode AS code,
+	COALESCE(putcode,'leeg') as code,
 	id as connection_node_id,
 	CASE
 		WHEN lower(vorm_gwsw) LIKE '%vierkant%' THEN 'sqr' -- not supported by GWSW, just to be sure
