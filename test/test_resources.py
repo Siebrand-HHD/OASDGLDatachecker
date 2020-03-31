@@ -8,16 +8,17 @@
 
 """
 
-__author__ = "svanderhoeven@hhdelfland.nl"
-__date__ = "2019-06-24"
-__copyright__ = "Copyright 2019, OAS De Grote Lucht"
+__author__ = 'o.claassen@schiedam.nl'
+__date__ = '2020-01-21'
+__copyright__ = 'Copyright 2020, OAS-De Groote Lucht'
 
 import unittest
 
 from PyQt5.QtGui import QIcon
 
 
-class OASdglDatacheckerDialogTest(unittest.TestCase):
+
+class DatacheckerDialogTest(unittest.TestCase):
     """Test rerources work."""
 
     def setUp(self):
@@ -30,12 +31,14 @@ class OASdglDatacheckerDialogTest(unittest.TestCase):
 
     def test_icon_png(self):
         """Test we can click OK."""
-        path = ":/plugins/OASdglDatachecker/icon.png"
+        path = ':/plugins/Datachecker/icon.png'
         icon = QIcon(path)
         self.assertFalse(icon.isNull())
 
-
 if __name__ == "__main__":
-    suite = unittest.makeSuite(OASdglDatacheckerResourcesTest)
+    suite = unittest.makeSuite(DatacheckerResourcesTest)
     runner = unittest.TextTestRunner(verbosity=2)
     runner.run(suite)
+
+
+

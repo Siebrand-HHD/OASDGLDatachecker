@@ -196,10 +196,13 @@ class ThreediDatabase(object):
 
     def execute_sql_file(self, filename):
         # Open and read the file as a single buffer
-        sql_file = open(filename, "r").read()
+        # OCL: problemen met het openen van de file: https://github.com/python-pillow/Pillow/issues/477
+        with open(filename, 'r') as f:
+            sql_file = f.read()        
+        # sql_file = open(filename, "r").read()
         self.execute_sql_statement(sql_statement=sql_file, fetch=False)
         logger.debug("Execute sql file with function:" + filename)
-
+        
     def commit_values(self, table_name, field_names, data, schema="public"):
         """
         :param table_name: destination table
