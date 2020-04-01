@@ -45,7 +45,29 @@ class SettingsObjectPlugin(object):
     """Contains the settings from the ini file"""
 
     def __init__(self):
-        self.origin = "plugin"
+        self.origin = "plugin"               
+        self.host="localhost"
+        self.database="work_checks_in_gui"
+        self.port="5432"
+        self.username="postgres"
+        self.password="postgres"
+        self.dropdb = False
+        self.createdb = False
+        self.emptydb = False
+        self.import_type = ''
+        self.export = False
+        self.gpkg_output_layer= ''
+        self.checks = False
+        self.max_connections = 8
+        
+        # putfile = self.get_qsetting('paths', 'putfile')
+        # self.manhole_layer = putfile
+        # leidingfile = self.get_qsetting('paths', 'leidingfile')
+        # self.pipe_layer = leidingfile
+        
+        # self.dem = os.path.realpath('C:\\Users\onnoc\AppData\Roaming\QGIS\QGIS3\profiles\default\python\plugins\OASDGLDatachecker\tool_quality_checks\test\data\schiedam-test\dem_schiedam_test.tif')
+        # self.instellingen_ophalen(self)
+        
         
 class Datachecker:
     """QGIS Plugin Implementation."""
@@ -321,7 +343,9 @@ class Datachecker:
         self.dockwidget.listExport.addItems(exportList)                        
 
     def save_qml_styling(self):#,style_dir):
-        style_dir=r'C:\Users\onnoc\AppData\Roaming\QGIS\QGIS3\profiles\default\python\plugins\OASDGLDatachecker\styling\Stylingbeheerder'
+        scriptLocatie =os.path.dirname(os.path.realpath(__file__))
+        style_dir = os.path.join(scriptLocatie, 'styling\Stylingbeheerder')
+        # style_dir=r'C:\Users\onnoc\AppData\Roaming\QGIS\QGIS3\profiles\default\python\plugins\OASDGLDatachecker\styling\Stylingbeheerder'
         for layer in QgsProject.instance().mapLayers().values():
             layer.saveNamedStyle(os.path.join(style_dir,layer.name()+'.qml'))
 
@@ -340,8 +364,8 @@ class Datachecker:
             qmlpad = os.path.join(scriptLocatie, folder, layer.name())+'.qml'
             layer.loadNamedStyle(qmlpad)
             layer.triggerRepaint()
-            print(layer.name())
-            print(qmlpad)
+            # print(layer.name())
+            # print(qmlpad)
         self.configure_dropdown()
     
     def update_status(self, waarde):
@@ -403,7 +427,9 @@ class Datachecker:
             QSettings().setValue('/Map/identifyAutoFeatureForm','true')
 
     def get_stylingfolders(self): 
-        folder = r'C:\Users\onnoc\AppData\Roaming\QGIS\QGIS3\profiles\default\python\plugins\OASDGLDatachecker\styling'
+        scriptLocatie =os.path.dirname(os.path.realpath(__file__))
+        folder = os.path.join(scriptLocatie, 'styling')        
+        # folder = r'C:\Users\onnoc\AppData\Roaming\QGIS\QGIS3\profiles\default\python\plugins\OASDGLDatachecker\styling'
         subfolders = [ f.name for f in os.scandir(folder) if f.is_dir() ]
         return subfolders
             
@@ -423,28 +449,44 @@ class Datachecker:
         # putfile = os.path.dirname(os.path.realpath(self.dockwidget.putFile.filePath()))   
         putfile = os.path.realpath(self.dockwidget.putFile.filePath())
         self.save_qsetting('paths', 'putfile',putfile)
+    
+    def save_DEMfile(self):
+        DEMfile = os.path.realpath(self.dockwidget.dem.filePath())              
+        self.save_qsetting('paths', 'DEMfile',DEMfile)        
               
     def create_db_from_qgis(self):
         settings = SettingsObjectPlugin()
         settings.createdb = True 
-        settings.host = self.dockwidget.?
-        settings.port = self.dockwidget.?
-        settings.username = self.dockwidget.?
-        settings.password = self.dockwidget.?
-        settings.s = self.dockwidget.?
+        settings.database = self.dockwidget.dbName.text()
+        settings.host = self.dockwidget.dbHost.text()
+        settings.port = self.dockwidget.dbPort.text()
+        settings.username = self.dockwidget.dbUsername.text()
+        settings.password = self.dockwidget.dbPassword.text()
+        # settings.s = self.dockwidget.?
         run_scripts(settings)
+        qgs_settings = QSettings()
+        qgs_settings.setValue('PostgreSQL/connections/'+settings.database+'/host',settings.host)
+        qgs_settings.setValue('PostgreSQL/connections/'+settings.database+'/port',settings.port)
+        qgs_settings.setValue('PostgreSQL/connections/'+settings.database+'/username',settings.username)
+        qgs_settings.setValue('PostgreSQL/connections/'+settings.database+'/password',settings.password)
+        qgs_settings.setValue('PostgreSQL/connections/'+settings.database+'/database',settings.database)
+        qgs_settings.setValue('PostgreSQL/connections/'+settings.database+'/saveUsername',True)
+        qgs_settings.setValue('PostgreSQL/connections/'+settings.database+'/savePassword',True)
+        databases=self.get_databases()
+        self.dockwidget.bestaandeDatabases.clear()
+        self.dockwidget.bestaandeDatabases.addItems(databases)
+        
         
     def get_settings(self):  #vul_settings     
         
         settings = SettingsObjectPlugin()
-        settings.s='localhost' #self.threedi_db_settings["threedi_host"]
-        settings.host="localhost"
-        settings.database="work_checks_in_gui"
-        settings.port="5432"
-        settings.username="postgres"
-        settings.password="postgres"
-        settings.dropdb = True
-        settings.createdb = True
+        # settings.s='localhost' #self.threedi_db_settings["threedi_host"]
+    
+        settings.host=self.threedi_db_settings['threedi_host']
+        settings.database=self.threedi_db_settings['threedi_dbname']
+        settings.port=self.threedi_db_settings['threedi_port']
+        settings.username=self.threedi_db_settings['threedi_user']
+        settings.password=self.threedi_db_settings['threedi_password']
         settings.emptydb = True
         # settings.import_type = False
         settings.import_type = 'gbi'
@@ -459,7 +501,8 @@ class Datachecker:
         leidingfile = self.get_qsetting('paths', 'leidingfile')
         settings.pipe_layer = leidingfile
         
-        settings.dem = os.path.realpath('C:\\Users\onnoc\AppData\Roaming\QGIS\QGIS3\profiles\default\python\plugins\OASDGLDatachecker\tool_quality_checks\test\data\schiedam-test\dem_schiedam_test.tif')
+        settings.dem = os.path.realpath(self.dockwidget.dem.filePath()) 
+        #'C:\\Users\onnoc\AppData\Roaming\QGIS\QGIS3\profiles\default\python\plugins\OASDGLDatachecker\tool_quality_checks\test\data\schiedam-test\dem_schiedam_test.tif')
         self.instellingen_ophalen(settings)
         
         print(settings.__dict__)
@@ -548,6 +591,13 @@ class Datachecker:
             self.dockwidget.folderNaam_export.setText(str(foldernaam_export))
             self.dockwidget.folderNaam_export.setToolTip(str(foldernaam_export))
             self.fill_export_list()
+        
+        DEMfile =self.get_qsetting('paths', 'DEMfile')
+        if DEMfile:
+            print(DEMfile)
+            self.dockwidget.dem.setFilePath(os.path.join(str(DEMfile)))
+             
+             
     
     def select_output_file(self):
         file_name=QFileDialog.getSaveFileName(filter='*.gpkg')
@@ -558,6 +608,7 @@ class Datachecker:
         # task1 = QgsTask.fromFunction('Draai checks',run_scripts,on_finished=self.completed,settings=settings)
         # QgsApplication.taskManager().addTask(task1)
         run_scripts(settings)
+        self.initialize_paths()
         
     def run(self):
         """Run method that loads and starts the plugin"""
@@ -588,6 +639,7 @@ class Datachecker:
             self.dockwidget.InladenGpkgButton.clicked.connect(self.laad_gpkg)
             self.dockwidget.savelayer.clicked.connect(self.save_qml_styling)
             self.dockwidget.selectFolderButton_export.clicked.connect(self.pb_select_exp_folder)
+            self.dockwidget.createdbButton.clicked.connect(self.create_db_from_qgis)
             ##self.dockwidget.linePutten.dropevent.connect(over
             self.dockwidget.pgecontroleerd.clicked.connect(lambda:self.update_status(waarde ='gecontroleerd'))
             self.dockwidget.pverwerkt.clicked.connect(lambda:self.update_status(waarde ='verwerkt'))
@@ -596,7 +648,7 @@ class Datachecker:
             
             self.dockwidget.leidingFile.fileChanged.connect(self.save_leidingfile)
             self.dockwidget.putFile.fileChanged.connect(self.save_putfile)  
-            
+            self.dockwidget.dem.fileChanged.connect(self.save_DEMfile) 
             
             self.dockwidget.DatachecksButton.clicked.connect(self.draai_de_checks)
             self.dockwidget.instellingenopslaan.clicked.connect(self.instellingen_opslaan)
