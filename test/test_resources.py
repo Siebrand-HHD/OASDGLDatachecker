@@ -8,14 +8,13 @@
 
 """
 
-__author__ = 'o.claassen@schiedam.nl'
-__date__ = '2020-01-21'
-__copyright__ = 'Copyright 2020, OAS-De Groote Lucht'
+__author__ = "o.claassen@schiedam.nl"
+__date__ = "2020-01-21"
+__copyright__ = "Copyright 2020, OAS-De Groote Lucht"
 
 import unittest
 
 from PyQt5.QtGui import QIcon
-
 
 
 class DatacheckerDialogTest(unittest.TestCase):
@@ -31,14 +30,12 @@ class DatacheckerDialogTest(unittest.TestCase):
 
     def test_icon_png(self):
         """Test we can click OK."""
-        path = ':/plugins/Datachecker/icon.png'
+        path = ":/plugins/Datachecker/icon.png"
         icon = QIcon(path)
         self.assertFalse(icon.isNull())
+
 
 if __name__ == "__main__":
     suite = unittest.makeSuite(DatacheckerResourcesTest)
     runner = unittest.TextTestRunner(verbosity=2)
     runner.run(suite)
-
-
-

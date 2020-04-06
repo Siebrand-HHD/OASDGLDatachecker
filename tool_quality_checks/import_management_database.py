@@ -10,6 +10,7 @@ from OASDGLDatachecker.tool_quality_checks.copy_ogr_layer import (
     copy2ogr,
     set_ogr_connection,
     set_ogr_connection_pg_database,
+    has_columns,
 )
 
 logger = logging.getLogger(__name__)
@@ -28,6 +29,11 @@ def import_sewerage_data_into_db(db, settings):
 
     # initialize source schema
     db.create_schema("src")
+
+    # check if base columns are available
+    if not has_columns(settings.manhole_layer, ["PUTCODE"]):
+        logger.error("Putcode or geometry not found in manhole layer")
+        raise AttributeError("Putcode or geometry not found in manhole layer")
 
     import_file_based_on_filetype(
         settings, settings.manhole_layer, "putten_" + settings.import_type

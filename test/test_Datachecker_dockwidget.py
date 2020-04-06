@@ -8,9 +8,9 @@
 
 """
 
-__author__ = 'o.claassen@schiedam.nl'
-__date__ = '2020-01-21'
-__copyright__ = 'Copyright 2020, OAS-De Groote Lucht'
+__author__ = "o.claassen@schiedam.nl"
+__date__ = "2020-01-21"
+__copyright__ = "Copyright 2020, OAS-De Groote Lucht"
 
 import unittest
 
@@ -38,8 +38,8 @@ class DatacheckerDockWidgetTest(unittest.TestCase):
         """Test we can click OK."""
         pass
 
+
 if __name__ == "__main__":
     suite = unittest.makeSuite(DatacheckerDialogTest)
     runner = unittest.TextTestRunner(verbosity=2)
     runner.run(suite)
-

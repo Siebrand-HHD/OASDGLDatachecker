@@ -2,7 +2,7 @@
 """
 Import OGR Datasource into the database
 """
-
+import os
 import ogr
 import osr
 import logging
@@ -12,6 +12,8 @@ _mem_num = 0
 
 logger = logging.getLogger(__name__)
 ogr.UseExceptions()
+
+os.environ["SHAPE_ENCODING"] = "ISO-8859-4"
 
 
 def create_mem_ds():
@@ -138,7 +140,7 @@ def fix_layer_name_length(layer_name):
     return layer_name
 
 
-def fix_vector_layer(in_layer, layer_name="", epsg=3857):
+def fix_vector_layer(in_layer, layer_name="", epsg=3857, in_spatial_ref=None):
     """
         This function standardizes a vector layer:
             1. Multipart to singleparts
@@ -156,7 +158,9 @@ def fix_vector_layer(in_layer, layer_name="", epsg=3857):
 
     # Get inspatial reference and geometry from in shape
     geom_type = in_layer.GetGeomType()
-    in_spatial_ref = in_layer.GetSpatialRef()
+    if in_spatial_ref is None:
+        in_spatial_ref = in_layer.GetSpatialRef()
+
     in_layer.ResetReading()
 
     layer_name = layer_name.lower()
@@ -248,7 +252,7 @@ def fix_vector_layer(in_layer, layer_name="", epsg=3857):
             break
 
     logger.info("check  - Features count")
-    out_feature_count = out_layer.GetFeatureCount()
+    out_feature_count = out_layer.__len__()
 
     if len(lost_features) > 0:
         logger.warning("Lost {} features during corrections".format(len(lost_features)))

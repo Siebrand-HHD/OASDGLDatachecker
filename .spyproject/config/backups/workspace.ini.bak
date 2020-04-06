@@ -1,0 +1,10 @@
+[workspace]
+restore_data_on_startup = True
+save_data_on_exit = True
+save_history = True
+save_non_project_files = False
+
+[main]
+version = 0.2.0
+recent_files = ['tool_quality_checks\\scripts.py', 'tool_quality_checks\\check_sewerage.py', 'tool_quality_checks\\fix_import_file.py', 'tool_quality_checks\\import_management_database.py', 'tool_quality_checks\\copy_ogr_layer.py', 'tool_quality_checks\\sql\\sql_gbi_manholes_to_3di.sql', 'tool_quality_checks\\sql\\sql_gbi_pipes_to_3di.sql']
+
