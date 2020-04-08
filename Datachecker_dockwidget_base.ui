@@ -552,7 +552,7 @@
              <x>10</x>
              <y>40</y>
              <width>441</width>
-             <height>74</height>
+             <height>126</height>
             </rect>
            </property>
            <layout class="QGridLayout" name="gridLayout">
@@ -608,7 +608,7 @@
          <widget class="QgsCollapsibleGroupBox" name="mGroupBox_3">
           <layout class="QVBoxLayout" name="verticalLayout_6">
            <item>
-            <widget class="QCheckBox" name="checkBox">
+            <widget class="QCheckBox" name="layerIsolate">
              <property name="text">
               <string>Laag isoleren</string>
              </property>

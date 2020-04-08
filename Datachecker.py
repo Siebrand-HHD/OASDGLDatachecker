@@ -21,7 +21,7 @@
  *                                                                         *
  ***************************************************************************/
 """
-from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, Qt
+from PyQt5.QtCore import QObject, QSettings, QTranslator, qVersion, QCoreApplication, Qt
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QAction,QFileDialog, QInputDialog, QLineEdit
 from qgis.core import QgsProject,QgsVectorLayer,QgsLayerTreeLayer,QgsApplication,QgsTask,QgsMessageLog, QgsEditorWidgetSetup, QgsMapLayer
@@ -577,19 +577,32 @@ class Datachecker:
         print(layer.name())
         #print(value)
         
+    def switch_layerIsolate(self,value):
+        if value:
+            iface.currentLayerChanged.connect(lambda _: self.switch_visibility())
+            
+            # iface.layerTreeView().selectionChanged.connect(self.switch_visibility)
+            # QObject.connect(self.iface,SIGNAL("currentLayerChanged(QgsMapLayer *)") ,self.switch_visibility)
+            # QObject.connect(self.iface.mapCanvas(),SIGNAL("selectionChanged(QgsMapLayer)"), self.switch_visibility)
+        else:
+            # iface.currentLayerChanged.disconnect(lambda _: self.switch_visibility)
+            iface.layerTreeView().currentLayerChanged.disconnect() #lambda _: self.switch_visibility)
+            # QObject.disconnect(self.iface,SIGNAL("currentLayerChanged(QgsMapLayer *)") ,self.switch_visibility)
+            # QObject.disconnect(self.iface.mapCanvas(),SIGNAL("selectionChanged(QgsMapLayer)"), self.switch_visibility)
         
-    def switch_visibility():
-        root = QgsProject.instance().layerTreeRoot()
-        allLayers = root.layerOrder()
-        for layer in allLayers:
-            if layer in iface.layerTreeView().selectedLayers():
-                root.findLayer(layer.id()).setItemVisibilityChecked(True)
-            else:
-                root.findLayer(layer.id()).setItemVisibilityChecked(False)
+    def switch_visibility(self):
+        check = self.dockwidget.layerIsolate.checkState()
+        print(check)
+        if check:
+            root = QgsProject.instance().layerTreeRoot()
+            allLayers = root.layerOrder()
+            for layer in allLayers:
+                if layer in iface.layerTreeView().selectedLayers():
+                    root.findLayer(layer.id()).setItemVisibilityChecked(True)
+                else:
+                    root.findLayer(layer.id()).setItemVisibilityChecked(False)
 
-            iface.layerTreeView().selectionChanged.connect(switch_visibility)
 
-            iface.layerTreeView().currentLayerChanged.disconnect(switch_visibility)
         
     def instellingen_opslaan(self):           
         for veld in velden:
@@ -690,6 +703,9 @@ class Datachecker:
             self.dockwidget.pverwerkt.clicked.connect(lambda:self.update_status(waarde ='verwerkt'))
             self.dockwidget.cbgecontroleerd.stateChanged.connect(lambda:self.filter_status(waarde ='gecontroleerd', filter = self.dockwidget.cbgecontroleerd.isChecked()))
             self.dockwidget.cbverwerkt.stateChanged.connect(lambda:self.filter_status(waarde ='verwerkt', filter = self.dockwidget.cbverwerkt.isChecked()))
+            
+            iface.currentLayerChanged.connect(lambda _: self.switch_visibility())
+            # self.dockwidget.layerIsolate.stateChanged.connect(self.switch_layerIsolate)
             
             self.dockwidget.leidingFile.fileChanged.connect(self.save_leidingfile)
             self.dockwidget.putFile.fileChanged.connect(self.save_putfile)  
