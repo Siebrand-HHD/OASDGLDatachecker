@@ -13,8 +13,6 @@ _mem_num = 0
 logger = logging.getLogger(__name__)
 ogr.UseExceptions()
 
-os.environ["SHAPE_ENCODING"] = "ISO-8859-4"
-
 
 def create_mem_ds():
     """ Creating an ogr datasource in memory"""
@@ -252,7 +250,7 @@ def fix_vector_layer(in_layer, layer_name="", epsg=3857, in_spatial_ref=None):
             break
 
     logger.info("check  - Features count")
-    out_feature_count = out_layer.__len__()
+    out_feature_count = out_layer.GetFeatureCount()
 
     if len(lost_features) > 0:
         logger.warning("Lost {} features during corrections".format(len(lost_features)))
