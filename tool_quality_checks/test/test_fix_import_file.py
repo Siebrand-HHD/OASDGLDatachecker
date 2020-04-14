@@ -28,6 +28,12 @@ _gpkg_abspath = os.path.join(OUR_DIR, _gpkg_relpath)
 GPKG_IN_DS = set_ogr_connection(_gpkg_abspath)
 
 
+_sign_relpath = "data/sign.shp"
+_sign_abspath = os.path.join(OUR_DIR, _sign_relpath)
+_sign_in_ds = set_ogr_connection(_shp_abspath)
+SIGN_IN_LAYER = _sign_in_ds[0]
+
+
 def test_create_mem_ds():
     ds = create_mem_ds()
     assert isinstance(ds, ogr.DataSource)
@@ -209,3 +215,22 @@ def test_fix_vector_layer_more_in_than_out(caplog):
         multipoly_in_layer, "more_in_than_out_polygon", epsg=28992
     )
     assert "In feature count greater than out" in caplog.text
+
+
+def test_special_characters():
+    in_spatial_ref = SIGN_IN_LAYER.GetSpatialRef()
+    mem_datasource = create_mem_ds()
+    mem_layer = mem_datasource.CreateLayer("", in_spatial_ref, ogr.wkbPoint)
+
+    layer_defn = SIGN_IN_LAYER.GetLayerDefn()
+    for i in range(layer_defn.GetFieldCount()):
+        field_defn = layer_defn.GetFieldDefn(i)
+        mem_layer.CreateField(field_defn)
+
+    feature = SIGN_IN_LAYER[0]
+    geom = feature.GetGeometryRef()
+    content = feature.items()
+
+    add_singlepart_geometry(geom.ExportToWkb(), content, mem_layer)
+
+    assert mem_layer.GetFeatureCount() == 1

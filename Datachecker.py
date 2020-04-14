@@ -23,22 +23,44 @@
 """
 from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, Qt
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QAction,QFileDialog
-from qgis.core import QgsProject,QgsVectorLayer,QgsLayerTreeLayer,QgsApplication,QgsTask,QgsMessageLog, QgsEditorWidgetSetup, QgsMapLayer
+from PyQt5.QtWidgets import QAction, QFileDialog
+from qgis.core import (
+    QgsProject,
+    QgsVectorLayer,
+    QgsLayerTreeLayer,
+    QgsApplication,
+    QgsTask,
+    QgsMessageLog,
+    QgsEditorWidgetSetup,
+    QgsMapLayer,
+)
 from qgis.utils import iface
+
 # Initialize Qt resources from file resources.py
 from .resources import *
 import os
 from osgeo import ogr
+
 # Import the code for the DockWidget
 from .Datachecker_dockwidget import DatacheckerDockWidget
 import os.path
 from .tool_quality_checks.scripts import run_scripts
 from pathlib import Path, PureWindowsPath
 
-#Debugging in vs : https://gist.github.com/AsgerPetersen/9ea79ae4139f4977c31dd6ede2297f90
+# Debugging in vs : https://gist.github.com/AsgerPetersen/9ea79ae4139f4977c31dd6ede2297f90
 
-velden = {'min_levels', 'max_levels', 'min_length','max_length', 'max_verhang','min_dekking', 'hoogte_verschil', 'min_dimensions', 'max_dimensions', 'padding_manhole'}     
+velden = {
+    "min_levels",
+    "max_levels",
+    "min_length",
+    "max_length",
+    "max_verhang",
+    "min_dekking",
+    "hoogte_verschil",
+    "min_dimensions",
+    "max_dimensions",
+    "padding_manhole",
+}
 
 
 class SettingsObjectPlugin(object):
@@ -46,7 +68,8 @@ class SettingsObjectPlugin(object):
 
     def __init__(self):
         self.origin = "plugin"
-        
+
+
 class Datachecker:
     """QGIS Plugin Implementation."""
 
@@ -65,32 +88,30 @@ class Datachecker:
         self.plugin_dir = os.path.dirname(__file__)
 
         # initialize locale
-        locale = QSettings().value('locale/userLocale')[0:2]
+        locale = QSettings().value("locale/userLocale")[0:2]
         locale_path = os.path.join(
-            self.plugin_dir,
-            'i18n',
-            'datachecker_{}.qm'.format(locale))
-        #print(locale_path)
+            self.plugin_dir, "i18n", "datachecker_{}.qm".format(locale)
+        )
+        # print(locale_path)
 
         if os.path.exists(locale_path):
             self.translator = QTranslator()
             self.translator.load(locale_path)
 
-            if qVersion() > '4.3.3':
+            if qVersion() > "4.3.3":
                 QCoreApplication.installTranslator(self.translator)
 
         # Declare instance attributes
         self.actions = []
-        self.menu = self.tr(u'&Riooldatachecker')
+        self.menu = self.tr(u"&Riooldatachecker")
         # TODO: We are going to let the user set this up in a future iteration
-        self.toolbar = self.iface.addToolBar(u'Datachecker')
-        self.toolbar.setObjectName(u'Datachecker')
+        self.toolbar = self.iface.addToolBar(u"Datachecker")
+        self.toolbar.setObjectName(u"Datachecker")
 
-        #print "** INITIALIZING Datachecker"
+        # print "** INITIALIZING Datachecker"
 
         self.pluginIsActive = False
         self.dockwidget = None
-
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -105,8 +126,7 @@ class Datachecker:
         :rtype: QString
         """
         # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
-        return QCoreApplication.translate('Datachecker', message)
-
+        return QCoreApplication.translate("Datachecker", message)
 
     def add_action(
         self,
@@ -118,7 +138,8 @@ class Datachecker:
         add_to_toolbar=True,
         status_tip=None,
         whats_this=None,
-        parent=None):
+        parent=None,
+    ):
         """Add a toolbar icon to the toolbar.
 
         :param icon_path: Path to the icon for this action. Can be a resource
@@ -173,31 +194,29 @@ class Datachecker:
             self.toolbar.addAction(action)
 
         if add_to_menu:
-            self.iface.addPluginToMenu(
-                self.menu,
-                action)
+            self.iface.addPluginToMenu(self.menu, action)
 
         self.actions.append(action)
 
         return action
 
-
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
 
-        icon_path = ':/plugins/Datachecker/icon.png'
+        icon_path = ":/plugins/Datachecker/icon.png"
         self.add_action(
             icon_path,
-            text=self.tr(u'Riooldatachecker'),
+            text=self.tr(u"Riooldatachecker"),
             callback=self.run,
-            parent=self.iface.mainWindow())
+            parent=self.iface.mainWindow(),
+        )
 
-    #--------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
 
     def onClosePlugin(self):
         """Cleanup necessary items here when plugin dockwidget is closed"""
 
-        #print "** CLOSING Datachecker"
+        # print "** CLOSING Datachecker"
 
         # disconnects
         self.dockwidget.closingPlugin.disconnect(self.onClosePlugin)
@@ -210,142 +229,140 @@ class Datachecker:
 
         self.pluginIsActive = False
 
-
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
 
-        #print "** UNLOAD Datachecker"
+        # print "** UNLOAD Datachecker"
 
         for action in self.actions:
-            self.iface.removePluginMenu(
-                self.tr(u'&Riooldatachecker'),
-                action)
+            self.iface.removePluginMenu(self.tr(u"&Riooldatachecker"), action)
             self.iface.removeToolBarIcon(action)
         # remove the toolbar
         del self.toolbar
 
-    #--------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def pb_select_dc_folder(self):
         foldername = QFileDialog.getExistingDirectory()
         self.dockwidget.folderNaam.setText(foldername)
         self.dockwidget.folderNaam.setToolTip(foldername)
-        if foldername:      
+        if foldername:
             self.fill_checks_list()
-    
+
     def fill_checks_list(self):
         self.dockwidget.listChecks.clear()
-        foldername= self.dockwidget.folderNaam.text()
-        geopackageList =[]
+        foldername = self.dockwidget.folderNaam.text()
+        geopackageList = []
         for file in os.listdir(foldername):
             if file.endswith(".gpkg"):
                 geopackageList.append(file)
         self.dockwidget.listChecks.addItems(geopackageList)
 
-
-    def getConnectionDetails(self,value):
+    def getConnectionDetails(self, value):
         type = value.split()[0]
         value = value.split()[1]
 
-        if type == 'Postgresql:':
-            password = self.s_postgresql.value(value+'/password')
-            username = self.s_postgresql.value(value+'/username')
-            port = self.s_postgresql.value(value+'/port')
-            host = self.s_postgresql.value(value+'/host')
+        if type == "Postgresql:":
+            password = self.s_postgresql.value(value + "/password")
+            username = self.s_postgresql.value(value + "/username")
+            port = self.s_postgresql.value(value + "/port")
+            host = self.s_postgresql.value(value + "/host")
             self.threedi_db_settings = {
-                            "threedi_dbname": value,
-                            "threedi_host": host,
-                            "threedi_user": username,
-                            "threedi_password": password,
-                            "threedi_port": port,
-                            "type": "Postgresql"
-                        }
+                "threedi_dbname": value,
+                "threedi_host": host,
+                "threedi_user": username,
+                "threedi_password": password,
+                "threedi_port": port,
+                "type": "Postgresql",
+            }
 
-        
     def get_databases(self):
-        databases=[]
+        databases = []
         self.s_postgresql = QSettings()
         self.s_postgresql.beginGroup("PostgreSQL/connections")
         all_pgsql_dbkeys = self.s_postgresql.allKeys()
         for key in all_pgsql_dbkeys:
-            databases.append('Postgresql: '+key.split("/")[0])
+            databases.append("Postgresql: " + key.split("/")[0])
         databases = list(dict.fromkeys(databases))
-        return databases    
-            
+        return databases
+
     def laad_gpkg(self):
-        fileName= self.dockwidget.listChecks.selectedItems()
+        fileName = self.dockwidget.listChecks.selectedItems()
         # dictionary with layer_names of gpkg and potential group name in QGIS
-        group_mapping = {'chk.leiding': 'leidingen', 'chk.put': 'putten', 'chk.profiel': 'profielen'}
+        group_mapping = {
+            "chk.leiding": "leidingen",
+            "chk.put": "putten",
+            "chk.profiel": "profielen",
+        }
         # group_mapping = {'leiding': 'leidingen', 'put': 'putten', 'profiel': 'profielen'}
-        
-        if len(fileName)>0:
-            root=QgsProject.instance().layerTreeRoot()
+
+        if len(fileName) > 0:
+            root = QgsProject.instance().layerTreeRoot()
             for gpkg in fileName:
-                foldername= self.dockwidget.folderNaam.text()
-                file = os.path.join(foldername,gpkg.text())
+                foldername = self.dockwidget.folderNaam.text()
+                file = os.path.join(foldername, gpkg.text())
                 conn = ogr.Open(file)
-                
+
                 for key, value in group_mapping.items():
                     group = root.addGroup(value)
                     for layer in conn:
-                        if layer.GetFeatureCount()>0:
-                            combined=file+"|layername={}".format(layer.GetName())
-                            vlayer=QgsVectorLayer(combined,layer.GetName(),"ogr")                        
-                            QgsProject.instance().addMapLayer(vlayer,False)
-                            if layer.GetName().split('_')[0]==key:
-                                group.addLayer(vlayer)    
+                        if layer.GetFeatureCount() > 0:
+                            combined = file + "|layername={}".format(layer.GetName())
+                            vlayer = QgsVectorLayer(combined, layer.GetName(), "ogr")
+                            QgsProject.instance().addMapLayer(vlayer, False)
+                            if layer.GetName().split("_")[0] == key:
+                                group.addLayer(vlayer)
                             if not vlayer.isValid():
-                                print('failed to load')
-                        
-                            
+                                print("failed to load")
+
         root = QgsProject.instance().layerTreeRoot()
         for child in root.children():
             if child.name() in group_mapping.values():
                 for child2 in child.children():
                     if isinstance(child2, QgsLayerTreeLayer):
                         child2.setCustomProperty("showFeatureCount", True)
-                        
+
     def pb_select_exp_folder(self):
         foldername = QFileDialog.getExistingDirectory()
         self.dockwidget.folderNaam_export.setText(foldername)
         self.dockwidget.folderNaam_export.setToolTip(foldername)
-        if foldername:            
-            self.fill_export_list()  
-                            
+        if foldername:
+            self.fill_export_list()
+
     def fill_export_list(self):
         self.dockwidget.listExport.clear()
-        foldername= self.dockwidget.folderNaam_export.text()
-        exportList =[]
+        foldername = self.dockwidget.folderNaam_export.text()
+        exportList = []
         for file in os.listdir(foldername):
             if file.endswith(".shp"):
                 exportList.append(file)
-        self.dockwidget.listExport.addItems(exportList)                        
+        self.dockwidget.listExport.addItems(exportList)
 
-    def save_qml_styling(self):#,style_dir):
-        style_dir=r'C:\Users\onnoc\AppData\Roaming\QGIS\QGIS3\profiles\default\python\plugins\OASDGLDatachecker\styling\Stylingbeheerder'
+    def save_qml_styling(self):  # ,style_dir):
+        style_dir = r"C:\Users\onnoc\AppData\Roaming\QGIS\QGIS3\profiles\default\python\plugins\OASDGLDatachecker\styling\Stylingbeheerder"
         for layer in QgsProject.instance().mapLayers().values():
-            layer.saveNamedStyle(os.path.join(style_dir,layer.name()+'.qml'))
+            layer.saveNamedStyle(os.path.join(style_dir, layer.name() + ".qml"))
 
     def laad_qml_styling(self):
-        folder = 'styling\\' +self.dockwidget.stylingbox.currentText()
+        folder = "styling\\" + self.dockwidget.stylingbox.currentText()
         print(folder)
         # if self.dockwidget.qmlBeheerderBox.checkState()==2:
-            # folder = 'styling\StylingBeheerder'
+        # folder = 'styling\StylingBeheerder'
         # elif self.dockwidget.qmlModelleurBox.checkState()==2:
-            # folder = 'styling\StylingModelleur'
+        # folder = 'styling\StylingModelleur'
         # else:
-            # return
-            
+        # return
+
         for layer in QgsProject.instance().mapLayers().values():
-            scriptLocatie =os.path.dirname(os.path.realpath(__file__))
-            qmlpad = os.path.join(scriptLocatie, folder, layer.name())+'.qml'
+            scriptLocatie = os.path.dirname(os.path.realpath(__file__))
+            qmlpad = os.path.join(scriptLocatie, folder, layer.name()) + ".qml"
             layer.loadNamedStyle(qmlpad)
             layer.triggerRepaint()
             print(layer.name())
             print(qmlpad)
         self.configure_dropdown()
-    
+
     def update_status(self, waarde):
-        # waarde='verwerkt' 
+        # waarde='verwerkt'
         lyr = iface.activeLayer()
         lyr.startEditing()
         features = lyr.selectedFeatures()
@@ -353,208 +370,211 @@ class Datachecker:
         idx = lyr.fields().indexFromName("status")
         for f in features:
             print(f)
-            lyr.changeAttributeValue(f.id(),idx,waarde)
+            lyr.changeAttributeValue(f.id(), idx, waarde)
         lyr.commitChanges()
         # self.filter_status()
-        
+
     def filter_status(self, waarde):
         filter = True
         statement = "status is null or status IN ()"
         basis = "status is null or status IN ("
         if filter:
             try:
-                oldstatement = iface.activeLayer().subsetString()           
+                oldstatement = iface.activeLayer().subsetString()
                 # statement = oldstatement[-len(oldstatement)-oldstatement.find('(')]
                 if not basis in oldstatement:
-                    statement = basis + "'" + waarde + "')"                  
-                elif oldstatement.find(waarde)==-1:
-                    statement=oldstatement.replace(basis, "")
-                    statement=statement.replace(")","")                                        
+                    statement = basis + "'" + waarde + "')"
+                elif oldstatement.find(waarde) == -1:
+                    statement = oldstatement.replace(basis, "")
+                    statement = statement.replace(")", "")
                     if len(statement) == 0:
                         statement = basis + "'" + waarde + "')"
                     elif len(statement) > 2:
-                        statement= basis + statement + ",'" + waarde + "')"
+                        statement = basis + statement + ",'" + waarde + "')"
                 else:
-                    statement = oldstatement                
+                    statement = oldstatement
             except:
                 pass
 
         else:
             try:
-                oldstatement = iface.activeLayer().subsetString() 
+                oldstatement = iface.activeLayer().subsetString()
             except:
                 pass
-            
-            print('test')
-        for layer in QgsProject.instance().mapLayers().values():          
+
+            print("test")
+        for layer in QgsProject.instance().mapLayers().values():
             layer.setSubsetString(statement)
             # layer.setSubsetString("status = 'gecontroleerd'")
-            # layer.setSubsetString('')        
+            # layer.setSubsetString('')
 
-
-    def configure_dropdown(self):    
+    def configure_dropdown(self):
         for layer in QgsProject.instance().mapLayers().values():
 
             idx = layer.fields().indexFromName("status")
             editor_widget_setup = QgsEditorWidgetSetup(
-                "ValueMap", {"map": {u"gecontroleerd": u"gecontroleerd", u"verwerkt": u"verwerkt"}}
+                "ValueMap",
+                {"map": {u"gecontroleerd": u"gecontroleerd", u"verwerkt": u"verwerkt"}},
             )
             layer.setEditorWidgetSetup(idx, editor_widget_setup)
-            QSettings().setValue('/Map/identifyAutoFeatureForm','true')
+            QSettings().setValue("/Map/identifyAutoFeatureForm", "true")
 
-    def get_stylingfolders(self): 
-        folder = r'C:\Users\arnold.vantveld\AppData\Roaming\QGIS\QGIS3\profiles\default\python\plugins\OASDGLDatachecker\styling'
-        subfolders = [ f.name for f in os.scandir(folder) if f.is_dir() ]
+    def get_stylingfolders(self):
+        folder = r"C:\Users\arnold.vantveld\AppData\Roaming\QGIS\QGIS3\profiles\default\python\plugins\OASDGLDatachecker\styling"
+        subfolders = [f.name for f in os.scandir(folder) if f.is_dir()]
         return subfolders
-            
+
     def save_folderchecks(self):
-        folderchecks = os.path.realpath(self.dockwidget.folderNaam.text())              
-        self.save_qsetting('paths', 'folderchecks',folderchecks)
-        
+        folderchecks = os.path.realpath(self.dockwidget.folderNaam.text())
+        self.save_qsetting("paths", "folderchecks", folderchecks)
+
     def save_folderbeheerexport(self):
-        folderchecks = os.path.realpath(self.dockwidget.folderNaam_export.text())              
-        self.save_qsetting('paths', 'folderbeheerexport',folderchecks)
-            
+        folderchecks = os.path.realpath(self.dockwidget.folderNaam_export.text())
+        self.save_qsetting("paths", "folderbeheerexport", folderchecks)
+
     def save_leidingfile(self):
-        leidingfile = os.path.realpath(self.dockwidget.leidingFile.filePath())              
-        self.save_qsetting('paths', 'leidingfile',leidingfile)        
-        
+        leidingfile = os.path.realpath(self.dockwidget.leidingFile.filePath())
+        self.save_qsetting("paths", "leidingfile", leidingfile)
+
     def save_putfile(self):
-        # putfile = os.path.dirname(os.path.realpath(self.dockwidget.putFile.filePath()))   
+        # putfile = os.path.dirname(os.path.realpath(self.dockwidget.putFile.filePath()))
         putfile = os.path.realpath(self.dockwidget.putFile.filePath())
-        self.save_qsetting('paths', 'putfile',putfile)
-        
-    def get_settings(self):  #vul_settings     
-        
+        self.save_qsetting("paths", "putfile", putfile)
+
+    def get_settings(self):  # vul_settings
+
         settings = SettingsObjectPlugin()
-        settings.s='localhost' #self.threedi_db_settings["threedi_host"]
-        settings.host="localhost"
-        settings.database="work_checks_in_gui"
-        settings.port="5432"
-        settings.username="postgres"
-        settings.password="postgres"
+        settings.s = "localhost"  # self.threedi_db_settings["threedi_host"]
+        settings.host = "localhost"
+        settings.database = "work_checks_in_gui"
+        settings.port = "5432"
+        settings.username = "postgres"
+        settings.password = "postgres"
         settings.dropdb = True
         settings.createdb = True
         settings.emptydb = True
         # settings.import_type = False
-        settings.import_type = 'gbi'
+        settings.import_type = "gbi"
         settings.export = True
-        settings.gpkg_output_layer= self.dockwidget.outputFileName.text()
+        settings.gpkg_output_layer = self.dockwidget.outputFileName.text()
         settings.checks = True
         # settings.checks = False
         settings.max_connections = 8
-        
-        putfile = self.get_qsetting('paths', 'putfile')
+
+        putfile = self.get_qsetting("paths", "putfile")
         settings.manhole_layer = putfile
-        leidingfile = self.get_qsetting('paths', 'leidingfile')
+        leidingfile = self.get_qsetting("paths", "leidingfile")
         settings.pipe_layer = leidingfile
-        
-        settings.dem = os.path.realpath('C:\\Users\onnoc\AppData\Roaming\QGIS\QGIS3\profiles\default\python\plugins\OASDGLDatachecker\tool_quality_checks\test\data\schiedam-test\dem_schiedam_test.tif')
+
+        settings.dem = os.path.realpath(
+            "C:\\Users\onnoc\AppData\Roaming\QGIS\QGIS3\profiles\default\python\plugins\OASDGLDatachecker\tool_quality_checks\test\data\schiedam-test\dem_schiedam_test.tif"
+        )
         self.instellingen_ophalen(settings)
-        
+
         print(settings.__dict__)
-        #run_scripts(settings)
-        #settings.dropdb = False
-        #settings.createdb = False
+        # run_scripts(settings)
+        # settings.dropdb = False
+        # settings.createdb = False
         return settings
-    
-    def completed(self,exception, result=None):
+
+    def completed(self, exception, result=None):
         """This is called when doSomething is finished.
         Exception is not None if doSomething raises an exception.
         result is the return value of doSomething."""
         if exception is None:
             if result is None:
                 QgsMessageLog.logMessage(
-                    'Completed with no exception and no result '\
-                    '(probably manually canceled by the user)',
-                    MESSAGE_CATEGORY, Qgis.Warning)
+                    "Completed with no exception and no result "
+                    "(probably manually canceled by the user)",
+                    MESSAGE_CATEGORY,
+                    Qgis.Warning,
+                )
             else:
                 QMessageBox.information(
-                None,
-                "Checks outcome",
-                "Your checks have ran succesfully",
+                    None, "Checks outcome", "Your checks have ran succesfully"
                 )
         else:
-            QgsMessageLog.logMessage("Exception: {}".format(exception),
-                                     MESSAGE_CATEGORY, Qgis.Critical)
-            raise exception     
-        
-    def slider_function(self,value):
-        layer = self.iface.mapCanvas().currentLayer()        
-        #print(layer.renderer().type()) 
-        #for field in layer.renderer().symbol().symbolLayer(0):
-                #print(field.name(), field.typeName())
-            #layer.renderer().symbol().symbolLayer(0).setSize(value)
-        if layer.renderer().symbol().type()==1: # Lijnen
+            QgsMessageLog.logMessage(
+                "Exception: {}".format(exception), MESSAGE_CATEGORY, Qgis.Critical
+            )
+            raise exception
+
+    def slider_function(self, value):
+        layer = self.iface.mapCanvas().currentLayer()
+        # print(layer.renderer().type())
+        # for field in layer.renderer().symbol().symbolLayer(0):
+        # print(field.name(), field.typeName())
+        # layer.renderer().symbol().symbolLayer(0).setSize(value)
+        if layer.renderer().symbol().type() == 1:  # Lijnen
             layer.renderer().symbol().symbolLayer(0).setWidth(value)
             print(layer.renderer().symbol().symbolLayer(0).width())
-            
-        elif layer.renderer().symbol().type()==0:  # symbolen  
-            #newsize = layer.renderer().symbol().symbolLayer(0).size()*5/value
+
+        elif layer.renderer().symbol().type() == 0:  # symbolen
+            # newsize = layer.renderer().symbol().symbolLayer(0).size()*5/value
             layer.renderer().symbol().symbolLayer(0).setSize(value)
             print(layer.renderer().symbol().symbolLayer(0).size())
         layer.triggerRepaint()
         print(layer.name())
-        #print(value)
-        
-    def instellingen_opslaan(self):           
+        # print(value)
+
+    def instellingen_opslaan(self):
         for veld in velden:
             box = getattr(self.dockwidget, veld)
             waarde = box.value()
-            # print(veld, waarde)            
-            self.save_qsetting('Instellingen', veld, waarde)
-    
+            # print(veld, waarde)
+            self.save_qsetting("Instellingen", veld, waarde)
+
     def instellingen_ophalen(self, settings):
-        s= QSettings()
-        group = 'Instellingen'
+        s = QSettings()
+        group = "Instellingen"
         for veld in velden:
-            value = s.value( 'OASDGLDatachecker/' + group + '/' + veld)
+            value = s.value("OASDGLDatachecker/" + group + "/" + veld)
             setattr(settings, veld, value)
-            print(value)  
+            print(value)
 
     def save_qsetting(self, group, key, value):
         # file waar het opgelsagen wordt: C:\Users\onnoc\AppData\Roaming\QGIS\QGIS3\profiles\default\QGIS\QGIS3.INI
-        s= QSettings()        
-        s.setValue( 'OASDGLDatachecker/' + group + '/' + key, value) 
-        test = s.value( 'OASDGLDatachecker/' + group + '/' + key)
-        
+        s = QSettings()
+        s.setValue("OASDGLDatachecker/" + group + "/" + key, value)
+        test = s.value("OASDGLDatachecker/" + group + "/" + key)
+
     def get_qsetting(self, group, key):
-        s= QSettings()
-        value = s.value( 'OASDGLDatachecker/' + group + '/' + key)
-        print(value)  
-        return(value)
-        
+        s = QSettings()
+        value = s.value("OASDGLDatachecker/" + group + "/" + key)
+        print(value)
+        return value
+
     def initialize_paths(self):
-        foldernaam=self.get_qsetting('paths', 'folderchecks')
+        foldernaam = self.get_qsetting("paths", "folderchecks")
         if foldernaam:
-            foldernaam=Path(foldernaam)
+            foldernaam = Path(foldernaam)
             self.dockwidget.folderNaam.setText(str(foldernaam))
             self.dockwidget.folderNaam.setToolTip(str(foldernaam))
             self.fill_checks_list()
-            
-        foldernaam_export = self.get_qsetting('paths', 'folderbeheerexport')
+
+        foldernaam_export = self.get_qsetting("paths", "folderbeheerexport")
         if foldernaam_export:
-            foldernaam_export=Path(foldernaam_export)
+            foldernaam_export = Path(foldernaam_export)
             self.dockwidget.folderNaam_export.setText(str(foldernaam_export))
             self.dockwidget.folderNaam_export.setToolTip(str(foldernaam_export))
             self.fill_export_list()
-    
+
     def select_output_file(self):
-        file_name=QFileDialog.getSaveFileName(filter='*.gpkg')
+        file_name = QFileDialog.getSaveFileName(filter="*.gpkg")
         self.dockwidget.outputFileName.setText(str(file_name[0]))
-        
+
     def draai_de_checks(self):
         settings = self.get_settings()
         # task1 = QgsTask.fromFunction('Draai checks',run_scripts,on_finished=self.completed,settings=settings)
         # QgsApplication.taskManager().addTask(task1)
         run_scripts(settings)
-        
+
     def run(self):
         """Run method that loads and starts the plugin"""
         if not self.pluginIsActive:
             self.pluginIsActive = True
-            
-            #print "** STARTING Datachecker"
+
+            # print "** STARTING Datachecker"
 
             # dockwidget may not exist if:
             #    first run of plugin
@@ -562,36 +582,50 @@ class Datachecker:
             if self.dockwidget == None:
                 # Create the dockwidget (after translation) and keep reference
                 self.dockwidget = DatacheckerDockWidget()
-            databases=self.get_databases()
+            databases = self.get_databases()
             self.dockwidget.bestaandeDatabases.addItems(databases)
             stylingfolders = self.get_stylingfolders()
             self.dockwidget.stylingbox.addItems(stylingfolders)
 
-            self.dockwidget.bestaandeDatabases.currentTextChanged.connect(self.getConnectionDetails)
+            self.dockwidget.bestaandeDatabases.currentTextChanged.connect(
+                self.getConnectionDetails
+            )
             self.dockwidget.ObjectSlider.valueChanged.connect(self.slider_function)
             self.dockwidget.applyStylingButton.clicked.connect(self.laad_qml_styling)
-            self.dockwidget.selectFolderButton.clicked.connect(self.pb_select_dc_folder) 
-            self.dockwidget.outputFileButton.clicked.connect(self.select_output_file)            
-            self.dockwidget.folderNaam.textChanged.connect(self.save_folderchecks) 
-            self.dockwidget.folderNaam_export.textChanged.connect(self.save_folderbeheerexport)
-            #self.dockwidget.folderNaam.editingFinished.connect(self.fill_checks_list)
+            self.dockwidget.selectFolderButton.clicked.connect(self.pb_select_dc_folder)
+            self.dockwidget.outputFileButton.clicked.connect(self.select_output_file)
+            self.dockwidget.folderNaam.textChanged.connect(self.save_folderchecks)
+            self.dockwidget.folderNaam_export.textChanged.connect(
+                self.save_folderbeheerexport
+            )
+            # self.dockwidget.folderNaam.editingFinished.connect(self.fill_checks_list)
             self.dockwidget.InladenGpkgButton.clicked.connect(self.laad_gpkg)
             self.dockwidget.savelayer.clicked.connect(self.save_qml_styling)
-            self.dockwidget.selectFolderButton_export.clicked.connect(self.pb_select_exp_folder)
+            self.dockwidget.selectFolderButton_export.clicked.connect(
+                self.pb_select_exp_folder
+            )
             ##self.dockwidget.linePutten.dropevent.connect(over
-            self.dockwidget.pgecontroleerd.clicked.connect(lambda:self.update_status(waarde ='gecontroleerd'))
-            self.dockwidget.pverwerkt.clicked.connect(lambda:self.update_status(waarde ='verwerkt'))
-            self.dockwidget.cbgecontroleerd.stateChanged.connect(lambda:self.filter_status(waarde ='gecontroleerd'))
-            self.dockwidget.cbverwerkt.stateChanged.connect(lambda:self.filter_status(waarde ='verwerkt'))
-            
+            self.dockwidget.pgecontroleerd.clicked.connect(
+                lambda: self.update_status(waarde="gecontroleerd")
+            )
+            self.dockwidget.pverwerkt.clicked.connect(
+                lambda: self.update_status(waarde="verwerkt")
+            )
+            self.dockwidget.cbgecontroleerd.stateChanged.connect(
+                lambda: self.filter_status(waarde="gecontroleerd")
+            )
+            self.dockwidget.cbverwerkt.stateChanged.connect(
+                lambda: self.filter_status(waarde="verwerkt")
+            )
+
             self.dockwidget.leidingFile.fileChanged.connect(self.save_leidingfile)
-            self.dockwidget.putFile.fileChanged.connect(self.save_putfile)  
-            
-            
+            self.dockwidget.putFile.fileChanged.connect(self.save_putfile)
+
             self.dockwidget.DatachecksButton.clicked.connect(self.draai_de_checks)
-            self.dockwidget.instellingenopslaan.clicked.connect(self.instellingen_opslaan)
-            
-                       
+            self.dockwidget.instellingenopslaan.clicked.connect(
+                self.instellingen_opslaan
+            )
+
             # connect to provide cleanup on closing of dockwidget
             self.dockwidget.closingPlugin.connect(self.onClosePlugin)
 

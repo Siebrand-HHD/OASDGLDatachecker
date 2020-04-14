@@ -27,8 +27,9 @@ import os
 from PyQt5 import QtGui, QtWidgets, uic
 from PyQt5.QtCore import pyqtSignal
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(
-    os.path.dirname(__file__), 'Datachecker_dockwidget_base.ui'))
+FORM_CLASS, _ = uic.loadUiType(
+    os.path.join(os.path.dirname(__file__), "Datachecker_dockwidget_base.ui")
+)
 
 
 class DatacheckerDockWidget(QtWidgets.QDockWidget, FORM_CLASS):

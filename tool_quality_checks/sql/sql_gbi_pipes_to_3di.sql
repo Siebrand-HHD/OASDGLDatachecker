@@ -35,7 +35,7 @@ INSERT INTO v2_pipe(
             material, zoom_category, connection_node_start_id, connection_node_end_id)
 SELECT
 	a.id 		AS id,
-	strengcode	AS display_name,
+    COALESCE(strengcode,'leeg') as display_name,
 	COALESCE(s.putcode,'0') || '_' || COALESCE(e.putcode,'0')	AS code,
 	CASE
 		--We achten stelseltyp het belangrijkste, alleen als dit geen uitsluitsel geeft over het sewerage_type zullen andere kolommen worden gebruikt: std_stelse 

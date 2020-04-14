@@ -2,7 +2,7 @@
 """
 Import OGR Datasource into the database
 """
-
+import os
 import ogr
 import osr
 import logging
@@ -138,7 +138,7 @@ def fix_layer_name_length(layer_name):
     return layer_name
 
 
-def fix_vector_layer(in_layer, layer_name="", epsg=3857):
+def fix_vector_layer(in_layer, layer_name="", epsg=3857, in_spatial_ref=None):
     """
         This function standardizes a vector layer:
             1. Multipart to singleparts
@@ -156,7 +156,9 @@ def fix_vector_layer(in_layer, layer_name="", epsg=3857):
 
     # Get inspatial reference and geometry from in shape
     geom_type = in_layer.GetGeomType()
-    in_spatial_ref = in_layer.GetSpatialRef()
+    if in_spatial_ref is None:
+        in_spatial_ref = in_layer.GetSpatialRef()
+
     in_layer.ResetReading()
 
     layer_name = layer_name.lower()

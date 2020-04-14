@@ -10,6 +10,8 @@ from OASDGLDatachecker.tool_quality_checks.copy_ogr_layer import (
     set_ogr_connection,
     copy2ogr,
     get_projection,
+    predict_projection,
+    has_columns,
 )
 from OASDGLDatachecker.tool_quality_checks.scripts import SettingsObject
 from OASDGLDatachecker.tool_quality_checks.db import (
@@ -23,6 +25,8 @@ OUR_DIR = os.path.dirname(__file__)
 INI_ABSPATH = os.path.join(OUR_DIR, "data/instellingen_test.ini")
 SHP_ABSPATH = os.path.join(OUR_DIR, "data/rioolput.shp")
 GKPG_ABSPATH = os.path.join(OUR_DIR, "data/test_copy_ogr.gpkg")
+SIGN_ABSPATH = os.path.join(OUR_DIR, "data/sign.shp")
+
 SHP_OUT_ABSPATH = os.path.join(OUR_DIR, "data/test_copy_ogr.shp")
 DRIVER_OGR_GPKG = ogr.GetDriverByName("GPKG")
 DRIVER_OGR_SHP = ogr.GetDriverByName("ESRI Shapefile")
@@ -142,3 +146,22 @@ class TestDB(TestCase):
         sr = osr.SpatialReference()
         sr.ImportFromWkt(proj)
         assert get_projection(sr) == "EPSG:28992"
+
+    def test_predict_projection_3857(self):
+        proj = predict_projection((516304, 516305, 6791010, 6791009))
+        assert proj.GetAuthorityCode("PROJCS") == "3857"
+
+    def test_predict_projection_28992(self):
+        proj = predict_projection((140205, 140206, 455148, 455149))
+        assert proj.GetAuthorityCode("PROJCS") == "28992"
+
+    def test_predict_projection_4326(self):
+        proj = predict_projection((5.138, 5.139, 52, 52.053))
+        assert proj.GetAuthorityCode("GEOGCS") == "4326"
+
+    def test_predict_projection_28992_not_good(self):
+        proj = predict_projection((56867, 56866, 247873, 247874))
+        assert proj == None
+
+    def test_has_columns(self):
+        assert not has_columns(SIGN_ABSPATH, ["PUTCODE"])

@@ -53,7 +53,7 @@ INSERT INTO v2_manhole(
 			manhole_indicator,bottom_level, surface_level, drain_level, zoom_category)
 SELECT
 	id as id,
-	putcode AS display_name,
+	COALESCE(putcode,'leeg') as display_name,
 	COALESCE(putcode,'leeg') as code,
 	id as connection_node_id,
 	CASE

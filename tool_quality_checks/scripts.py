@@ -58,10 +58,12 @@ def run_scripts(settings):
         print("import")
         logger.info("Import your sewerage data of %s" % settings.import_type)
         import_sewerage_data_into_db(db, settings)
-        logger.info("Completed - Import your sewerage data of %s" % settings.import_type)
+        logger.info(
+            "Completed - Import your sewerage data of %s" % settings.import_type
+        )
 
     if settings.checks:
-        print('checks')
+        print("checks")
         logger.info("Check your sewerage system")
         check_sewerage(db, settings)
         logger.info("Completed - Check your sewerage system")
