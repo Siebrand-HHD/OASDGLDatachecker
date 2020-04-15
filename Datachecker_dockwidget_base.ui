@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>503</width>
-    <height>702</height>
+    <width>517</width>
+    <height>740</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -33,7 +33,7 @@
        <bool>true</bool>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>3</number>
       </property>
       <property name="documentMode">
        <bool>true</bool>
@@ -62,7 +62,7 @@
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_2">
            <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_2">
+            <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="10,4,0">
              <item>
               <widget class="QLineEdit" name="folderNaam"/>
              </item>
@@ -70,6 +70,28 @@
               <widget class="QPushButton" name="selectFolderButton">
                <property name="text">
                 <string>Select Folder</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="reloadResult">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="toolTip">
+                <string>Herladen</string>
+               </property>
+               <property name="text">
+                <string>R</string>
                </property>
               </widget>
              </item>
@@ -107,11 +129,15 @@
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="InladenGpkgButton">
-             <property name="text">
-              <string>Resultaten Datachecks laden</string>
-             </property>
-            </widget>
+            <layout class="QHBoxLayout" name="horizontalLayout_12" stretch="20">
+             <item>
+              <widget class="QPushButton" name="InladenGpkgButton">
+               <property name="text">
+                <string>Resultaten Datachecks laden</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </item>
            <item>
             <spacer name="verticalSpacer">
@@ -339,7 +365,7 @@
        <attribute name="title">
         <string>Layer Tools</string>
        </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_5" stretch="2,0,0,0,0,0">
+       <layout class="QVBoxLayout" name="verticalLayout_5" stretch="2,0,0,0">
         <item>
          <widget class="QgsDockWidget" name="mDockWidget">
           <property name="maximumSize">
@@ -543,7 +569,7 @@
           <property name="minimumSize">
            <size>
             <width>0</width>
-            <height>140</height>
+            <height>180</height>
            </size>
           </property>
           <property name="title">
@@ -555,14 +581,23 @@
              <x>10</x>
              <y>40</y>
              <width>441</width>
-             <height>126</height>
+             <height>91</height>
             </rect>
            </property>
            <layout class="QGridLayout" name="gridLayout">
+            <property name="horizontalSpacing">
+             <number>6</number>
+            </property>
+            <property name="verticalSpacing">
+             <number>2</number>
+            </property>
             <item row="0" column="1">
              <widget class="QCheckBox" name="cbgecontroleerd">
               <property name="text">
                <string/>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
               </property>
               <property name="tristate">
                <bool>false</bool>
@@ -578,6 +613,12 @@
             </item>
             <item row="0" column="0">
              <widget class="QPushButton" name="pgecontroleerd">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
               <property name="text">
                <string>gecontroleerd</string>
               </property>
@@ -600,6 +641,9 @@
              <widget class="QCheckBox" name="cbverwerkt">
               <property name="text">
                <string/>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
@@ -649,32 +693,6 @@
             <widget class="QTreeView" name="treeView"/>
            </item>
           </layout>
-         </widget>
-        </item>
-        <item>
-         <widget class="QCheckBox" name="qmlModelleurBox">
-          <property name="text">
-           <string>Modelleur</string>
-          </property>
-          <property name="autoExclusive">
-           <bool>true</bool>
-          </property>
-          <property name="tristate">
-           <bool>false</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QCheckBox" name="qmlBeheerderBox">
-          <property name="text">
-           <string>Beheerder</string>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
-          </property>
-          <property name="autoExclusive">
-           <bool>true</bool>
-          </property>
          </widget>
         </item>
         <item>
@@ -962,7 +980,7 @@
       </widget>
       <widget class="QWidget" name="tab_6">
        <attribute name="title">
-        <string>Page</string>
+        <string>Db</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_2">
         <item row="3" column="0">
