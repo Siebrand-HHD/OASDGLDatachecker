@@ -1,21 +1,21 @@
 <!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
-<qgis minScale="1e+08" readOnly="0" version="3.8.0-Zanzibar" labelsEnabled="0" simplifyAlgorithm="0" styleCategories="AllStyleCategories" maxScale="0" simplifyDrawingTol="1" simplifyDrawingHints="1" simplifyMaxScale="1" hasScaleBasedVisibilityFlag="0" simplifyLocal="1">
+<qgis styleCategories="AllStyleCategories" simplifyDrawingHints="1" version="3.8.0-Zanzibar" simplifyLocal="1" maxScale="0" labelsEnabled="0" readOnly="0" simplifyMaxScale="1" simplifyAlgorithm="0" hasScaleBasedVisibilityFlag="0" minScale="1e+08" simplifyDrawingTol="1">
   <flags>
     <Identifiable>1</Identifiable>
     <Removable>1</Removable>
     <Searchable>1</Searchable>
   </flags>
-  <renderer-v2 symbollevels="0" enableorderby="0" type="singleSymbol" forceraster="0">
+  <renderer-v2 symbollevels="0" forceraster="0" enableorderby="0" type="singleSymbol">
     <symbols>
-      <symbol clip_to_extent="1" alpha="1" force_rhr="0" name="0" type="line">
-        <layer locked="0" class="SimpleLine" pass="0" enabled="1">
+      <symbol alpha="1" name="0" type="line" clip_to_extent="1" force_rhr="0">
+        <layer pass="0" enabled="1" locked="0" class="SimpleLine">
           <prop v="square" k="capstyle"/>
           <prop v="5;2" k="customdash"/>
           <prop v="3x:0,0,0,0,0,0" k="customdash_map_unit_scale"/>
           <prop v="MM" k="customdash_unit"/>
           <prop v="0" k="draw_inside_polygon"/>
           <prop v="bevel" k="joinstyle"/>
-          <prop v="225,89,137,255" k="line_color"/>
+          <prop v="196,60,57,255" k="line_color"/>
           <prop v="solid" k="line_style"/>
           <prop v="0.26" k="line_width"/>
           <prop v="MM" k="line_width_unit"/>
@@ -27,9 +27,9 @@
           <prop v="3x:0,0,0,0,0,0" k="width_map_unit_scale"/>
           <data_defined_properties>
             <Option type="Map">
-              <Option name="name" type="QString" value=""/>
+              <Option value="" name="name" type="QString"/>
               <Option name="properties"/>
-              <Option name="type" type="QString" value="collection"/>
+              <Option value="collection" name="type" type="QString"/>
             </Option>
           </data_defined_properties>
         </layer>
@@ -44,7 +44,7 @@
   <layerOpacity>1</layerOpacity>
   <geometryOptions geometryPrecision="0" removeDuplicateNodes="0">
     <activeChecks type="StringList">
-      <Option type="QString" value=""/>
+      <Option value="" type="QString"/>
     </activeChecks>
     <checkConfiguration/>
   </geometryOptions>
@@ -264,29 +264,29 @@
     <default field="def_code" expression="" applyOnUpdate="0"/>
   </defaults>
   <constraints>
-    <constraint constraints="3" field="id" notnull_strength="1" exp_strength="0" unique_strength="1"/>
-    <constraint constraints="0" field="pipe_id" notnull_strength="0" exp_strength="0" unique_strength="0"/>
-    <constraint constraints="0" field="pipe_display_name" notnull_strength="0" exp_strength="0" unique_strength="0"/>
-    <constraint constraints="0" field="pipe_code" notnull_strength="0" exp_strength="0" unique_strength="0"/>
-    <constraint constraints="0" field="pipe_profile_num" notnull_strength="0" exp_strength="0" unique_strength="0"/>
-    <constraint constraints="0" field="pipe_sewerage_type" notnull_strength="0" exp_strength="0" unique_strength="0"/>
-    <constraint constraints="0" field="pipe_calculation_type" notnull_strength="0" exp_strength="0" unique_strength="0"/>
-    <constraint constraints="0" field="pipe_invert_level_start_point" notnull_strength="0" exp_strength="0" unique_strength="0"/>
-    <constraint constraints="0" field="pipe_invert_level_end_point" notnull_strength="0" exp_strength="0" unique_strength="0"/>
-    <constraint constraints="0" field="pipe_cross_section_definition_id" notnull_strength="0" exp_strength="0" unique_strength="0"/>
-    <constraint constraints="0" field="pipe_friction_value" notnull_strength="0" exp_strength="0" unique_strength="0"/>
-    <constraint constraints="0" field="pipe_friction_type" notnull_strength="0" exp_strength="0" unique_strength="0"/>
-    <constraint constraints="0" field="pipe_dist_calc_points" notnull_strength="0" exp_strength="0" unique_strength="0"/>
-    <constraint constraints="0" field="pipe_material" notnull_strength="0" exp_strength="0" unique_strength="0"/>
-    <constraint constraints="0" field="pipe_original_length" notnull_strength="0" exp_strength="0" unique_strength="0"/>
-    <constraint constraints="0" field="pipe_zoom_category" notnull_strength="0" exp_strength="0" unique_strength="0"/>
-    <constraint constraints="0" field="pipe_connection_node_start_id" notnull_strength="0" exp_strength="0" unique_strength="0"/>
-    <constraint constraints="0" field="pipe_connection_node_end_id" notnull_strength="0" exp_strength="0" unique_strength="0"/>
-    <constraint constraints="0" field="def_id" notnull_strength="0" exp_strength="0" unique_strength="0"/>
-    <constraint constraints="0" field="def_shape" notnull_strength="0" exp_strength="0" unique_strength="0"/>
-    <constraint constraints="0" field="def_width" notnull_strength="0" exp_strength="0" unique_strength="0"/>
-    <constraint constraints="0" field="def_height" notnull_strength="0" exp_strength="0" unique_strength="0"/>
-    <constraint constraints="0" field="def_code" notnull_strength="0" exp_strength="0" unique_strength="0"/>
+    <constraint field="id" unique_strength="1" notnull_strength="1" constraints="3" exp_strength="0"/>
+    <constraint field="pipe_id" unique_strength="0" notnull_strength="0" constraints="0" exp_strength="0"/>
+    <constraint field="pipe_display_name" unique_strength="0" notnull_strength="0" constraints="0" exp_strength="0"/>
+    <constraint field="pipe_code" unique_strength="0" notnull_strength="0" constraints="0" exp_strength="0"/>
+    <constraint field="pipe_profile_num" unique_strength="0" notnull_strength="0" constraints="0" exp_strength="0"/>
+    <constraint field="pipe_sewerage_type" unique_strength="0" notnull_strength="0" constraints="0" exp_strength="0"/>
+    <constraint field="pipe_calculation_type" unique_strength="0" notnull_strength="0" constraints="0" exp_strength="0"/>
+    <constraint field="pipe_invert_level_start_point" unique_strength="0" notnull_strength="0" constraints="0" exp_strength="0"/>
+    <constraint field="pipe_invert_level_end_point" unique_strength="0" notnull_strength="0" constraints="0" exp_strength="0"/>
+    <constraint field="pipe_cross_section_definition_id" unique_strength="0" notnull_strength="0" constraints="0" exp_strength="0"/>
+    <constraint field="pipe_friction_value" unique_strength="0" notnull_strength="0" constraints="0" exp_strength="0"/>
+    <constraint field="pipe_friction_type" unique_strength="0" notnull_strength="0" constraints="0" exp_strength="0"/>
+    <constraint field="pipe_dist_calc_points" unique_strength="0" notnull_strength="0" constraints="0" exp_strength="0"/>
+    <constraint field="pipe_material" unique_strength="0" notnull_strength="0" constraints="0" exp_strength="0"/>
+    <constraint field="pipe_original_length" unique_strength="0" notnull_strength="0" constraints="0" exp_strength="0"/>
+    <constraint field="pipe_zoom_category" unique_strength="0" notnull_strength="0" constraints="0" exp_strength="0"/>
+    <constraint field="pipe_connection_node_start_id" unique_strength="0" notnull_strength="0" constraints="0" exp_strength="0"/>
+    <constraint field="pipe_connection_node_end_id" unique_strength="0" notnull_strength="0" constraints="0" exp_strength="0"/>
+    <constraint field="def_id" unique_strength="0" notnull_strength="0" constraints="0" exp_strength="0"/>
+    <constraint field="def_shape" unique_strength="0" notnull_strength="0" constraints="0" exp_strength="0"/>
+    <constraint field="def_width" unique_strength="0" notnull_strength="0" constraints="0" exp_strength="0"/>
+    <constraint field="def_height" unique_strength="0" notnull_strength="0" constraints="0" exp_strength="0"/>
+    <constraint field="def_code" unique_strength="0" notnull_strength="0" constraints="0" exp_strength="0"/>
   </constraints>
   <constraintExpressions>
     <constraint field="id" desc="" exp=""/>
@@ -315,7 +315,7 @@
   </constraintExpressions>
   <expressionfields/>
   <attributeactions/>
-  <attributetableconfig sortExpression="" sortOrder="0" actionWidgetStyle="dropDown">
+  <attributetableconfig actionWidgetStyle="dropDown" sortOrder="0" sortExpression="">
     <columns/>
   </attributetableconfig>
   <conditionalstyles>

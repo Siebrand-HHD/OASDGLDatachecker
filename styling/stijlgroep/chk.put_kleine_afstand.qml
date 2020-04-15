@@ -1,37 +1,37 @@
 <!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
-<qgis simplifyDrawingHints="1" hasScaleBasedVisibilityFlag="0" simplifyAlgorithm="0" version="3.8.0-Zanzibar" labelsEnabled="0" simplifyMaxScale="1" minScale="1e+08" styleCategories="AllStyleCategories" maxScale="0" readOnly="0" simplifyDrawingTol="1" simplifyLocal="1">
+<qgis styleCategories="AllStyleCategories" simplifyDrawingHints="1" version="3.8.0-Zanzibar" simplifyLocal="1" maxScale="0" labelsEnabled="0" readOnly="0" simplifyMaxScale="1" simplifyAlgorithm="0" hasScaleBasedVisibilityFlag="0" minScale="1e+08" simplifyDrawingTol="1">
   <flags>
     <Identifiable>1</Identifiable>
     <Removable>1</Removable>
     <Searchable>1</Searchable>
   </flags>
-  <renderer-v2 forceraster="0" symbollevels="0" type="singleSymbol" enableorderby="0">
+  <renderer-v2 symbollevels="0" forceraster="0" enableorderby="0" type="singleSymbol">
     <symbols>
-      <symbol clip_to_extent="1" alpha="1" type="marker" name="0" force_rhr="0">
+      <symbol alpha="1" name="0" type="marker" clip_to_extent="1" force_rhr="0">
         <layer pass="0" enabled="1" locked="0" class="SimpleMarker">
-          <prop k="angle" v="0"/>
-          <prop k="color" v="231,113,72,255"/>
-          <prop k="horizontal_anchor_point" v="1"/>
-          <prop k="joinstyle" v="bevel"/>
-          <prop k="name" v="circle"/>
-          <prop k="offset" v="0,0"/>
-          <prop k="offset_map_unit_scale" v="3x:0,0,0,0,0,0"/>
-          <prop k="offset_unit" v="MM"/>
-          <prop k="outline_color" v="35,35,35,255"/>
-          <prop k="outline_style" v="solid"/>
-          <prop k="outline_width" v="0"/>
-          <prop k="outline_width_map_unit_scale" v="3x:0,0,0,0,0,0"/>
-          <prop k="outline_width_unit" v="MM"/>
-          <prop k="scale_method" v="diameter"/>
-          <prop k="size" v="2"/>
-          <prop k="size_map_unit_scale" v="3x:0,0,0,0,0,0"/>
-          <prop k="size_unit" v="MM"/>
-          <prop k="vertical_anchor_point" v="1"/>
+          <prop v="0" k="angle"/>
+          <prop v="231,113,72,255" k="color"/>
+          <prop v="1" k="horizontal_anchor_point"/>
+          <prop v="bevel" k="joinstyle"/>
+          <prop v="circle" k="name"/>
+          <prop v="0,0" k="offset"/>
+          <prop v="3x:0,0,0,0,0,0" k="offset_map_unit_scale"/>
+          <prop v="MM" k="offset_unit"/>
+          <prop v="35,35,35,255" k="outline_color"/>
+          <prop v="solid" k="outline_style"/>
+          <prop v="0" k="outline_width"/>
+          <prop v="3x:0,0,0,0,0,0" k="outline_width_map_unit_scale"/>
+          <prop v="MM" k="outline_width_unit"/>
+          <prop v="diameter" k="scale_method"/>
+          <prop v="2" k="size"/>
+          <prop v="3x:0,0,0,0,0,0" k="size_map_unit_scale"/>
+          <prop v="MM" k="size_unit"/>
+          <prop v="1" k="vertical_anchor_point"/>
           <data_defined_properties>
             <Option type="Map">
-              <Option value="" type="QString" name="name"/>
+              <Option value="" name="name" type="QString"/>
               <Option name="properties"/>
-              <Option value="collection" type="QString" name="type"/>
+              <Option value="collection" name="type" type="QString"/>
             </Option>
           </data_defined_properties>
         </layer>
@@ -94,54 +94,59 @@
       </editWidget>
     </field>
     <field name="status">
-      <editWidget type="">
+      <editWidget type="ValueMap">
         <config>
-          <Option/>
+          <Option type="Map">
+            <Option name="map" type="Map">
+              <Option value="gecontroleerd" name="gecontroleerd" type="QString"/>
+              <Option value="verwerkt" name="verwerkt" type="QString"/>
+            </Option>
+          </Option>
         </config>
       </editWidget>
     </field>
   </fieldConfiguration>
   <aliases>
-    <alias index="0" name="" field="id"/>
-    <alias index="1" name="" field="rioolput_een"/>
-    <alias index="2" name="" field="rioolput_twee"/>
-    <alias index="3" name="" field="threedi_id_een"/>
-    <alias index="4" name="" field="threedi_id_twee"/>
-    <alias index="5" name="" field="afstand"/>
-    <alias index="6" name="" field="status"/>
+    <alias field="id" index="0" name=""/>
+    <alias field="rioolput_een" index="1" name=""/>
+    <alias field="rioolput_twee" index="2" name=""/>
+    <alias field="threedi_id_een" index="3" name=""/>
+    <alias field="threedi_id_twee" index="4" name=""/>
+    <alias field="afstand" index="5" name=""/>
+    <alias field="status" index="6" name=""/>
   </aliases>
   <excludeAttributesWMS/>
   <excludeAttributesWFS/>
   <defaults>
-    <default applyOnUpdate="0" expression="" field="id"/>
-    <default applyOnUpdate="0" expression="" field="rioolput_een"/>
-    <default applyOnUpdate="0" expression="" field="rioolput_twee"/>
-    <default applyOnUpdate="0" expression="" field="threedi_id_een"/>
-    <default applyOnUpdate="0" expression="" field="threedi_id_twee"/>
-    <default applyOnUpdate="0" expression="" field="afstand"/>
-    <default applyOnUpdate="0" expression="" field="status"/>
+    <default field="id" expression="" applyOnUpdate="0"/>
+    <default field="rioolput_een" expression="" applyOnUpdate="0"/>
+    <default field="rioolput_twee" expression="" applyOnUpdate="0"/>
+    <default field="threedi_id_een" expression="" applyOnUpdate="0"/>
+    <default field="threedi_id_twee" expression="" applyOnUpdate="0"/>
+    <default field="afstand" expression="" applyOnUpdate="0"/>
+    <default field="status" expression="" applyOnUpdate="0"/>
   </defaults>
   <constraints>
-    <constraint field="id" exp_strength="0" constraints="3" unique_strength="1" notnull_strength="1"/>
-    <constraint field="rioolput_een" exp_strength="0" constraints="0" unique_strength="0" notnull_strength="0"/>
-    <constraint field="rioolput_twee" exp_strength="0" constraints="0" unique_strength="0" notnull_strength="0"/>
-    <constraint field="threedi_id_een" exp_strength="0" constraints="0" unique_strength="0" notnull_strength="0"/>
-    <constraint field="threedi_id_twee" exp_strength="0" constraints="0" unique_strength="0" notnull_strength="0"/>
-    <constraint field="afstand" exp_strength="0" constraints="0" unique_strength="0" notnull_strength="0"/>
-    <constraint field="status" exp_strength="0" constraints="0" unique_strength="0" notnull_strength="0"/>
+    <constraint field="id" unique_strength="1" notnull_strength="1" constraints="3" exp_strength="0"/>
+    <constraint field="rioolput_een" unique_strength="0" notnull_strength="0" constraints="0" exp_strength="0"/>
+    <constraint field="rioolput_twee" unique_strength="0" notnull_strength="0" constraints="0" exp_strength="0"/>
+    <constraint field="threedi_id_een" unique_strength="0" notnull_strength="0" constraints="0" exp_strength="0"/>
+    <constraint field="threedi_id_twee" unique_strength="0" notnull_strength="0" constraints="0" exp_strength="0"/>
+    <constraint field="afstand" unique_strength="0" notnull_strength="0" constraints="0" exp_strength="0"/>
+    <constraint field="status" unique_strength="0" notnull_strength="0" constraints="0" exp_strength="0"/>
   </constraints>
   <constraintExpressions>
-    <constraint exp="" field="id" desc=""/>
-    <constraint exp="" field="rioolput_een" desc=""/>
-    <constraint exp="" field="rioolput_twee" desc=""/>
-    <constraint exp="" field="threedi_id_een" desc=""/>
-    <constraint exp="" field="threedi_id_twee" desc=""/>
-    <constraint exp="" field="afstand" desc=""/>
-    <constraint exp="" field="status" desc=""/>
+    <constraint field="id" desc="" exp=""/>
+    <constraint field="rioolput_een" desc="" exp=""/>
+    <constraint field="rioolput_twee" desc="" exp=""/>
+    <constraint field="threedi_id_een" desc="" exp=""/>
+    <constraint field="threedi_id_twee" desc="" exp=""/>
+    <constraint field="afstand" desc="" exp=""/>
+    <constraint field="status" desc="" exp=""/>
   </constraintExpressions>
   <expressionfields/>
   <attributeactions/>
-  <attributetableconfig actionWidgetStyle="dropDown" sortExpression="" sortOrder="0">
+  <attributetableconfig actionWidgetStyle="dropDown" sortOrder="0" sortExpression="">
     <columns/>
   </attributetableconfig>
   <conditionalstyles>

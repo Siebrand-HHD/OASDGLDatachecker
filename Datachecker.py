@@ -591,8 +591,7 @@ class Datachecker:
             # QObject.disconnect(self.iface.mapCanvas(),SIGNAL("selectionChanged(QgsMapLayer)"), self.switch_visibility)
         
     def switch_visibility(self):
-        check = self.dockwidget.layerIsolate.checkState()
-        print(check)
+        check = self.dockwidget.layerIsolate.checkState()        
         if check:
             root = QgsProject.instance().layerTreeRoot()
             allLayers = root.layerOrder()
