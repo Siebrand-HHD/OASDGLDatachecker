@@ -670,9 +670,12 @@ class Datachecker:
 
     def get_qsetting(self, group, key):
         s= QSettings()
-        value = s.value( 'OASDGLDatachecker/' + group + '/' + key)
-        print(value)  
-        return(value)
+        try:
+            value = s.value( 'OASDGLDatachecker/' + group + '/' + key)
+            print(value)  
+            return(value)
+        except:
+            pass
         
     def delete_qsetting(self):
         QSettings().remove('UI/recentProjects') # als voorbeeld
