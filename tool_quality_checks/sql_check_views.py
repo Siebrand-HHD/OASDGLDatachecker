@@ -36,7 +36,7 @@ CREATE OR REPLACE VIEW {schema}.put_vorm_leeg AS
     FROM v2_manhole a JOIN v2_connection_nodes b ON a.connection_node_id = b.id
     WHERE shape IS NULL;
 -- putten zonder afmeting
-CREATE OR REPLACE VIEW {schema}.put_afmeting_leeg_onlogisch AS
+CREATE OR REPLACE VIEW {schema}.put_afmeting_leeg AS
     SELECT
         a.code AS rioolput,
         a.id AS threedi_id,
@@ -45,13 +45,12 @@ CREATE OR REPLACE VIEW {schema}.put_afmeting_leeg_onlogisch AS
         (length * 1000)::double precision AS lengte,
         CASE 
             WHEN width IS NULL THEN 'breedte ontbreekt'::text
-            WHEN width != length AND shape != 'rect' THEN 'rond/vierkant: breedte is ongelijk aan lengte'::text
             WHEN (width IS NULL OR length IS NULL) AND shape = 'rect' THEN 'rechthoekig: breedte of lengte ontbreekt'::text
         END AS bericht,
 	NULL::text AS status,
         b.the_geom::geometry(Point, 28992)
     FROM v2_manhole a JOIN v2_connection_nodes b ON a.connection_node_id = b.id
-    WHERE (width IS NULL) OR (width != length AND shape != 'rect') OR ((width IS NULL OR length IS NULL) AND shape = 'rect');
+    WHERE (width IS NULL) OR ((width IS NULL OR length IS NULL) AND shape = 'rect');
 """,
     "sql_completeness_pipe": """
 ----------------- Leidingen ------------------------
@@ -541,10 +540,15 @@ CREATE OR REPLACE VIEW {schema}.put_afmeting_onlogisch AS
         shape AS vorm,
         (width * 1000)::double precision AS breedte,
         (length * 1000)::double precision AS lengte,
+        CASE 
+            WHEN width = 0 THEN 'breedte is nul'::text
+            WHEN legnth = 0 THEN 'lengte is nul'::text
+            WHEN width != length AND shape != 'rect' THEN 'rond/vierkant: breedte is ongelijk aan lengte'::text
+        END AS bericht,
 	NULL::text AS status,
         b.the_geom::geometry(Point, 28992)
     FROM v2_manhole a JOIN v2_connection_nodes b ON a.connection_node_id = b.id
-    WHERE width = 0 OR length = 0;
+    WHERE width = 0 OR length = 0 OR (width != length AND shape != 'rect');
 -- Check putten buiten de dem
 CREATE OR REPLACE VIEW {schema}.put_buiten_dem AS
     SELECT
@@ -915,7 +919,7 @@ CREATE OR REPLACE VIEW {schema}.leiding_lang AS
         ON 	pipe.connection_node_end_id = end_node.id
     WHERE ST_Length(st_makeline(start_node.the_geom, end_node.the_geom)) > {max_length};
 -- Dubbele leidingen
-CREATE OR REPLACE VIEW {schema}.kunstwerken_dubbel AS
+CREATE OR REPLACE VIEW {schema}.leiding_dubbel AS
     SELECT
         string_agg(line_id::text, ', ' ORDER BY line_type) AS threedi_ids,
         string_agg(start_point::text, ', ' ORDER BY line_type) AS beginpunt,
