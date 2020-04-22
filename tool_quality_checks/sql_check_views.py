@@ -216,7 +216,7 @@ CREATE OR REPLACE VIEW {schema}.overstort_punten_leeg AS
         ON weir.cross_section_definition_id = def.id
     WHERE weir.connection_node_start_id IS NULL OR weir.connection_node_end_id IS NULL;
 -- Drempelhoogte aanwezig
-CREATE OR REPLACE VIEW {schema}.overstort_niveau_leeg_onlogisch AS
+CREATE OR REPLACE VIEW {schema}.overstort_niveau_leeg AS
     SELECT
         weir.code AS overstort,
         weir.id AS threedi_id,
