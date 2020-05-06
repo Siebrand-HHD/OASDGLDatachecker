@@ -11,7 +11,7 @@
 -- import GISIB files with ogr2ogr
 CREATE SCHEMA gisib;
 -- Open OSGEO4W shell and navigate to your folder (cd)
-for %f in (*.shp) do (ogr2ogr -overwrite -skipfailures -f "PostgreSQL" PG:"host=<hostname> user=<username> dbname=<databasename> password=<password> port=5432" -lco GEOMETRY_NAME=geom -lco FID="id" -nln gbi.%~nf %f -a_srs EPSG:28992)
+for %f in (*.shp) do (ogr2ogr -overwrite -skipfailures -f "PostgreSQL" PG:"host=<hostname> user=<username> dbname=<databasename> password=<password> port=5432" -lco GEOMETRY_NAME=geom -lco FID="id" -nln gisib.%~nf %f -a_srs EPSG:28992)
 
 -- Error and Answer:
 -- UTF8 issues -> resave shapefile with UTF8 encoding on in QGIS

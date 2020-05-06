@@ -58,6 +58,14 @@ def import_sewerage_data_into_db(db, settings):
             sql_abspath = os.path.join(OUR_DIR, sql_relpath)
             db.execute_sql_file(sql_abspath)
 
+    if settings.import_type == "gisib":
+        sql_relpath = os.path.join("sql", "sql_gisib_manholes_to_3di.sql")
+        sql_abspath = os.path.join(OUR_DIR, sql_relpath)
+        db.execute_sql_file(sql_abspath)
+        if has_gisib_pipe_layer:
+            sql_relpath = os.path.join("sql", "sql_gisib_pipes_to_3di.sql")
+            sql_abspath = os.path.join(OUR_DIR, sql_relpath)
+            db.execute_sql_file(sql_abspath)
 
 def import_file_based_on_filetype(settings, file_path, out_name):
     """
