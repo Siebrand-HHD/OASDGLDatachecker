@@ -1,6 +1,6 @@
 -------------------------------------------------------------------------------------------
---- GBI TO 3Di (currently manholes and pipes only)
---- Input: Export of GBI (vrijv_leiding.shp and rioolput.shp)
+--- Gisib TO 3Di (currently manholes and pipes only)
+--- Input: Export of Gisib (vrijv_leiding.shp and rioolput.shp)
 --- Output: 3Di model in work_db
 -------------------------------------------------------------------------------------------
 
@@ -8,10 +8,10 @@
 ------ Stap 0: Data inladen ---------------------
 -------------------------------------------------
 /* Used in other scripts
--- import GBI files with ogr2ogr
-CREATE SCHEMA gbi;
+-- import Gisib files with ogr2ogr
+CREATE SCHEMA gisib;
 -- Open OSGEO4W shell and navigate to your folder (cd)
-for %f in (*.shp) do (ogr2ogr -overwrite -skipfailures -f "PostgreSQL" PG:"host=<hostname> user=<username> dbname=<databasename> password=<password> port=5432" -lco GEOMETRY_NAME=geom -lco FID="id" -nln gbi.%~nf %f -a_srs EPSG:28992)
+for %f in (*.shp) do (ogr2ogr -overwrite -skipfailures -f "PostgreSQL" PG:"host=<hostname> user=<username> dbname=<databasename> password=<password> port=5432" -lco GEOMETRY_NAME=geom -lco FID="id" -nln gisib.%~nf %f -a_srs EPSG:28992)
 
 -- Error and Answer:
 -- UTF8 issues -> resave shapefile with UTF8 encoding on in QGIS
@@ -45,7 +45,7 @@ SELECT
 
         --std_stelse--
 		WHEN lower(soort_afva) LIKE '%gemengd%'	                                             THEN 0	-- GEMENGD
-		WHEN lower(soort_afva) LIKE '%hemel%'	                                             THEN 1	-- RWA
+		WHEN lower(soort_afva) LIKE '%regen%' OR lower(soort_afva) LIKE '%hemel%'            THEN 1	-- RWA
 		WHEN lower(soort_afva) LIKE '%vuil%'	                                             THEN 2	-- DWA
 
 		WHEN lower(soort_afva) LIKE '%overig%'                                               THEN 10	-- OVERIG
