@@ -1,35 +1,35 @@
 <!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
-<qgis minScale="1e+08" maxScale="0" simplifyAlgorithm="0" hasScaleBasedVisibilityFlag="0" simplifyDrawingTol="1" readOnly="0" version="3.8.0-Zanzibar" labelsEnabled="0" simplifyLocal="1" simplifyDrawingHints="1" styleCategories="AllStyleCategories" simplifyMaxScale="1">
+<qgis simplifyAlgorithm="0" readOnly="0" version="3.8.0-Zanzibar" simplifyDrawingTol="1" styleCategories="AllStyleCategories" simplifyMaxScale="1" maxScale="0" labelsEnabled="0" hasScaleBasedVisibilityFlag="0" minScale="1e+08" simplifyDrawingHints="1" simplifyLocal="1">
   <flags>
     <Identifiable>1</Identifiable>
     <Removable>1</Removable>
     <Searchable>1</Searchable>
   </flags>
-  <renderer-v2 enableorderby="0" symbollevels="0" type="singleSymbol" forceraster="0">
+  <renderer-v2 enableorderby="0" forceraster="0" symbollevels="0" type="singleSymbol">
     <symbols>
-      <symbol name="0" alpha="1" force_rhr="0" type="line" clip_to_extent="1">
-        <layer enabled="1" class="SimpleLine" pass="0" locked="0">
-          <prop v="square" k="capstyle"/>
-          <prop v="5;2" k="customdash"/>
-          <prop v="3x:0,0,0,0,0,0" k="customdash_map_unit_scale"/>
-          <prop v="MM" k="customdash_unit"/>
-          <prop v="0" k="draw_inside_polygon"/>
-          <prop v="bevel" k="joinstyle"/>
-          <prop v="133,182,111,255" k="line_color"/>
-          <prop v="solid" k="line_style"/>
-          <prop v="0.26" k="line_width"/>
-          <prop v="MM" k="line_width_unit"/>
-          <prop v="0" k="offset"/>
-          <prop v="3x:0,0,0,0,0,0" k="offset_map_unit_scale"/>
-          <prop v="MM" k="offset_unit"/>
-          <prop v="0" k="ring_filter"/>
-          <prop v="0" k="use_custom_dash"/>
-          <prop v="3x:0,0,0,0,0,0" k="width_map_unit_scale"/>
+      <symbol alpha="1" clip_to_extent="1" force_rhr="0" name="0" type="line">
+        <layer enabled="1" locked="0" class="SimpleLine" pass="0">
+          <prop k="capstyle" v="square"/>
+          <prop k="customdash" v="5;2"/>
+          <prop k="customdash_map_unit_scale" v="3x:0,0,0,0,0,0"/>
+          <prop k="customdash_unit" v="MM"/>
+          <prop k="draw_inside_polygon" v="0"/>
+          <prop k="joinstyle" v="bevel"/>
+          <prop k="line_color" v="152,125,183,255"/>
+          <prop k="line_style" v="solid"/>
+          <prop k="line_width" v="0.26"/>
+          <prop k="line_width_unit" v="MM"/>
+          <prop k="offset" v="0"/>
+          <prop k="offset_map_unit_scale" v="3x:0,0,0,0,0,0"/>
+          <prop k="offset_unit" v="MM"/>
+          <prop k="ring_filter" v="0"/>
+          <prop k="use_custom_dash" v="0"/>
+          <prop k="width_map_unit_scale" v="3x:0,0,0,0,0,0"/>
           <data_defined_properties>
             <Option type="Map">
-              <Option name="name" value="" type="QString"/>
+              <Option value="" name="name" type="QString"/>
               <Option name="properties"/>
-              <Option name="type" value="collection" type="QString"/>
+              <Option value="collection" name="type" type="QString"/>
             </Option>
           </data_defined_properties>
         </layer>
@@ -113,73 +113,66 @@
       </editWidget>
     </field>
     <field name="status">
-      <editWidget type="ValueMap">
+      <editWidget type="">
         <config>
-          <Option type="Map">
-            <Option name="map" type="Map">
-              <Option name="gecontroleerd" value="gecontroleerd" type="QString"/>
-              <Option name="verwerkt" value="verwerkt" type="QString"/>
-            </Option>
-          </Option>
+          <Option/>
         </config>
       </editWidget>
     </field>
   </fieldConfiguration>
   <aliases>
-    <alias name="" index="0" field="id"/>
-    <alias name="" index="1" field="leiding"/>
-    <alias name="" index="2" field="threedi_id"/>
-    <alias name="" index="3" field="beginpunt"/>
-    <alias name="" index="4" field="eindpunt"/>
-    <alias name="" index="5" field="vormprofiel"/>
-    <alias name="" index="6" field="breedte"/>
-    <alias name="" index="7" field="hoogte"/>
-    <alias name="" index="8" field="bericht"/>
-    <alias name="" index="9" field="status"/>
+    <alias field="id" index="0" name=""/>
+    <alias field="leiding" index="1" name=""/>
+    <alias field="threedi_id" index="2" name=""/>
+    <alias field="beginpunt" index="3" name=""/>
+    <alias field="eindpunt" index="4" name=""/>
+    <alias field="vormprofiel" index="5" name=""/>
+    <alias field="breedte" index="6" name=""/>
+    <alias field="hoogte" index="7" name=""/>
+    <alias field="bericht" index="8" name=""/>
+    <alias field="status" index="9" name=""/>
   </aliases>
   <excludeAttributesWMS/>
   <excludeAttributesWFS/>
   <defaults>
-    <default field="id" expression="" applyOnUpdate="0"/>
-    <default field="leiding" expression="" applyOnUpdate="0"/>
-    <default field="threedi_id" expression="" applyOnUpdate="0"/>
-    <default field="beginpunt" expression="" applyOnUpdate="0"/>
-    <default field="eindpunt" expression="" applyOnUpdate="0"/>
-    <default field="vormprofiel" expression="" applyOnUpdate="0"/>
-    <default field="breedte" expression="" applyOnUpdate="0"/>
-    <default field="hoogte" expression="" applyOnUpdate="0"/>
-    <default field="bericht" expression="" applyOnUpdate="0"/>
-    <default field="status" expression="" applyOnUpdate="0"/>
+    <default field="id" applyOnUpdate="0" expression=""/>
+    <default field="leiding" applyOnUpdate="0" expression=""/>
+    <default field="threedi_id" applyOnUpdate="0" expression=""/>
+    <default field="beginpunt" applyOnUpdate="0" expression=""/>
+    <default field="eindpunt" applyOnUpdate="0" expression=""/>
+    <default field="vormprofiel" applyOnUpdate="0" expression=""/>
+    <default field="breedte" applyOnUpdate="0" expression=""/>
+    <default field="hoogte" applyOnUpdate="0" expression=""/>
+    <default field="bericht" applyOnUpdate="0" expression=""/>
+    <default field="status" applyOnUpdate="0" expression=""/>
   </defaults>
   <constraints>
-    <constraint constraints="3" field="id" notnull_strength="1" unique_strength="1" exp_strength="0"/>
-    <constraint constraints="0" field="leiding" notnull_strength="0" unique_strength="0" exp_strength="0"/>
-    <constraint constraints="0" field="threedi_id" notnull_strength="0" unique_strength="0" exp_strength="0"/>
-    <constraint constraints="0" field="beginpunt" notnull_strength="0" unique_strength="0" exp_strength="0"/>
-    <constraint constraints="0" field="eindpunt" notnull_strength="0" unique_strength="0" exp_strength="0"/>
-    <constraint constraints="0" field="vormprofiel" notnull_strength="0" unique_strength="0" exp_strength="0"/>
-    <constraint constraints="0" field="breedte" notnull_strength="0" unique_strength="0" exp_strength="0"/>
-    <constraint constraints="0" field="hoogte" notnull_strength="0" unique_strength="0" exp_strength="0"/>
-    <constraint constraints="0" field="bericht" notnull_strength="0" unique_strength="0" exp_strength="0"/>
-    <constraint constraints="0" field="status" notnull_strength="0" unique_strength="0" exp_strength="0"/>
+    <constraint exp_strength="0" field="id" unique_strength="1" constraints="3" notnull_strength="1"/>
+    <constraint exp_strength="0" field="leiding" unique_strength="0" constraints="0" notnull_strength="0"/>
+    <constraint exp_strength="0" field="threedi_id" unique_strength="0" constraints="0" notnull_strength="0"/>
+    <constraint exp_strength="0" field="beginpunt" unique_strength="0" constraints="0" notnull_strength="0"/>
+    <constraint exp_strength="0" field="eindpunt" unique_strength="0" constraints="0" notnull_strength="0"/>
+    <constraint exp_strength="0" field="vormprofiel" unique_strength="0" constraints="0" notnull_strength="0"/>
+    <constraint exp_strength="0" field="breedte" unique_strength="0" constraints="0" notnull_strength="0"/>
+    <constraint exp_strength="0" field="hoogte" unique_strength="0" constraints="0" notnull_strength="0"/>
+    <constraint exp_strength="0" field="bericht" unique_strength="0" constraints="0" notnull_strength="0"/>
+    <constraint exp_strength="0" field="status" unique_strength="0" constraints="0" notnull_strength="0"/>
   </constraints>
   <constraintExpressions>
-    <constraint exp="" desc="" field="id"/>
-    <constraint exp="" desc="" field="leiding"/>
-    <constraint exp="" desc="" field="threedi_id"/>
-    <constraint exp="" desc="" field="beginpunt"/>
-    <constraint exp="" desc="" field="eindpunt"/>
-    <constraint exp="" desc="" field="vormprofiel"/>
-    <constraint exp="" desc="" field="breedte"/>
-    <constraint exp="" desc="" field="hoogte"/>
-    <constraint exp="" desc="" field="bericht"/>
-    <constraint exp="" desc="" field="status"/>
+    <constraint exp="" field="id" desc=""/>
+    <constraint exp="" field="leiding" desc=""/>
+    <constraint exp="" field="threedi_id" desc=""/>
+    <constraint exp="" field="beginpunt" desc=""/>
+    <constraint exp="" field="eindpunt" desc=""/>
+    <constraint exp="" field="vormprofiel" desc=""/>
+    <constraint exp="" field="breedte" desc=""/>
+    <constraint exp="" field="hoogte" desc=""/>
+    <constraint exp="" field="bericht" desc=""/>
+    <constraint exp="" field="status" desc=""/>
   </constraintExpressions>
   <expressionfields/>
-  <attributeactions>
-    <defaultAction value="{00000000-0000-0000-0000-000000000000}" key="Canvas"/>
-  </attributeactions>
-  <attributetableconfig sortExpression="" actionWidgetStyle="dropDown" sortOrder="0">
+  <attributeactions/>
+  <attributetableconfig actionWidgetStyle="dropDown" sortExpression="" sortOrder="0">
     <columns/>
   </attributetableconfig>
   <conditionalstyles>

@@ -554,8 +554,10 @@ class Datachecker:
         settings.username=self.threedi_db_settings['threedi_user']
         settings.password=self.threedi_db_settings['threedi_password']
         settings.emptydb = True
-        # settings.import_type = False
-        settings.import_type = "gbi"
+        import_type  = self.get_qsetting("Instellingen", "ImportSoftware") #"gbi"
+        if import_type == "":
+            import_type ="gbi"
+        settings.import_type = self.get_qsetting("Instellingen", "ImportSoftware") 
         settings.export = True
         settings.gpkg_output_layer = self.dockwidget.outputFileName.text()
         settings.checks = True
@@ -647,12 +649,20 @@ class Datachecker:
 
 
         
-    def instellingen_opslaan(self):           
+    def instellingen_opslaan(self, value=False):           
         for veld in velden:
             box = getattr(self.dockwidget, veld)
             waarde = box.value()
             # print(veld, waarde)
-            self.save_qsetting("Instellingen", veld, waarde)
+            if value ==False or value == veld:
+                self.save_qsetting("Instellingen", veld, waarde)
+        
+    def instellingenDefault_opslaan(self):           
+        for veld in velden:
+            box = getattr(self.dockwidget, veld)
+            waarde = box.value()
+            # print(veld, waarde)
+            self.save_qsetting("InstellingenDefault", veld, waarde)        
 
     def instellingen_ophalen(self, settings):
         s = QSettings()
@@ -660,10 +670,39 @@ class Datachecker:
         for veld in velden:
             value = s.value("OASDGLDatachecker/" + group + "/" + veld)
             setattr(settings, veld, value)
-            print(value)
+            # print(value)
+            
+    def instellingen_laden(self, default=False,initializePlugin=False):
+        # default = True
+        # initializePlugin = False
+        if default:
+            group = "InstellingenDefault"
+        else:
+            group = "Instellingen"
+        for veld in velden:  
+            try:
+                s = QSettings()
+                value = s.value("OASDGLDatachecker/" + group + "/" + veld)
+                box = getattr(self.dockwidget, veld)
+                value2  = float(value)
+                # print(value2)
+                if value:
+                    box.valueChanged.disconnect(self.instellingen_opslaan)
+                    box.setValue(value2) #float(value) #
+                    box.valueChanged.connect(self.instellingen_opslaan)
+            except:
+                if initializePlugin:
+                    self.instellingenDefault_opslaan()
+                else:                
+                    pass
+                    
+    def importSoftware_opslaan(self,waarde):
+        s = QSettings()
+        self.save_qsetting("Instellingen", "ImportSoftware", waarde)
+        
 
     def save_qsetting(self, group, key, value):
-        # file waar het opgelsagen wordt: C:\Users\onnoc\AppData\Roaming\QGIS\QGIS3\profiles\default\QGIS\QGIS3.INI
+        # file waar het opgeslagen wordt: C:\Users\onnoc\AppData\Roaming\QGIS\QGIS3\profiles\default\QGIS\QGIS3.INI
         s = QSettings()
         s.setValue("OASDGLDatachecker/" + group + "/" + key, value)
         test = s.value("OASDGLDatachecker/" + group + "/" + key)
@@ -671,14 +710,28 @@ class Datachecker:
     def get_qsetting(self, group, key):
         s= QSettings()
         try:
-            value = s.value( 'OASDGLDatachecker/' + group + '/' + key)
-            print(value)  
+            value = s.value( 'OASDGLDatachecker/' + group + '/' + key)            
             return(value)
         except:
             pass
         
     def delete_qsetting(self):
         QSettings().remove('UI/recentProjects') # als voorbeeld
+        
+    def select_output_file(self):
+        file_name = QFileDialog.getSaveFileName(filter="*.gpkg")
+        if str(file_name[0]):
+            self.dockwidget.outputFileName.setText(str(file_name[0]))
+            file_name = os.path.realpath(str(file_name[0]))
+            self.save_qsetting('paths', 'outputfile',file_name)
+
+    def draai_de_checks(self):
+        settings = self.get_settings()
+
+        task1 = QgsTask.fromFunction('Draai checks',run_scripts_task,on_finished=self.completed,settings=settings)
+        QgsApplication.taskManager().addTask(task1)
+        #run_scripts(settings)
+        self.initialize_paths()        
         
     def initialize_paths(self):
         foldernaam = self.get_qsetting("paths", "folderchecks")
@@ -707,21 +760,15 @@ class Datachecker:
         leidingfile = self.get_qsetting('paths', 'leidingfile')
         if leidingfile:     
             self.dockwidget.leidingFile.setFilePath(os.path.join(str(leidingfile)))
+        
+        importSoftware = self.get_qsetting("Instellingen", "ImportSoftware")
+        if importSoftware:
+            self.dockwidget.boxSoftware.setCurrentText(importSoftware)
             
-    def select_output_file(self):
-        file_name = QFileDialog.getSaveFileName(filter="*.gpkg")
-        if str(file_name[0]):
-            self.dockwidget.outputFileName.setText(str(file_name[0]))
-            file_name = os.path.realpath(str(file_name[0]))
-            self.save_qsetting('paths', 'outputfile',file_name)
+        self.instellingen_laden(initializePlugin=True)
+        
+            
 
-    def draai_de_checks(self):
-        settings = self.get_settings()
-
-        task1 = QgsTask.fromFunction('Draai checks',run_scripts_task,on_finished=self.completed,settings=settings)
-        QgsApplication.taskManager().addTask(task1)
-        #run_scripts(settings)
-        self.initialize_paths()
 
     def run(self):
         """Run method that loads and starts the plugin"""
@@ -776,9 +823,23 @@ class Datachecker:
             self.dockwidget.dem.fileChanged.connect(self.save_DEMfile) 
             
             self.dockwidget.DatachecksButton.clicked.connect(self.draai_de_checks)
-            self.dockwidget.instellingenopslaan.clicked.connect(
-                self.instellingen_opslaan
-            )
+            
+            try:
+                self.dockwidget.boxSoftware.currentTextChanged.disconnect( self.importSoftware_opslaan)
+            except:
+                pass            
+            self.dockwidget.boxSoftware.clear()
+            self.dockwidget.boxSoftware.addItems(["gbi", "gishib"])
+            self.dockwidget.boxSoftware.currentTextChanged.connect( self.importSoftware_opslaan)
+            
+            
+            self.dockwidget.instellingenopslaan.clicked.connect(self.instellingenDefault_opslaan)
+            
+            for veld in velden:
+                box = getattr(self.dockwidget, veld)
+                box.valueChanged.connect(self.instellingen_opslaan)
+                # waarde = box.valueChanged.connect(self.instellingen_opslaan)
+            self.dockwidget.defaultInstellingen.clicked.connect(lambda:self.instellingen_laden(default=True))
 
             # connect to provide cleanup on closing of dockwidget
             self.dockwidget.closingPlugin.connect(self.onClosePlugin)
