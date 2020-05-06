@@ -17,10 +17,10 @@ for %f in (*.shp) do (ogr2ogr -overwrite -skipfailures -f "PostgreSQL" PG:"host=
 -- UTF8 issues -> resave shapefile with UTF8 encoding on in QGIS
 
 -- CHECK EXPECTED FILES ON CORRECT NUMBER OF PUTTEN EN LEIDINGEN
-SELECT * FROM src.putten_gbi LIMIT 10;
-SELECT * FROM src.leidingen_gbi LIMIT 10;
-SELECT count(*) FROM src.putten_gbi;
-SELECT count(*) FROM src.leidingen_gbi;
+SELECT * FROM src.putten_gisib LIMIT 10;
+SELECT * FROM src.leidingen_gisib LIMIT 10;
+SELECT count(*) FROM src.putten_gisib;
+SELECT count(*) FROM src.leidingen_gisib;
 */
 
 -------------------------------------------------
@@ -35,92 +35,92 @@ INSERT INTO v2_pipe(
             material, zoom_category, connection_node_start_id, connection_node_end_id)
 SELECT
 	a.id 		AS id,
-    COALESCE(strengcode,'leeg') as display_name,
-	COALESCE(s.putcode,'0') || '_' || COALESCE(e.putcode,'0')	AS code,
+    COALESCE(naam_of_nu,'leeg') as display_name,
+	COALESCE(s.naam_of_nu,'0') || '_' || COALESCE(e.naam_of_nu,'0')	AS code,
 	CASE
-		--We achten stelseltyp het belangrijkste, alleen als dit geen uitsluitsel geeft over het sewerage_type zullen andere kolommen worden gebruikt: std_stelse 
-        --strengtype kunstwerken--
-        WHEN lower(std_streng) LIKE '%bergbezink%'		                                     THEN 7 -- BERGBEZINKVOORZIENING
-		WHEN lower(std_streng) LIKE '%zinker%' OR lower(std_streng) LIKE '%duiker%'     	 THEN 3 -- TRANSPORT
+		--We halen strengtype uit std_streng en type water uit std_stelse 
+		--strengtype kunstwerken--
+        WHEN lower(soort_leid) LIKE '%bergbezink%'		                                     THEN 7 -- BERGBEZINKVOORZIENING
+		WHEN lower(soort_leid) LIKE '%zinker%' OR lower(soort_leid) LIKE '%duiker%'     	 THEN 3 -- TRANSPORT
 
         --std_stelse--
-		WHEN lower(std_stelse) LIKE '%gemengd%'	                                             THEN 0	-- GEMENGD
-		WHEN lower(std_stelse) LIKE '%hemel%'	                                             THEN 1	-- RWA
-		WHEN lower(std_stelse) LIKE '%vuil%'	                                             THEN 2	-- DWA
+		WHEN lower(soort_afva) LIKE '%gemengd%'	                                             THEN 0	-- GEMENGD
+		WHEN lower(soort_afva) LIKE '%hemel%'	                                             THEN 1	-- RWA
+		WHEN lower(soort_afva) LIKE '%vuil%'	                                             THEN 2	-- DWA
 
-		WHEN lower(std_stelse) LIKE '%overig%'                                               THEN 10	-- OVERIG
-		WHEN lower(std_stelse) IS NOT NULL                                                   THEN 11	-- OVERIG
+		WHEN lower(soort_afva) LIKE '%overig%'                                               THEN 10	-- OVERIG
+		WHEN lower(soort_afva) IS NOT NULL                                                   THEN 11	-- OVERIG
 
         ELSE NULL 																						-- onbekend
    
 	END AS sewerage_type,
     
-	bob_begin_ AS invert_level_start_point,
-	bob_eind_a AS invert_level_end_point,
+	begin_bob AS invert_level_start_point,
+	eind_bob AS invert_level_end_point,
 	NULL as cross_section_definition_id,
 	CASE
-		WHEN lower(a.std_materi) LIKE '%beton%' THEN 0
-		WHEN lower(a.std_materi) LIKE '%pvc%' THEN 1
-		WHEN lower(a.std_materi) LIKE '%gres%' THEN 2
-		WHEN lower(a.std_materi) LIKE '%gietijzer%' THEN 3
-		WHEN lower(a.std_materi) LIKE '%metselwerk%' THEN 4
-		WHEN lower(a.std_materi) LIKE '%PE%' OR lower(a.std_materi) LIKE '%poly%' THEN 5
-		WHEN lower(a.std_materi) LIKE '%plaatijzer%' THEN 7
-		WHEN lower(a.std_materi) LIKE '%staal%' THEN 8        	    
-		WHEN lower(a.std_materi) LIKE '%overig%' THEN 99 --overig
+		WHEN lower(a.materiaal) LIKE '%beton%' THEN 0
+		WHEN lower(a.materiaal) LIKE '%pvc%' THEN 1
+		WHEN lower(a.materiaal) LIKE '%gres%' THEN 2
+		WHEN lower(a.materiaal) LIKE '%gietijzer%' THEN 3
+		WHEN lower(a.materiaal) LIKE '%metselwerk%' THEN 4
+		WHEN lower(a.materiaal) LIKE '%PE%' OR lower(a.std_materi) LIKE '%poly%' THEN 5
+		WHEN lower(a.materiaal) LIKE '%plaatijzer%' THEN 7
+		WHEN lower(a.materiaal) LIKE '%staal%' THEN 8        	    
+		WHEN lower(a.materiaal) LIKE '%overig%' THEN 99 --overig
 		ELSE NULL
 	END AS material,
 	2 AS zoom_category,
 	s.id AS connection_node_start_id,
 	e.id AS connection_node_end_id
-	FROM src.leidingen_gbi a
-	LEFT JOIN src.putten_gbi s ON beginput_i = s.object_gui
-	LEFT JOIN src.putten_gbi e ON eindput_id = e.object_gui;
+	FROM src.leidingen_gisib a
+	LEFT JOIN src.putten_gisib s ON begin_knoo = s.id
+	LEFT JOIN src.putten_gisib e ON eind_knoop = e.id;
     --where a.aanlegjaar != 9999 or lower(strengtype) NOT LIKE 'volgeschuimd' or lower(strengtype) NOT LIKE 'buiten gebruik';
 
 
 -----------------------------------------------------------
 -------- Stap 4: cross-sections voor pipe toevoegen -------
 -----------------------------------------------------------
-SELECT buistype, std_buisty, buisvorm, breedte, hoogte, diameter, count(*)
-FROM src.leidingen_gbi
-GROUP BY  buistype, std_buisty, buisvorm, breedte, hoogte, diameter
-ORDER BY buistype, std_buisty, buisvorm, breedte, hoogte, diameter
+SELECT afmeting_l, vorm, breedte_le, hoogte_lei, diameter, count(*)
+FROM src.leidingen_gisib
+GROUP BY afmeting_l, vorm, breedte_le, hoogte_lei, diameter
+ORDER BY afmeting_l, vorm, breedte_le, hoogte_lei, diameter
 LIMIT 20;
 
-SELECT CASE diameter WHEN 0 then NULL::numeric END as diamter, * FROM src.leidingen_gbi LIMIT 20;
+SELECT CASE diameter WHEN 0 then NULL::numeric END as diamter, * FROM src.leidingen_gisib LIMIT 20;
 ---- ZET IN 1 KEER ALLES OM NAAR LOCATION EN DEFINITION
 -- set sequence maximum id
 delete from v2_cross_section_definition;
 select setval('v2_cross_section_definition_id_seq',1);
 --insert cross_section_definition and add definition_id in v2_cross_section_location
 with gather_data as (
-	SELECT DISTINCT buistype, 
-		buisvorm,
-	CASE WHEN buisvorm ilike '%rond%' THEN 2
-		WHEN buisvorm ilike '%ei%' then 3
-		when buisvorm ilike '%vierkant%' THEN 5
-		when buisvorm ilike '%rh%' THEN 5
+	SELECT DISTINCT afmeting_l, 
+		vorm,
+	CASE WHEN vorm ilike '%cirkel%' THEN 2
+		WHEN vorm ilike '%ei%' then 3
+		when vorm ilike '%vierkant%' THEN 5
+		when vorm ilike '%rh%' THEN 5
 		ELSE NULL
 	END as shape,
 	(CASE
-		WHEN (string_to_array(buisvorm,' '))[1] LIKE '%rond%' 
+		WHEN (string_to_array(vorm,' '))[1] LIKE '%cirkel%' 
 			THEN COALESCE(
 				CASE diameter WHEN 0 then NULL::numeric ELSE diameter/1000.0 END,
-				CASE breedte WHEN 0 then NULL::numeric ELSE breedte/1000.0 END
+				CASE breedte_le WHEN 0 then NULL::numeric ELSE breedte_le/1000.0 END
 			)
 		ELSE COALESCE(
-				CASE breedte WHEN 0 then NULL::numeric ELSE breedte/1000.0 END,
+				CASE breedte_le WHEN 0 then NULL::numeric ELSE breedte_le/1000.0 END,
 				CASE diameter WHEN 0 then NULL::numeric ELSE diameter/1000.0 END
 			)
 	END) AS width,
 	COALESCE(
-		CASE hoogte WHEN 0 then NULL::numeric ELSE hoogte/1000.0 END, 
+		CASE hoogte_lei WHEN 0 then NULL::numeric ELSE hoogte_lei/1000.0 END, 
 		CASE diameter WHEN 0 then NULL::numeric ELSE diameter/1000.0 END
 
 	) as height
-	FROM src.leidingen_gbi
-	ORDER BY buistype
+	FROM src.leidingen_gisib
+	ORDER BY afmeting_l
 ),
 create_definitions as (
 	INSERT INTO v2_cross_section_definition
@@ -134,12 +134,12 @@ create_definitions as (
 	THEN  '0 ' || height || ' ' || height
 	ELSE height::text
 	END as height,
-	COALESCE(buistype,'leeg') as code
+	COALESCE(afmeting_l,'leeg') as code
 	FROM gather_data
 	ORDER BY id
 	RETURNING *
 )
 UPDATE v2_pipe
 SET cross_section_definition_id = b.id
-FROM create_definitions b, src.leidingen_gbi c
-WHERE v2_pipe.id = c.id AND b.code = c.buistype
+FROM create_definitions b, src.leidingen_gisib c
+WHERE v2_pipe.id = c.id AND b.code = c.afmeting_l

@@ -40,12 +40,12 @@ SELECT COUNT(DISTINCT code) FROM v2_connection_nodes;
 -------------------------------------------------
 ---------- Stap 2: manholes toevoegen -----------
 -------------------------------------------------
-SELECT putafmetin, CASE
+/*SELECT putafmetin, CASE
 		WHEN lower(putafmetin) LIKE '%vierkant%' THEN 'sqr'
 		WHEN lower(putafmetin) LIKE '%rond%' THEN 'rnd'
 		WHEN lower(putafmetin) LIKE '%rechthoekig%' THEN 'rect'
 		ELSE NULL END, COUNT(*) FROM src.putten_gisib GROUP BY putafmetin LIMIT 10;
-
+*/
 SELECT * FROM v2_manhole WHERE shape IS NOT NULL LIMIT 10;
 DELETE FROM v2_manhole;
 INSERT INTO v2_manhole(
@@ -80,7 +80,7 @@ SELECT
 		WHEN lower(type_knoop) LIKE '%uitlaat%' THEN 1
 		ELSE 0
 	END AS manhole_indicator,
-	putbodem AS bottom_level,
+	straatpeil - putbodem AS bottom_level,
 	straatpeil AS surface_level,
 	NULL AS drain_level,
 	1 AS zoom_category
