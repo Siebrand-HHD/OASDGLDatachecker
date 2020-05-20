@@ -23,7 +23,7 @@
 """
 from PyQt5.QtCore import QObject, QSettings, QTranslator, qVersion, QCoreApplication, Qt
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QAction, QFileDialog, QInputDialog, QLineEdit
+from PyQt5.QtWidgets import QAction, QFileDialog, QInputDialog, QLineEdit, QMessageBox
 from qgis.core import (
     QgsProject,
     QgsVectorLayer,
@@ -40,6 +40,7 @@ from qgis.utils import iface
 # Initialize Qt resources from file resources.py
 from .resources import *
 import os
+import glob
 from osgeo import ogr
 
 # Import the code for the DockWidget
@@ -260,9 +261,9 @@ class Datachecker:
     # --------------------------------------------------------------------------
     def pb_select_dc_folder(self):
         foldername = QFileDialog.getExistingDirectory()
-        self.dockwidget.folderNaam.setText(foldername)
-        self.dockwidget.folderNaam.setToolTip(foldername)
         if foldername:
+            self.dockwidget.folderNaam.setText(foldername)
+            self.dockwidget.folderNaam.setToolTip(foldername)        
             self.fill_checks_list()
 
     def fill_checks_list(self):
@@ -346,9 +347,9 @@ class Datachecker:
 
     def pb_select_exp_folder(self):
         foldername = QFileDialog.getExistingDirectory()
-        self.dockwidget.folderNaam_export.setText(foldername)
-        self.dockwidget.folderNaam_export.setToolTip(foldername)
         if foldername:
+            self.dockwidget.folderNaam_export.setText(foldername)
+            self.dockwidget.folderNaam_export.setToolTip(foldername)
             self.fill_export_list()
 
     def fill_export_list(self):
@@ -371,14 +372,7 @@ class Datachecker:
 
     def laad_qml_styling(self):
         folder = "styling\\" + self.dockwidget.stylingbox.currentText()
-        print(folder)
-        # if self.dockwidget.qmlBeheerderBox.checkState()==2:
-        # folder = 'styling\StylingBeheerder'
-        # elif self.dockwidget.qmlModelleurBox.checkState()==2:
-        # folder = 'styling\StylingModelleur'
-        # else:
-        # return
-
+        # print(folder)
         for layer in QgsProject.instance().mapLayers().values():
             scriptLocatie = os.path.dirname(os.path.realpath(__file__))
             qmlpad = os.path.join(scriptLocatie, folder, layer.name()) + ".qml"
@@ -404,6 +398,29 @@ class Datachecker:
             stylingfolders = self.get_stylingfolders()
             self.dockwidget.stylingbox.clear()
             self.dockwidget.stylingbox.addItems(stylingfolders)
+            self.dockwidget.stylingbox.setCurrentText(text)
+            
+    def remove_qml_styling(self):
+        stylinggroup = self.dockwidget.stylingbox.currentText()
+        msgbox = QMessageBox() # https://www.riverbankcomputing.com/static/Docs/PyQt4/qmessagebox.html#details
+        msgbox.setText("De stijlgroep: '" + stylinggroup + "' wordt verwijderd als je doorgaat.")
+        msgbox.setInformativeText("Wil je doorgaan?")
+        msgbox.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+        ret = msgbox.exec_()        
+        if not stylinggroup in ['Beheerder-std', 'Modelleur-std']:
+            if ret == QMessageBox.Ok:
+                scriptLocatie =os.path.dirname(os.path.realpath(__file__))
+                folder = os.path.join(scriptLocatie, 'styling', stylinggroup)
+                print(folder)
+                # subfolders = [ f.name for f in os.scandir(folder) if f.is_dir() ]
+                files = glob.glob(os.path.join(folder, '*'))
+                for file in files:
+                    os.remove(file)
+                os.rmdir(folder)
+                self.dockwidget.stylingbox.clear()
+                stylingfolders = self.get_stylingfolders()
+                self.dockwidget.stylingbox.addItems(stylingfolders)
+                
     
     def update_status(self, waarde):
         # waarde='verwerkt'
@@ -537,8 +554,10 @@ class Datachecker:
         settings.username=self.threedi_db_settings['threedi_user']
         settings.password=self.threedi_db_settings['threedi_password']
         settings.emptydb = True
-        # settings.import_type = False
-        settings.import_type = "gbi"
+        import_type  = self.get_qsetting("Instellingen", "ImportSoftware") #"gbi"
+        if import_type == "":
+            import_type ="gbi"
+        settings.import_type = self.get_qsetting("Instellingen", "ImportSoftware") 
         settings.export = True
         settings.gpkg_output_layer = self.dockwidget.outputFileName.text()
         settings.checks = True
@@ -636,6 +655,13 @@ class Datachecker:
             waarde = box.value()
             # print(veld, waarde)
             self.save_qsetting("Instellingen", veld, waarde)
+        
+    def instellingenDefault_opslaan(self):           
+        for veld in velden:
+            box = getattr(self.dockwidget, veld)
+            waarde = box.value()
+            # print(veld, waarde)
+            self.save_qsetting("InstellingenDefault", veld, waarde)        
 
     def instellingen_ophalen(self, settings):
         s = QSettings()
@@ -643,22 +669,68 @@ class Datachecker:
         for veld in velden:
             value = s.value("OASDGLDatachecker/" + group + "/" + veld)
             setattr(settings, veld, value)
-            print(value)
+            # print(value)
+            
+    def instellingen_laden(self, default=False,initializePlugin=False):
+        # default = True
+        # initializePlugin = False
+        if default:
+            group = "InstellingenDefault"
+        else:
+            group = "Instellingen"
+        for veld in velden:  
+            try:
+                s = QSettings()
+                value = s.value("OASDGLDatachecker/" + group + "/" + veld)
+                box = getattr(self.dockwidget, veld)
+                value2  = float(value)
+                # print(value2)
+                if value:
+                    box.valueChanged.disconnect(self.instellingen_opslaan)
+                    box.setValue(value2) #float(value) #
+                    box.valueChanged.connect(self.instellingen_opslaan)
+            except:
+                if initializePlugin:
+                    self.instellingenDefault_opslaan()
+                else:                
+                    pass
+                    
+    def importSoftware_opslaan(self,waarde):
+        s = QSettings()
+        self.save_qsetting("Instellingen", "ImportSoftware", waarde)
+        
 
     def save_qsetting(self, group, key, value):
-        # file waar het opgelsagen wordt: C:\Users\onnoc\AppData\Roaming\QGIS\QGIS3\profiles\default\QGIS\QGIS3.INI
+        # file waar het opgeslagen wordt: C:\Users\onnoc\AppData\Roaming\QGIS\QGIS3\profiles\default\QGIS\QGIS3.INI
         s = QSettings()
         s.setValue("OASDGLDatachecker/" + group + "/" + key, value)
         test = s.value("OASDGLDatachecker/" + group + "/" + key)
 
     def get_qsetting(self, group, key):
         s= QSettings()
-        value = s.value( 'OASDGLDatachecker/' + group + '/' + key)
-        print(value)  
-        return(value)
+        try:
+            value = s.value( 'OASDGLDatachecker/' + group + '/' + key)            
+            return(value)
+        except:
+            pass
         
     def delete_qsetting(self):
         QSettings().remove('UI/recentProjects') # als voorbeeld
+        
+    def select_output_file(self):
+        file_name = QFileDialog.getSaveFileName(filter="*.gpkg")
+        if str(file_name[0]):
+            self.dockwidget.outputFileName.setText(str(file_name[0]))
+            file_name = os.path.realpath(str(file_name[0]))
+            self.save_qsetting('paths', 'outputfile',file_name)
+
+    def draai_de_checks(self):
+        settings = self.get_settings()
+
+        task1 = QgsTask.fromFunction('Draai checks',run_scripts_task,on_finished=self.completed,settings=settings)
+        QgsApplication.taskManager().addTask(task1)
+        #run_scripts(settings)
+        self.initialize_paths()        
         
     def initialize_paths(self):
         foldernaam = self.get_qsetting("paths", "folderchecks")
@@ -679,19 +751,23 @@ class Datachecker:
         if DEMfile:
             print(DEMfile)
             self.dockwidget.dem.setFilePath(os.path.join(str(DEMfile)))
-             
+            
+        putfile = self.get_qsetting('paths', 'putfile')
+        if putfile:
+            self.dockwidget.putFile.setFilePath(os.path.join(str(putfile)))
+            
+        leidingfile = self.get_qsetting('paths', 'leidingfile')
+        if leidingfile:     
+            self.dockwidget.leidingFile.setFilePath(os.path.join(str(leidingfile)))
+        
+        importSoftware = self.get_qsetting("Instellingen", "ImportSoftware")
+        if importSoftware:
+            self.dockwidget.boxSoftware.setCurrentText(importSoftware)
+            
+        self.instellingen_laden(initializePlugin=True)
+        
+            
 
-    def select_output_file(self):
-        file_name = QFileDialog.getSaveFileName(filter="*.gpkg")
-        self.dockwidget.outputFileName.setText(str(file_name[0]))
-
-    def draai_de_checks(self):
-        settings = self.get_settings()
-
-        task1 = QgsTask.fromFunction('Draai checks',run_scripts_task,on_finished=self.completed,settings=settings)
-        QgsApplication.taskManager().addTask(task1)
-        #run_scripts(settings)
-        self.initialize_paths()
 
     def run(self):
         """Run method that loads and starts the plugin"""
@@ -709,6 +785,7 @@ class Datachecker:
             databases = self.get_databases()
             self.dockwidget.bestaandeDatabases.addItems(databases)
             stylingfolders = self.get_stylingfolders()
+            self.dockwidget.stylingbox.clear()
             self.dockwidget.stylingbox.addItems(stylingfolders)
 
             self.dockwidget.bestaandeDatabases.currentTextChanged.connect(
@@ -717,6 +794,7 @@ class Datachecker:
             self.dockwidget.ObjectSlider.valueChanged.connect(self.slider_function)
             self.dockwidget.applyStylingButton.clicked.connect(self.laad_qml_styling)
             self.dockwidget.selectFolderButton.clicked.connect(self.pb_select_dc_folder)
+            self.dockwidget.reloadResult.clicked.connect(self.fill_checks_list)
             self.dockwidget.outputFileButton.clicked.connect(self.select_output_file)
             self.dockwidget.folderNaam.textChanged.connect(self.save_folderchecks)
             self.dockwidget.folderNaam_export.textChanged.connect(
@@ -727,6 +805,7 @@ class Datachecker:
             self.dockwidget.savelayer.clicked.connect(self.save_qml_styling)
 
             self.dockwidget.addStyling.clicked.connect(self.add_qml_styling)
+            self.dockwidget.removeStyling.clicked.connect(self.remove_qml_styling)
             self.dockwidget.selectFolderButton_export.clicked.connect(self.pb_select_exp_folder)
             self.dockwidget.createdbButton.clicked.connect(self.create_db_from_qgis)
             ##self.dockwidget.linePutten.dropevent.connect(over
@@ -743,9 +822,23 @@ class Datachecker:
             self.dockwidget.dem.fileChanged.connect(self.save_DEMfile) 
             
             self.dockwidget.DatachecksButton.clicked.connect(self.draai_de_checks)
-            self.dockwidget.instellingenopslaan.clicked.connect(
-                self.instellingen_opslaan
-            )
+            
+            try:
+                self.dockwidget.boxSoftware.currentTextChanged.disconnect( self.importSoftware_opslaan)
+            except:
+                pass            
+            self.dockwidget.boxSoftware.clear()
+            self.dockwidget.boxSoftware.addItems(["gbi", "gisib"])
+            self.dockwidget.boxSoftware.currentTextChanged.connect( self.importSoftware_opslaan)
+            
+            
+            self.dockwidget.instellingenopslaan.clicked.connect(self.instellingenDefault_opslaan)
+            
+            for veld in velden:
+                box = getattr(self.dockwidget, veld)
+                box.valueChanged.connect(self.instellingen_opslaan)
+                # waarde = box.valueChanged.connect(self.instellingen_opslaan)
+            self.dockwidget.defaultInstellingen.clicked.connect(lambda:self.instellingen_laden(default=True))
 
             # connect to provide cleanup on closing of dockwidget
             self.dockwidget.closingPlugin.connect(self.onClosePlugin)
