@@ -649,13 +649,12 @@ class Datachecker:
 
 
         
-    def instellingen_opslaan(self, value=False):           
+    def instellingen_opslaan(self):           
         for veld in velden:
             box = getattr(self.dockwidget, veld)
             waarde = box.value()
             # print(veld, waarde)
-            if value ==False or value == veld:
-                self.save_qsetting("Instellingen", veld, waarde)
+            self.save_qsetting("Instellingen", veld, waarde)
         
     def instellingenDefault_opslaan(self):           
         for veld in velden:
@@ -829,7 +828,7 @@ class Datachecker:
             except:
                 pass            
             self.dockwidget.boxSoftware.clear()
-            self.dockwidget.boxSoftware.addItems(["gbi", "gishib"])
+            self.dockwidget.boxSoftware.addItems(["gbi", "gisib"])
             self.dockwidget.boxSoftware.currentTextChanged.connect( self.importSoftware_opslaan)
             
             
