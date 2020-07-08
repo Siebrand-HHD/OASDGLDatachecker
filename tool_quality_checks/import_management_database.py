@@ -31,9 +31,14 @@ def import_sewerage_data_into_db(db, settings):
     db.create_schema("src")
 
     # check if base columns are available
-    if not has_columns(settings.manhole_layer, ["PUTCODE"]):
-        logger.error("Putcode or geometry not found in manhole layer")
-        raise AttributeError("Putcode or geometry not found in manhole layer")
+    if settings.import_type == "gbi":
+        if not has_columns(settings.manhole_layer, ["PUTCODE"]):
+            logger.error("Putcode or geometry not found in manhole layer")
+            raise AttributeError("Putcode or geometry not found in manhole layer")
+    elif settings.import_type == "gisib":
+        if not has_columns(settings.manhole_layer, ["NAAM_OF_NU"]):
+            logger.error("Putcode or geometry not found in manhole layer")
+            raise AttributeError("Putcode or geometry not found in manhole layer")
 
     import_file_based_on_filetype(
         settings, settings.manhole_layer, "putten_" + settings.import_type
@@ -44,28 +49,28 @@ def import_sewerage_data_into_db(db, settings):
         import_file_based_on_filetype(
             settings, settings.pipe_layer, "leidingen_" + settings.import_type
         )
-        has_gbi_pipe_layer = True
+        has_pipe_layer = True
     else:
         logger.warning("Pipe layer is not available.")
-        has_gbi_pipe_layer = False
+        has_pipe_layer = False
 
     if settings.import_type == "gbi":
         sql_relpath = os.path.join("sql", "sql_gbi_manholes_to_3di.sql")
         sql_abspath = os.path.join(OUR_DIR, sql_relpath)
         db.execute_sql_file(sql_abspath)
-        if has_gbi_pipe_layer:
+        if has_pipe_layer:
             sql_relpath = os.path.join("sql", "sql_gbi_pipes_to_3di.sql")
             sql_abspath = os.path.join(OUR_DIR, sql_relpath)
             db.execute_sql_file(sql_abspath)
-
-    if settings.import_type == "gisib":
+    elif settings.import_type == "gisib":
         sql_relpath = os.path.join("sql", "sql_gisib_manholes_to_3di.sql")
         sql_abspath = os.path.join(OUR_DIR, sql_relpath)
         db.execute_sql_file(sql_abspath)
-        if has_gisib_pipe_layer:
+        if has_pipe_layer:
             sql_relpath = os.path.join("sql", "sql_gisib_pipes_to_3di.sql")
             sql_abspath = os.path.join(OUR_DIR, sql_relpath)
             db.execute_sql_file(sql_abspath)
+
 
 def import_file_based_on_filetype(settings, file_path, out_name):
     """
@@ -81,7 +86,7 @@ def import_file_based_on_filetype(settings, file_path, out_name):
     filename, file_extension = os.path.splitext(file_with_extention)
     out_source = set_ogr_connection_pg_database(settings)
 
-    if file_extension == ".shp":
+    if file_extension == ".shp" or ".SHP":
         in_source = set_ogr_connection(file_path)
         copy2ogr(in_source, filename, out_source, out_name, schema="src")
         in_source.Destroy()

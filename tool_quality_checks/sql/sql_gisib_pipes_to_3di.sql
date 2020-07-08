@@ -34,29 +34,29 @@ INSERT INTO v2_pipe(
             invert_level_start_point, invert_level_end_point, cross_section_definition_id,
             material, zoom_category, connection_node_start_id, connection_node_end_id)
 SELECT
-	a.id 		AS id,
-    COALESCE(naam_of_nu,'leeg') as display_name,
+	a.id::integer AS id,
+    COALESCE(a.naam_of_nu,'leeg') as display_name,
 	COALESCE(s.naam_of_nu,'0') || '_' || COALESCE(e.naam_of_nu,'0')	AS code,
 	CASE
 		--We halen strengtype uit std_streng en type water uit std_stelse 
 		--strengtype kunstwerken--
-        WHEN lower(soort_leid) LIKE '%bergbezink%'		                                     THEN 7 -- BERGBEZINKVOORZIENING
-		WHEN lower(soort_leid) LIKE '%zinker%' OR lower(soort_leid) LIKE '%duiker%'     	 THEN 3 -- TRANSPORT
+        WHEN lower(a.type_afwat) LIKE '%bergbezink%'		                                     THEN 7 -- BERGBEZINKVOORZIENING
+		WHEN lower(a.type_afwat) LIKE '%zinker%' OR lower(a.type_afwat) LIKE '%duiker%'     	 THEN 3 -- TRANSPORT
 
         --std_stelse--
-		WHEN lower(soort_afva) LIKE '%gemengd%'	                                             THEN 0	-- GEMENGD
-		WHEN lower(soort_afva) LIKE '%regen%' OR lower(soort_afva) LIKE '%hemel%'            THEN 1	-- RWA
-		WHEN lower(soort_afva) LIKE '%vuil%'	                                             THEN 2	-- DWA
+		WHEN lower(a.soort_afva) LIKE '%gemengd%'	                                             THEN 0	-- GEMENGD
+		WHEN lower(a.soort_afva) LIKE '%regen%' OR lower(a.soort_afva) LIKE '%hemel%'            THEN 1	-- RWA
+		WHEN lower(a.soort_afva) LIKE '%vuil%'	OR lower(a.soort_afva) LIKE '%droog%'            THEN 2	-- DWA
 
-		WHEN lower(soort_afva) LIKE '%overig%'                                               THEN 10	-- OVERIG
-		WHEN lower(soort_afva) IS NOT NULL                                                   THEN 11	-- OVERIG
+		WHEN lower(a.soort_afva) LIKE '%overig%'                                               THEN 10	-- OVERIG
+		WHEN lower(a.soort_afva) IS NOT NULL                                                   THEN 11	-- OVERIG
 
         ELSE NULL 																						-- onbekend
    
 	END AS sewerage_type,
     
-	begin_bob AS invert_level_start_point,
-	eind_bob AS invert_level_end_point,
+	a.begin_bob AS invert_level_start_point,
+	a.eind_bob AS invert_level_end_point,
 	NULL as cross_section_definition_id,
 	CASE
 		WHEN lower(a.materiaal) LIKE '%beton%' THEN 0
@@ -64,18 +64,18 @@ SELECT
 		WHEN lower(a.materiaal) LIKE '%gres%' THEN 2
 		WHEN lower(a.materiaal) LIKE '%gietijzer%' THEN 3
 		WHEN lower(a.materiaal) LIKE '%metselwerk%' THEN 4
-		WHEN lower(a.materiaal) LIKE '%PE%' OR lower(a.std_materi) LIKE '%poly%' THEN 5
+		WHEN lower(a.materiaal) LIKE '%PE%' OR lower(a.materiaal) LIKE '%poly%' THEN 5
 		WHEN lower(a.materiaal) LIKE '%plaatijzer%' THEN 7
 		WHEN lower(a.materiaal) LIKE '%staal%' THEN 8        	    
 		WHEN lower(a.materiaal) LIKE '%overig%' THEN 99 --overig
 		ELSE NULL
 	END AS material,
 	2 AS zoom_category,
-	s.id AS connection_node_start_id,
-	e.id AS connection_node_end_id
+	s.id::integer AS connection_node_start_id,
+	e.id::integer AS connection_node_end_id
 	FROM src.leidingen_gisib a
-	LEFT JOIN src.putten_gisib s ON begin_knoo = s.id
-	LEFT JOIN src.putten_gisib e ON eind_knoop = e.id;
+	LEFT JOIN src.putten_gisib s ON a.begin_knoo::integer = s.id::integer
+	LEFT JOIN src.putten_gisib e ON a.eind_knoop::integer = e.id::integer;
     --where a.aanlegjaar != 9999 or lower(strengtype) NOT LIKE 'volgeschuimd' or lower(strengtype) NOT LIKE 'buiten gebruik';
 
 

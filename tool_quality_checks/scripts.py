@@ -168,7 +168,7 @@ def get_parser():
         "--import",
         dest="import_type",
         default=False,
-        choices=["gbi"],
+        choices=["gbi", "gisib"],
         help="Import your sewerage data",
     )
     parser.add_argument(

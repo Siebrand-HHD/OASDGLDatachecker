@@ -164,4 +164,4 @@ class TestDB(TestCase):
         assert proj == None
 
     def test_has_columns(self):
-        assert not has_columns(SIGN_ABSPATH, ["PUTCODE"])
+        assert not has_columns(SIGN_ABSPATH, ["PUTCODE", "NAAM_OF_NU"])
