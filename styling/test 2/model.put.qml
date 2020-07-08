@@ -72,6 +72,34 @@
         </config>
       </editWidget>
     </field>
+    <field name="vorm">
+      <editWidget type="">
+        <config>
+          <Option/>
+        </config>
+      </editWidget>
+    </field>
+    <field name="breedte">
+      <editWidget type="">
+        <config>
+          <Option/>
+        </config>
+      </editWidget>
+    </field>
+    <field name="lengte">
+      <editWidget type="">
+        <config>
+          <Option/>
+        </config>
+      </editWidget>
+    </field>
+    <field name="typeknooppunt">
+      <editWidget type="">
+        <config>
+          <Option/>
+        </config>
+      </editWidget>
+    </field>
     <field name="bodemhoogte">
       <editWidget type="">
         <config>
@@ -79,7 +107,7 @@
         </config>
       </editWidget>
     </field>
-    <field name="status">
+    <field name="maaiveldhoogte">
       <editWidget type="">
         <config>
           <Option/>
@@ -91,8 +119,12 @@
     <alias field="id" name="" index="0"/>
     <alias field="rioolput" name="" index="1"/>
     <alias field="threedi_id" name="" index="2"/>
-    <alias field="bodemhoogte" name="" index="3"/>
-    <alias field="status" name="" index="4"/>
+    <alias field="vorm" name="" index="3"/>
+    <alias field="breedte" name="" index="4"/>
+    <alias field="lengte" name="" index="5"/>
+    <alias field="typeknooppunt" name="" index="6"/>
+    <alias field="bodemhoogte" name="" index="7"/>
+    <alias field="maaiveldhoogte" name="" index="8"/>
   </aliases>
   <excludeAttributesWMS/>
   <excludeAttributesWFS/>
@@ -100,22 +132,34 @@
     <default field="id" applyOnUpdate="0" expression=""/>
     <default field="rioolput" applyOnUpdate="0" expression=""/>
     <default field="threedi_id" applyOnUpdate="0" expression=""/>
+    <default field="vorm" applyOnUpdate="0" expression=""/>
+    <default field="breedte" applyOnUpdate="0" expression=""/>
+    <default field="lengte" applyOnUpdate="0" expression=""/>
+    <default field="typeknooppunt" applyOnUpdate="0" expression=""/>
     <default field="bodemhoogte" applyOnUpdate="0" expression=""/>
-    <default field="status" applyOnUpdate="0" expression=""/>
+    <default field="maaiveldhoogte" applyOnUpdate="0" expression=""/>
   </defaults>
   <constraints>
     <constraint exp_strength="0" unique_strength="1" field="id" notnull_strength="1" constraints="3"/>
     <constraint exp_strength="0" unique_strength="0" field="rioolput" notnull_strength="0" constraints="0"/>
     <constraint exp_strength="0" unique_strength="0" field="threedi_id" notnull_strength="0" constraints="0"/>
+    <constraint exp_strength="0" unique_strength="0" field="vorm" notnull_strength="0" constraints="0"/>
+    <constraint exp_strength="0" unique_strength="0" field="breedte" notnull_strength="0" constraints="0"/>
+    <constraint exp_strength="0" unique_strength="0" field="lengte" notnull_strength="0" constraints="0"/>
+    <constraint exp_strength="0" unique_strength="0" field="typeknooppunt" notnull_strength="0" constraints="0"/>
     <constraint exp_strength="0" unique_strength="0" field="bodemhoogte" notnull_strength="0" constraints="0"/>
-    <constraint exp_strength="0" unique_strength="0" field="status" notnull_strength="0" constraints="0"/>
+    <constraint exp_strength="0" unique_strength="0" field="maaiveldhoogte" notnull_strength="0" constraints="0"/>
   </constraints>
   <constraintExpressions>
     <constraint exp="" field="id" desc=""/>
     <constraint exp="" field="rioolput" desc=""/>
     <constraint exp="" field="threedi_id" desc=""/>
+    <constraint exp="" field="vorm" desc=""/>
+    <constraint exp="" field="breedte" desc=""/>
+    <constraint exp="" field="lengte" desc=""/>
+    <constraint exp="" field="typeknooppunt" desc=""/>
     <constraint exp="" field="bodemhoogte" desc=""/>
-    <constraint exp="" field="status" desc=""/>
+    <constraint exp="" field="maaiveldhoogte" desc=""/>
   </constraintExpressions>
   <expressionfields/>
   <attributeactions/>

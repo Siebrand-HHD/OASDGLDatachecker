@@ -1,30 +1,30 @@
 <!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
-<qgis simplifyAlgorithm="0" readOnly="0" version="3.8.0-Zanzibar" simplifyDrawingTol="1" styleCategories="AllStyleCategories" simplifyMaxScale="1" maxScale="0" labelsEnabled="0" hasScaleBasedVisibilityFlag="0" minScale="1e+08" simplifyDrawingHints="1" simplifyLocal="1">
+<qgis styleCategories="AllStyleCategories" hasScaleBasedVisibilityFlag="0" minScale="1e+08" readOnly="0" version="3.8.0-Zanzibar" simplifyDrawingTol="1" labelsEnabled="0" simplifyLocal="1" simplifyMaxScale="1" simplifyDrawingHints="1" maxScale="0" simplifyAlgorithm="0">
   <flags>
     <Identifiable>1</Identifiable>
     <Removable>1</Removable>
     <Searchable>1</Searchable>
   </flags>
-  <renderer-v2 enableorderby="0" forceraster="0" symbollevels="0" type="singleSymbol">
+  <renderer-v2 forceraster="0" enableorderby="0" type="singleSymbol" symbollevels="0">
     <symbols>
-      <symbol alpha="1" clip_to_extent="1" force_rhr="0" name="0" type="line">
-        <layer enabled="1" locked="0" class="SimpleLine" pass="0">
-          <prop k="capstyle" v="square"/>
-          <prop k="customdash" v="5;2"/>
-          <prop k="customdash_map_unit_scale" v="3x:0,0,0,0,0,0"/>
-          <prop k="customdash_unit" v="MM"/>
-          <prop k="draw_inside_polygon" v="0"/>
-          <prop k="joinstyle" v="bevel"/>
-          <prop k="line_color" v="231,113,72,255"/>
-          <prop k="line_style" v="solid"/>
-          <prop k="line_width" v="0.26"/>
-          <prop k="line_width_unit" v="MM"/>
-          <prop k="offset" v="0"/>
-          <prop k="offset_map_unit_scale" v="3x:0,0,0,0,0,0"/>
-          <prop k="offset_unit" v="MM"/>
-          <prop k="ring_filter" v="0"/>
-          <prop k="use_custom_dash" v="0"/>
-          <prop k="width_map_unit_scale" v="3x:0,0,0,0,0,0"/>
+      <symbol clip_to_extent="1" alpha="1" name="0" type="line" force_rhr="0">
+        <layer locked="0" class="SimpleLine" enabled="1" pass="0">
+          <prop v="square" k="capstyle"/>
+          <prop v="5;2" k="customdash"/>
+          <prop v="3x:0,0,0,0,0,0" k="customdash_map_unit_scale"/>
+          <prop v="MM" k="customdash_unit"/>
+          <prop v="0" k="draw_inside_polygon"/>
+          <prop v="bevel" k="joinstyle"/>
+          <prop v="141,90,153,255" k="line_color"/>
+          <prop v="solid" k="line_style"/>
+          <prop v="0.26" k="line_width"/>
+          <prop v="MM" k="line_width_unit"/>
+          <prop v="0" k="offset"/>
+          <prop v="3x:0,0,0,0,0,0" k="offset_map_unit_scale"/>
+          <prop v="MM" k="offset_unit"/>
+          <prop v="0" k="ring_filter"/>
+          <prop v="0" k="use_custom_dash"/>
+          <prop v="3x:0,0,0,0,0,0" k="width_map_unit_scale"/>
           <data_defined_properties>
             <Option type="Map">
               <Option value="" name="name" type="QString"/>
@@ -42,7 +42,7 @@
   <blendMode>0</blendMode>
   <featureBlendMode>0</featureBlendMode>
   <layerOpacity>1</layerOpacity>
-  <geometryOptions geometryPrecision="0" removeDuplicateNodes="0">
+  <geometryOptions removeDuplicateNodes="0" geometryPrecision="0">
     <activeChecks type="StringList">
       <Option value="" type="QString"/>
     </activeChecks>
@@ -135,18 +135,18 @@
     </field>
   </fieldConfiguration>
   <aliases>
-    <alias field="id" index="0" name=""/>
-    <alias field="leiding" index="1" name=""/>
-    <alias field="threedi_id" index="2" name=""/>
-    <alias field="threedi_start_id" index="3" name=""/>
-    <alias field="threedi_end_id" index="4" name=""/>
-    <alias field="beginpunt" index="5" name=""/>
-    <alias field="eindpunt" index="6" name=""/>
-    <alias field="bob_beginpunt" index="7" name=""/>
-    <alias field="bob_eindpunt" index="8" name=""/>
-    <alias field="hoogte_profiel" index="9" name=""/>
-    <alias field="bericht" index="10" name=""/>
-    <alias field="status" index="11" name=""/>
+    <alias field="id" name="" index="0"/>
+    <alias field="leiding" name="" index="1"/>
+    <alias field="threedi_id" name="" index="2"/>
+    <alias field="threedi_start_id" name="" index="3"/>
+    <alias field="threedi_end_id" name="" index="4"/>
+    <alias field="beginpunt" name="" index="5"/>
+    <alias field="eindpunt" name="" index="6"/>
+    <alias field="bob_beginpunt" name="" index="7"/>
+    <alias field="bob_eindpunt" name="" index="8"/>
+    <alias field="hoogte_profiel" name="" index="9"/>
+    <alias field="bericht" name="" index="10"/>
+    <alias field="status" name="" index="11"/>
   </aliases>
   <excludeAttributesWMS/>
   <excludeAttributesWFS/>
@@ -165,18 +165,18 @@
     <default field="status" applyOnUpdate="0" expression=""/>
   </defaults>
   <constraints>
-    <constraint exp_strength="0" field="id" unique_strength="1" constraints="3" notnull_strength="1"/>
-    <constraint exp_strength="0" field="leiding" unique_strength="0" constraints="0" notnull_strength="0"/>
-    <constraint exp_strength="0" field="threedi_id" unique_strength="0" constraints="0" notnull_strength="0"/>
-    <constraint exp_strength="0" field="threedi_start_id" unique_strength="0" constraints="0" notnull_strength="0"/>
-    <constraint exp_strength="0" field="threedi_end_id" unique_strength="0" constraints="0" notnull_strength="0"/>
-    <constraint exp_strength="0" field="beginpunt" unique_strength="0" constraints="0" notnull_strength="0"/>
-    <constraint exp_strength="0" field="eindpunt" unique_strength="0" constraints="0" notnull_strength="0"/>
-    <constraint exp_strength="0" field="bob_beginpunt" unique_strength="0" constraints="0" notnull_strength="0"/>
-    <constraint exp_strength="0" field="bob_eindpunt" unique_strength="0" constraints="0" notnull_strength="0"/>
-    <constraint exp_strength="0" field="hoogte_profiel" unique_strength="0" constraints="0" notnull_strength="0"/>
-    <constraint exp_strength="0" field="bericht" unique_strength="0" constraints="0" notnull_strength="0"/>
-    <constraint exp_strength="0" field="status" unique_strength="0" constraints="0" notnull_strength="0"/>
+    <constraint exp_strength="0" unique_strength="1" field="id" notnull_strength="1" constraints="3"/>
+    <constraint exp_strength="0" unique_strength="0" field="leiding" notnull_strength="0" constraints="0"/>
+    <constraint exp_strength="0" unique_strength="0" field="threedi_id" notnull_strength="0" constraints="0"/>
+    <constraint exp_strength="0" unique_strength="0" field="threedi_start_id" notnull_strength="0" constraints="0"/>
+    <constraint exp_strength="0" unique_strength="0" field="threedi_end_id" notnull_strength="0" constraints="0"/>
+    <constraint exp_strength="0" unique_strength="0" field="beginpunt" notnull_strength="0" constraints="0"/>
+    <constraint exp_strength="0" unique_strength="0" field="eindpunt" notnull_strength="0" constraints="0"/>
+    <constraint exp_strength="0" unique_strength="0" field="bob_beginpunt" notnull_strength="0" constraints="0"/>
+    <constraint exp_strength="0" unique_strength="0" field="bob_eindpunt" notnull_strength="0" constraints="0"/>
+    <constraint exp_strength="0" unique_strength="0" field="hoogte_profiel" notnull_strength="0" constraints="0"/>
+    <constraint exp_strength="0" unique_strength="0" field="bericht" notnull_strength="0" constraints="0"/>
+    <constraint exp_strength="0" unique_strength="0" field="status" notnull_strength="0" constraints="0"/>
   </constraints>
   <constraintExpressions>
     <constraint exp="" field="id" desc=""/>
@@ -194,7 +194,7 @@
   </constraintExpressions>
   <expressionfields/>
   <attributeactions/>
-  <attributetableconfig actionWidgetStyle="dropDown" sortExpression="" sortOrder="0">
+  <attributetableconfig actionWidgetStyle="dropDown" sortOrder="0" sortExpression="">
     <columns/>
   </attributetableconfig>
   <conditionalstyles>

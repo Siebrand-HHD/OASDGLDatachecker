@@ -368,7 +368,12 @@ class Datachecker:
         style_dir = os.path.join(scriptLocatie, 'styling', stijlgroep)
         # style_dir=r'C:\Users\onnoc\AppData\Roaming\QGIS\QGIS3\profiles\default\python\plugins\OASDGLDatachecker\styling\Stylingbeheerder'
         for layer in QgsProject.instance().mapLayers().values():
-            layer.saveNamedStyle(os.path.join(style_dir, layer.name() + ".qml"))
+            file = os.path.join(style_dir, layer.name() + ".qml")
+            if os.path.exists(file):
+                os.remove(file)
+            # layer.exportNamedStyle(file, "test")   
+            layer.saveNamedStyle(file)
+            # print(result)
 
     def laad_qml_styling(self):
         folder = "styling\\" + self.dockwidget.stylingbox.currentText()
@@ -379,7 +384,7 @@ class Datachecker:
             layer.loadNamedStyle(qmlpad)
             layer.triggerRepaint()
             # print(layer.name())
-            # print(qmlpad)
+            print(qmlpad)
         self.configure_dropdown()
 
     def add_qml_styling(self):
@@ -554,10 +559,10 @@ class Datachecker:
         settings.username=self.threedi_db_settings['threedi_user']
         settings.password=self.threedi_db_settings['threedi_password']
         settings.emptydb = True
-        import_type  = self.get_qsetting("Instellingen", "ImportSoftware") #"gbi"
-        if import_type == "":
-            import_type ="gbi"
-        settings.import_type = self.get_qsetting("Instellingen", "ImportSoftware") 
+        settings.import_type  = self.get_qsetting("Instellingen", "ImportSoftware") #"gbi"
+        if settings.import_type == "":
+            settings.import_type = "gbi"
+        # settings.import_type = self.get_qsetting("Instellingen", "ImportSoftware") 
         settings.export = True
         settings.gpkg_output_layer = self.dockwidget.outputFileName.text()
         settings.checks = True
