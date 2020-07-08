@@ -10,7 +10,7 @@
       <symbol clip_to_extent="1" alpha="1" name="0" type="marker" force_rhr="0">
         <layer locked="0" class="SimpleMarker" enabled="1" pass="0">
           <prop v="0" k="angle"/>
-          <prop v="133,182,111,255" k="color"/>
+          <prop v="164,113,88,255" k="color"/>
           <prop v="1" k="horizontal_anchor_point"/>
           <prop v="bevel" k="joinstyle"/>
           <prop v="circle" k="name"/>
@@ -80,9 +80,14 @@
       </editWidget>
     </field>
     <field name="status">
-      <editWidget type="">
+      <editWidget type="ValueMap">
         <config>
-          <Option/>
+          <Option type="Map">
+            <Option name="map" type="Map">
+              <Option value="gecontroleerd" name="gecontroleerd" type="QString"/>
+              <Option value="verwerkt" name="verwerkt" type="QString"/>
+            </Option>
+          </Option>
         </config>
       </editWidget>
     </field>

@@ -15,7 +15,7 @@
           <prop v="MM" k="customdash_unit"/>
           <prop v="0" k="draw_inside_polygon"/>
           <prop v="bevel" k="joinstyle"/>
-          <prop v="255,158,23,255" k="line_color"/>
+          <prop v="190,207,80,255" k="line_color"/>
           <prop v="solid" k="line_style"/>
           <prop v="0.26" k="line_width"/>
           <prop v="MM" k="line_width_unit"/>
@@ -70,35 +70,7 @@
         </config>
       </editWidget>
     </field>
-    <field name="threedi_start_id">
-      <editWidget type="">
-        <config>
-          <Option/>
-        </config>
-      </editWidget>
-    </field>
-    <field name="threedi_end_id">
-      <editWidget type="">
-        <config>
-          <Option/>
-        </config>
-      </editWidget>
-    </field>
     <field name="beginpunt">
-      <editWidget type="">
-        <config>
-          <Option/>
-        </config>
-      </editWidget>
-    </field>
-    <field name="eindpunt">
-      <editWidget type="">
-        <config>
-          <Option/>
-        </config>
-      </editWidget>
-    </field>
-    <field name="bob_beginpunt">
       <editWidget type="">
         <config>
           <Option/>
@@ -119,7 +91,35 @@
         </config>
       </editWidget>
     </field>
-    <field name="bericht">
+    <field name="bovenkant_leiding">
+      <editWidget type="">
+        <config>
+          <Option/>
+        </config>
+      </editWidget>
+    </field>
+    <field name="put_maaiveldhoogte">
+      <editWidget type="">
+        <config>
+          <Option/>
+        </config>
+      </editWidget>
+    </field>
+    <field name="ahn_maaiveldhoogte">
+      <editWidget type="">
+        <config>
+          <Option/>
+        </config>
+      </editWidget>
+    </field>
+    <field name="dekking_put_maaiveldhoogte">
+      <editWidget type="">
+        <config>
+          <Option/>
+        </config>
+      </editWidget>
+    </field>
+    <field name="dekking_ahn_maaiveldhoogte">
       <editWidget type="">
         <config>
           <Option/>
@@ -127,9 +127,14 @@
       </editWidget>
     </field>
     <field name="status">
-      <editWidget type="">
+      <editWidget type="ValueMap">
         <config>
-          <Option/>
+          <Option type="Map">
+            <Option name="map" type="Map">
+              <Option value="gecontroleerd" name="gecontroleerd" type="QString"/>
+              <Option value="verwerkt" name="verwerkt" type="QString"/>
+            </Option>
+          </Option>
         </config>
       </editWidget>
     </field>
@@ -138,14 +143,14 @@
     <alias field="id" name="" index="0"/>
     <alias field="leiding" name="" index="1"/>
     <alias field="threedi_id" name="" index="2"/>
-    <alias field="threedi_start_id" name="" index="3"/>
-    <alias field="threedi_end_id" name="" index="4"/>
-    <alias field="beginpunt" name="" index="5"/>
-    <alias field="eindpunt" name="" index="6"/>
-    <alias field="bob_beginpunt" name="" index="7"/>
-    <alias field="bob_eindpunt" name="" index="8"/>
-    <alias field="hoogte_profiel" name="" index="9"/>
-    <alias field="bericht" name="" index="10"/>
+    <alias field="beginpunt" name="" index="3"/>
+    <alias field="bob_eindpunt" name="" index="4"/>
+    <alias field="hoogte_profiel" name="" index="5"/>
+    <alias field="bovenkant_leiding" name="" index="6"/>
+    <alias field="put_maaiveldhoogte" name="" index="7"/>
+    <alias field="ahn_maaiveldhoogte" name="" index="8"/>
+    <alias field="dekking_put_maaiveldhoogte" name="" index="9"/>
+    <alias field="dekking_ahn_maaiveldhoogte" name="" index="10"/>
     <alias field="status" name="" index="11"/>
   </aliases>
   <excludeAttributesWMS/>
@@ -154,42 +159,42 @@
     <default field="id" applyOnUpdate="0" expression=""/>
     <default field="leiding" applyOnUpdate="0" expression=""/>
     <default field="threedi_id" applyOnUpdate="0" expression=""/>
-    <default field="threedi_start_id" applyOnUpdate="0" expression=""/>
-    <default field="threedi_end_id" applyOnUpdate="0" expression=""/>
     <default field="beginpunt" applyOnUpdate="0" expression=""/>
-    <default field="eindpunt" applyOnUpdate="0" expression=""/>
-    <default field="bob_beginpunt" applyOnUpdate="0" expression=""/>
     <default field="bob_eindpunt" applyOnUpdate="0" expression=""/>
     <default field="hoogte_profiel" applyOnUpdate="0" expression=""/>
-    <default field="bericht" applyOnUpdate="0" expression=""/>
+    <default field="bovenkant_leiding" applyOnUpdate="0" expression=""/>
+    <default field="put_maaiveldhoogte" applyOnUpdate="0" expression=""/>
+    <default field="ahn_maaiveldhoogte" applyOnUpdate="0" expression=""/>
+    <default field="dekking_put_maaiveldhoogte" applyOnUpdate="0" expression=""/>
+    <default field="dekking_ahn_maaiveldhoogte" applyOnUpdate="0" expression=""/>
     <default field="status" applyOnUpdate="0" expression=""/>
   </defaults>
   <constraints>
     <constraint exp_strength="0" unique_strength="1" field="id" notnull_strength="1" constraints="3"/>
     <constraint exp_strength="0" unique_strength="0" field="leiding" notnull_strength="0" constraints="0"/>
     <constraint exp_strength="0" unique_strength="0" field="threedi_id" notnull_strength="0" constraints="0"/>
-    <constraint exp_strength="0" unique_strength="0" field="threedi_start_id" notnull_strength="0" constraints="0"/>
-    <constraint exp_strength="0" unique_strength="0" field="threedi_end_id" notnull_strength="0" constraints="0"/>
     <constraint exp_strength="0" unique_strength="0" field="beginpunt" notnull_strength="0" constraints="0"/>
-    <constraint exp_strength="0" unique_strength="0" field="eindpunt" notnull_strength="0" constraints="0"/>
-    <constraint exp_strength="0" unique_strength="0" field="bob_beginpunt" notnull_strength="0" constraints="0"/>
     <constraint exp_strength="0" unique_strength="0" field="bob_eindpunt" notnull_strength="0" constraints="0"/>
     <constraint exp_strength="0" unique_strength="0" field="hoogte_profiel" notnull_strength="0" constraints="0"/>
-    <constraint exp_strength="0" unique_strength="0" field="bericht" notnull_strength="0" constraints="0"/>
+    <constraint exp_strength="0" unique_strength="0" field="bovenkant_leiding" notnull_strength="0" constraints="0"/>
+    <constraint exp_strength="0" unique_strength="0" field="put_maaiveldhoogte" notnull_strength="0" constraints="0"/>
+    <constraint exp_strength="0" unique_strength="0" field="ahn_maaiveldhoogte" notnull_strength="0" constraints="0"/>
+    <constraint exp_strength="0" unique_strength="0" field="dekking_put_maaiveldhoogte" notnull_strength="0" constraints="0"/>
+    <constraint exp_strength="0" unique_strength="0" field="dekking_ahn_maaiveldhoogte" notnull_strength="0" constraints="0"/>
     <constraint exp_strength="0" unique_strength="0" field="status" notnull_strength="0" constraints="0"/>
   </constraints>
   <constraintExpressions>
     <constraint exp="" field="id" desc=""/>
     <constraint exp="" field="leiding" desc=""/>
     <constraint exp="" field="threedi_id" desc=""/>
-    <constraint exp="" field="threedi_start_id" desc=""/>
-    <constraint exp="" field="threedi_end_id" desc=""/>
     <constraint exp="" field="beginpunt" desc=""/>
-    <constraint exp="" field="eindpunt" desc=""/>
-    <constraint exp="" field="bob_beginpunt" desc=""/>
     <constraint exp="" field="bob_eindpunt" desc=""/>
     <constraint exp="" field="hoogte_profiel" desc=""/>
-    <constraint exp="" field="bericht" desc=""/>
+    <constraint exp="" field="bovenkant_leiding" desc=""/>
+    <constraint exp="" field="put_maaiveldhoogte" desc=""/>
+    <constraint exp="" field="ahn_maaiveldhoogte" desc=""/>
+    <constraint exp="" field="dekking_put_maaiveldhoogte" desc=""/>
+    <constraint exp="" field="dekking_ahn_maaiveldhoogte" desc=""/>
     <constraint exp="" field="status" desc=""/>
   </constraintExpressions>
   <expressionfields/>

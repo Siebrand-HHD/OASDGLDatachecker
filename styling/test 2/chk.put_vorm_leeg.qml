@@ -10,7 +10,7 @@
       <symbol clip_to_extent="1" alpha="1" name="0" type="marker" force_rhr="0">
         <layer locked="0" class="SimpleMarker" enabled="1" pass="0">
           <prop v="0" k="angle"/>
-          <prop v="133,182,111,255" k="color"/>
+          <prop v="125,139,143,255" k="color"/>
           <prop v="1" k="horizontal_anchor_point"/>
           <prop v="bevel" k="joinstyle"/>
           <prop v="circle" k="name"/>
@@ -72,7 +72,14 @@
         </config>
       </editWidget>
     </field>
-    <field name="bodemhoogte">
+    <field name="vorm">
+      <editWidget type="">
+        <config>
+          <Option/>
+        </config>
+      </editWidget>
+    </field>
+    <field name="bericht">
       <editWidget type="">
         <config>
           <Option/>
@@ -80,9 +87,14 @@
       </editWidget>
     </field>
     <field name="status">
-      <editWidget type="">
+      <editWidget type="ValueMap">
         <config>
-          <Option/>
+          <Option type="Map">
+            <Option name="map" type="Map">
+              <Option value="gecontroleerd" name="gecontroleerd" type="QString"/>
+              <Option value="verwerkt" name="verwerkt" type="QString"/>
+            </Option>
+          </Option>
         </config>
       </editWidget>
     </field>
@@ -91,8 +103,9 @@
     <alias field="id" name="" index="0"/>
     <alias field="rioolput" name="" index="1"/>
     <alias field="threedi_id" name="" index="2"/>
-    <alias field="bodemhoogte" name="" index="3"/>
-    <alias field="status" name="" index="4"/>
+    <alias field="vorm" name="" index="3"/>
+    <alias field="bericht" name="" index="4"/>
+    <alias field="status" name="" index="5"/>
   </aliases>
   <excludeAttributesWMS/>
   <excludeAttributesWFS/>
@@ -100,21 +113,24 @@
     <default field="id" applyOnUpdate="0" expression=""/>
     <default field="rioolput" applyOnUpdate="0" expression=""/>
     <default field="threedi_id" applyOnUpdate="0" expression=""/>
-    <default field="bodemhoogte" applyOnUpdate="0" expression=""/>
+    <default field="vorm" applyOnUpdate="0" expression=""/>
+    <default field="bericht" applyOnUpdate="0" expression=""/>
     <default field="status" applyOnUpdate="0" expression=""/>
   </defaults>
   <constraints>
     <constraint exp_strength="0" unique_strength="1" field="id" notnull_strength="1" constraints="3"/>
     <constraint exp_strength="0" unique_strength="0" field="rioolput" notnull_strength="0" constraints="0"/>
     <constraint exp_strength="0" unique_strength="0" field="threedi_id" notnull_strength="0" constraints="0"/>
-    <constraint exp_strength="0" unique_strength="0" field="bodemhoogte" notnull_strength="0" constraints="0"/>
+    <constraint exp_strength="0" unique_strength="0" field="vorm" notnull_strength="0" constraints="0"/>
+    <constraint exp_strength="0" unique_strength="0" field="bericht" notnull_strength="0" constraints="0"/>
     <constraint exp_strength="0" unique_strength="0" field="status" notnull_strength="0" constraints="0"/>
   </constraints>
   <constraintExpressions>
     <constraint exp="" field="id" desc=""/>
     <constraint exp="" field="rioolput" desc=""/>
     <constraint exp="" field="threedi_id" desc=""/>
-    <constraint exp="" field="bodemhoogte" desc=""/>
+    <constraint exp="" field="vorm" desc=""/>
+    <constraint exp="" field="bericht" desc=""/>
     <constraint exp="" field="status" desc=""/>
   </constraintExpressions>
   <expressionfields/>

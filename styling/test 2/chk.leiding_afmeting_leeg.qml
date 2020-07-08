@@ -15,7 +15,7 @@
           <prop v="MM" k="customdash_unit"/>
           <prop v="0" k="draw_inside_polygon"/>
           <prop v="bevel" k="joinstyle"/>
-          <prop v="255,158,23,255" k="line_color"/>
+          <prop v="196,60,57,255" k="line_color"/>
           <prop v="solid" k="line_style"/>
           <prop v="0.26" k="line_width"/>
           <prop v="MM" k="line_width_unit"/>
@@ -70,20 +70,6 @@
         </config>
       </editWidget>
     </field>
-    <field name="threedi_start_id">
-      <editWidget type="">
-        <config>
-          <Option/>
-        </config>
-      </editWidget>
-    </field>
-    <field name="threedi_end_id">
-      <editWidget type="">
-        <config>
-          <Option/>
-        </config>
-      </editWidget>
-    </field>
     <field name="beginpunt">
       <editWidget type="">
         <config>
@@ -98,21 +84,21 @@
         </config>
       </editWidget>
     </field>
-    <field name="bob_beginpunt">
+    <field name="vormprofiel">
       <editWidget type="">
         <config>
           <Option/>
         </config>
       </editWidget>
     </field>
-    <field name="bob_eindpunt">
+    <field name="breedte">
       <editWidget type="">
         <config>
           <Option/>
         </config>
       </editWidget>
     </field>
-    <field name="hoogte_profiel">
+    <field name="hoogte">
       <editWidget type="">
         <config>
           <Option/>
@@ -127,9 +113,14 @@
       </editWidget>
     </field>
     <field name="status">
-      <editWidget type="">
+      <editWidget type="ValueMap">
         <config>
-          <Option/>
+          <Option type="Map">
+            <Option name="map" type="Map">
+              <Option value="gecontroleerd" name="gecontroleerd" type="QString"/>
+              <Option value="verwerkt" name="verwerkt" type="QString"/>
+            </Option>
+          </Option>
         </config>
       </editWidget>
     </field>
@@ -138,15 +129,13 @@
     <alias field="id" name="" index="0"/>
     <alias field="leiding" name="" index="1"/>
     <alias field="threedi_id" name="" index="2"/>
-    <alias field="threedi_start_id" name="" index="3"/>
-    <alias field="threedi_end_id" name="" index="4"/>
-    <alias field="beginpunt" name="" index="5"/>
-    <alias field="eindpunt" name="" index="6"/>
-    <alias field="bob_beginpunt" name="" index="7"/>
-    <alias field="bob_eindpunt" name="" index="8"/>
-    <alias field="hoogte_profiel" name="" index="9"/>
-    <alias field="bericht" name="" index="10"/>
-    <alias field="status" name="" index="11"/>
+    <alias field="beginpunt" name="" index="3"/>
+    <alias field="eindpunt" name="" index="4"/>
+    <alias field="vormprofiel" name="" index="5"/>
+    <alias field="breedte" name="" index="6"/>
+    <alias field="hoogte" name="" index="7"/>
+    <alias field="bericht" name="" index="8"/>
+    <alias field="status" name="" index="9"/>
   </aliases>
   <excludeAttributesWMS/>
   <excludeAttributesWFS/>
@@ -154,13 +143,11 @@
     <default field="id" applyOnUpdate="0" expression=""/>
     <default field="leiding" applyOnUpdate="0" expression=""/>
     <default field="threedi_id" applyOnUpdate="0" expression=""/>
-    <default field="threedi_start_id" applyOnUpdate="0" expression=""/>
-    <default field="threedi_end_id" applyOnUpdate="0" expression=""/>
     <default field="beginpunt" applyOnUpdate="0" expression=""/>
     <default field="eindpunt" applyOnUpdate="0" expression=""/>
-    <default field="bob_beginpunt" applyOnUpdate="0" expression=""/>
-    <default field="bob_eindpunt" applyOnUpdate="0" expression=""/>
-    <default field="hoogte_profiel" applyOnUpdate="0" expression=""/>
+    <default field="vormprofiel" applyOnUpdate="0" expression=""/>
+    <default field="breedte" applyOnUpdate="0" expression=""/>
+    <default field="hoogte" applyOnUpdate="0" expression=""/>
     <default field="bericht" applyOnUpdate="0" expression=""/>
     <default field="status" applyOnUpdate="0" expression=""/>
   </defaults>
@@ -168,13 +155,11 @@
     <constraint exp_strength="0" unique_strength="1" field="id" notnull_strength="1" constraints="3"/>
     <constraint exp_strength="0" unique_strength="0" field="leiding" notnull_strength="0" constraints="0"/>
     <constraint exp_strength="0" unique_strength="0" field="threedi_id" notnull_strength="0" constraints="0"/>
-    <constraint exp_strength="0" unique_strength="0" field="threedi_start_id" notnull_strength="0" constraints="0"/>
-    <constraint exp_strength="0" unique_strength="0" field="threedi_end_id" notnull_strength="0" constraints="0"/>
     <constraint exp_strength="0" unique_strength="0" field="beginpunt" notnull_strength="0" constraints="0"/>
     <constraint exp_strength="0" unique_strength="0" field="eindpunt" notnull_strength="0" constraints="0"/>
-    <constraint exp_strength="0" unique_strength="0" field="bob_beginpunt" notnull_strength="0" constraints="0"/>
-    <constraint exp_strength="0" unique_strength="0" field="bob_eindpunt" notnull_strength="0" constraints="0"/>
-    <constraint exp_strength="0" unique_strength="0" field="hoogte_profiel" notnull_strength="0" constraints="0"/>
+    <constraint exp_strength="0" unique_strength="0" field="vormprofiel" notnull_strength="0" constraints="0"/>
+    <constraint exp_strength="0" unique_strength="0" field="breedte" notnull_strength="0" constraints="0"/>
+    <constraint exp_strength="0" unique_strength="0" field="hoogte" notnull_strength="0" constraints="0"/>
     <constraint exp_strength="0" unique_strength="0" field="bericht" notnull_strength="0" constraints="0"/>
     <constraint exp_strength="0" unique_strength="0" field="status" notnull_strength="0" constraints="0"/>
   </constraints>
@@ -182,13 +167,11 @@
     <constraint exp="" field="id" desc=""/>
     <constraint exp="" field="leiding" desc=""/>
     <constraint exp="" field="threedi_id" desc=""/>
-    <constraint exp="" field="threedi_start_id" desc=""/>
-    <constraint exp="" field="threedi_end_id" desc=""/>
     <constraint exp="" field="beginpunt" desc=""/>
     <constraint exp="" field="eindpunt" desc=""/>
-    <constraint exp="" field="bob_beginpunt" desc=""/>
-    <constraint exp="" field="bob_eindpunt" desc=""/>
-    <constraint exp="" field="hoogte_profiel" desc=""/>
+    <constraint exp="" field="vormprofiel" desc=""/>
+    <constraint exp="" field="breedte" desc=""/>
+    <constraint exp="" field="hoogte" desc=""/>
     <constraint exp="" field="bericht" desc=""/>
     <constraint exp="" field="status" desc=""/>
   </constraintExpressions>
