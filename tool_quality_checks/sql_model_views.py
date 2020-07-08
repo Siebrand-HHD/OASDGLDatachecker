@@ -3,27 +3,6 @@
 # TODO putmateriaal toevoegen      material AS materiaalput,
 
 sql_understandable_model_views = {
-    "put": """CREATE OR REPLACE VIEW {schema}.put AS
-    SELECT
-        a.code AS rioolput,
-        a.id AS threedi_id,
-        CASE
-            WHEN shape = '00' or shape = '02' THEN 'rechthoekig'
-            WHEN shape = '01' THEN 'rond'
-            ELSE 'overige'
- 		END as vorm,
-        width AS breedte,
-        length AS lengte,
-        CASE
-            WHEN manhole_indicator = 0 THEN 'inspectieput'
-            WHEN manhole_indicator = 1 THEN 'uitlaat'
-            WHEN manhole_indicator = 2 THEN 'pomp'
-            ELSE 'overige'
- 		END as typeknooppunt,
-        bottom_level AS bodemhoogte,
-        surface_level AS maaiveldhoogte,
-        b.the_geom::geometry(Point, 28992)
-    FROM v2_manhole a JOIN v2_connection_nodes b ON a.connection_node_id = b.id;""",
     "leiding": """CREATE OR REPLACE VIEW {schema}.leiding AS
     SELECT
         pipe.code AS leiding,
@@ -58,8 +37,8 @@ sql_understandable_model_views = {
             WHEN shape = 6 THEN 'getabelleerd trapezium'
             ELSE 'overige'
  		END as vormprofiel,
-        array_greatest(string_to_array(width,' ')) AS breedte,
-        array_greatest(string_to_array(height,' ')) AS hoogte,
+        ((array_greatest(string_to_array(width,' '))::float) * 1000)::double precision AS breedte,
+        (array_greatest(string_to_array(height,' '))::float * 1000)::double precision AS hoogte,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_pipe pipe
     LEFT JOIN v2_connection_nodes start_node
@@ -170,4 +149,25 @@ sql_understandable_model_views = {
         ON 	pump.connection_node_start_id = start_node.id 
     LEFT JOIN v2_connection_nodes end_node
         ON 	pump.connection_node_end_id = end_node.id;""",
+    "put": """CREATE OR REPLACE VIEW {schema}.put AS
+    SELECT
+        a.code AS rioolput,
+        a.id AS threedi_id,
+        CASE
+            WHEN shape = '00' or shape = '02' THEN 'rechthoekig'
+            WHEN shape = '01' THEN 'rond'
+            ELSE 'overige'
+ 		END as vorm,
+        (width * 1000)::double precision AS breedte,
+        (length * 1000)::double precision AS lengte,
+        CASE
+            WHEN manhole_indicator = 0 THEN 'inspectieput'
+            WHEN manhole_indicator = 1 THEN 'uitlaat'
+            WHEN manhole_indicator = 2 THEN 'pomp'
+            ELSE 'overige'
+ 		END as typeknooppunt,
+        bottom_level AS bodemhoogte,
+        surface_level AS maaiveldhoogte,
+        b.the_geom::geometry(Point, 28992)
+    FROM v2_manhole a JOIN v2_connection_nodes b ON a.connection_node_id = b.id;""",
 }

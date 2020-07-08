@@ -445,10 +445,10 @@ class Datachecker:
         # filter = true
         statement = "status is null or status IN ()"
         basis = "status is null or status IN ("
-        oldstatement=""
+        oldstatement = ""
         try:
             oldstatement = iface.activeLayer().subsetString()
-            if filter:                            
+            if filter:
                 if not basis in oldstatement:
                     statement = basis + "'" + waarde + "')"
                 elif oldstatement.find(waarde) == -1:
@@ -459,27 +459,29 @@ class Datachecker:
                     elif len(statement) > 2:
                         statement = basis + statement + ",'" + waarde + "')"
                 else:
-                    statement = oldstatement 
-            else:            
-                if not basis in oldstatement:
                     statement = oldstatement
+            else:
+                if not basis in oldstatement:
+                    statement = "status is null or status IN ('gecontroleerd', 'verwerkt')"
+                    statement = statement.replace("'" + waarde + "', ","")
                 elif oldstatement.find(waarde)==-1:
                     statement = oldstatement
                 else:
-                    statement=oldstatement.replace(basis, "")
-                    statement=statement.replace(")","") 
+                    statement = oldstatement.replace(basis, "")
+                    statement = statement.replace(")","") 
                     statement = statement.replace("'" + waarde + "'","")
                     if len(statement) == 0:
                         statement = basis +  ")"
                     elif len(statement) > 2:
-                        statement = statement.replace(",," ,",")                        
+                        statement = statement.replace(",," ,",")
                         statement = statement.strip(",")
                         statement = basis +  statement + ")"
         except:         
+        #    statement = "status is null or status IN (gecontroleerd, verwerkt)"
             pass
             
-        if not statement in [ oldstatement, ""]:             
-            for layer in QgsProject.instance().mapLayers().values():          
+        if not statement in [ oldstatement, ""]:
+            for layer in QgsProject.instance().mapLayers().values():
                 if layer.name().startswith("chk."):
                     layer.setSubsetString(statement)
                       
@@ -559,10 +561,11 @@ class Datachecker:
         settings.username=self.threedi_db_settings['threedi_user']
         settings.password=self.threedi_db_settings['threedi_password']
         settings.emptydb = True
-        settings.import_type  = self.get_qsetting("Instellingen", "ImportSoftware") #"gbi"
+
+        settings.import_type = self.get_qsetting("Instellingen", "ImportSoftware") #"gbi"
         if settings.import_type == "":
-            settings.import_type = "gbi"
-        # settings.import_type = self.get_qsetting("Instellingen", "ImportSoftware") 
+            settings.import_type ="gbi"
+
         settings.export = True
         settings.gpkg_output_layer = self.dockwidget.outputFileName.text()
         settings.checks = True
@@ -735,6 +738,7 @@ class Datachecker:
         task1 = QgsTask.fromFunction('Draai checks',run_scripts_task,on_finished=self.completed,settings=settings)
         QgsApplication.taskManager().addTask(task1)
         #run_scripts(settings)
+        
         self.initialize_paths()        
         
     def initialize_paths(self):
@@ -816,6 +820,7 @@ class Datachecker:
             ##self.dockwidget.linePutten.dropevent.connect(over
             self.dockwidget.pgecontroleerd.clicked.connect(lambda:self.update_status(waarde ='gecontroleerd'))
             self.dockwidget.pverwerkt.clicked.connect(lambda:self.update_status(waarde ='verwerkt'))
+            self.dockwidget.pleeg.clicked.connect(lambda:self.update_status(waarde = None))
             self.dockwidget.cbgecontroleerd.stateChanged.connect(lambda:self.filter_status(waarde ='gecontroleerd', filter = self.dockwidget.cbgecontroleerd.isChecked()))
             self.dockwidget.cbverwerkt.stateChanged.connect(lambda:self.filter_status(waarde ='verwerkt', filter = self.dockwidget.cbverwerkt.isChecked()))
             

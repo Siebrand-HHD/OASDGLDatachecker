@@ -1,10 +1,15 @@
 <!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
+<<<<<<< HEAD
 <qgis styleCategories="AllStyleCategories" hasScaleBasedVisibilityFlag="0" minScale="1e+08" readOnly="0" version="3.8.0-Zanzibar" simplifyDrawingTol="1" labelsEnabled="0" simplifyLocal="1" simplifyMaxScale="1" simplifyDrawingHints="1" maxScale="0" simplifyAlgorithm="0">
+=======
+<qgis simplifyAlgorithm="0" readOnly="0" version="3.8.0-Zanzibar" simplifyDrawingTol="1" styleCategories="AllStyleCategories" simplifyMaxScale="1" maxScale="0" labelsEnabled="0" hasScaleBasedVisibilityFlag="0" minScale="1e+08" simplifyDrawingHints="1" simplifyLocal="1">
+>>>>>>> siebrand-gisib
   <flags>
     <Identifiable>1</Identifiable>
     <Removable>1</Removable>
     <Searchable>1</Searchable>
   </flags>
+<<<<<<< HEAD
   <renderer-v2 forceraster="0" enableorderby="0" type="singleSymbol" symbollevels="0">
     <symbols>
       <symbol clip_to_extent="1" alpha="1" name="0" type="line" force_rhr="0">
@@ -25,6 +30,28 @@
           <prop v="0" k="ring_filter"/>
           <prop v="0" k="use_custom_dash"/>
           <prop v="3x:0,0,0,0,0,0" k="width_map_unit_scale"/>
+=======
+  <renderer-v2 enableorderby="0" forceraster="0" symbollevels="0" type="singleSymbol">
+    <symbols>
+      <symbol alpha="1" clip_to_extent="1" force_rhr="0" name="0" type="line">
+        <layer enabled="1" locked="0" class="SimpleLine" pass="0">
+          <prop k="capstyle" v="square"/>
+          <prop k="customdash" v="5;2"/>
+          <prop k="customdash_map_unit_scale" v="3x:0,0,0,0,0,0"/>
+          <prop k="customdash_unit" v="MM"/>
+          <prop k="draw_inside_polygon" v="0"/>
+          <prop k="joinstyle" v="bevel"/>
+          <prop k="line_color" v="183,72,75,255"/>
+          <prop k="line_style" v="solid"/>
+          <prop k="line_width" v="0.26"/>
+          <prop k="line_width_unit" v="MM"/>
+          <prop k="offset" v="0"/>
+          <prop k="offset_map_unit_scale" v="3x:0,0,0,0,0,0"/>
+          <prop k="offset_unit" v="MM"/>
+          <prop k="ring_filter" v="0"/>
+          <prop k="use_custom_dash" v="0"/>
+          <prop k="width_map_unit_scale" v="3x:0,0,0,0,0,0"/>
+>>>>>>> siebrand-gisib
           <data_defined_properties>
             <Option type="Map">
               <Option value="" name="name" type="QString"/>
@@ -42,7 +69,11 @@
   <blendMode>0</blendMode>
   <featureBlendMode>0</featureBlendMode>
   <layerOpacity>1</layerOpacity>
+<<<<<<< HEAD
   <geometryOptions removeDuplicateNodes="0" geometryPrecision="0">
+=======
+  <geometryOptions geometryPrecision="0" removeDuplicateNodes="0">
+>>>>>>> siebrand-gisib
     <activeChecks type="StringList">
       <Option value="" type="QString"/>
     </activeChecks>
@@ -212,6 +243,7 @@
     </field>
   </fieldConfiguration>
   <aliases>
+<<<<<<< HEAD
     <alias field="id" name="" index="0"/>
     <alias field="pipe_id" name="" index="1"/>
     <alias field="pipe_display_name" name="" index="2"/>
@@ -235,6 +267,31 @@
     <alias field="def_width" name="" index="20"/>
     <alias field="def_height" name="" index="21"/>
     <alias field="def_code" name="" index="22"/>
+=======
+    <alias field="id" index="0" name=""/>
+    <alias field="pipe_id" index="1" name=""/>
+    <alias field="pipe_display_name" index="2" name=""/>
+    <alias field="pipe_code" index="3" name=""/>
+    <alias field="pipe_profile_num" index="4" name=""/>
+    <alias field="pipe_sewerage_type" index="5" name=""/>
+    <alias field="pipe_calculation_type" index="6" name=""/>
+    <alias field="pipe_invert_level_start_point" index="7" name=""/>
+    <alias field="pipe_invert_level_end_point" index="8" name=""/>
+    <alias field="pipe_cross_section_definition_id" index="9" name=""/>
+    <alias field="pipe_friction_value" index="10" name=""/>
+    <alias field="pipe_friction_type" index="11" name=""/>
+    <alias field="pipe_dist_calc_points" index="12" name=""/>
+    <alias field="pipe_material" index="13" name=""/>
+    <alias field="pipe_original_length" index="14" name=""/>
+    <alias field="pipe_zoom_category" index="15" name=""/>
+    <alias field="pipe_connection_node_start_id" index="16" name=""/>
+    <alias field="pipe_connection_node_end_id" index="17" name=""/>
+    <alias field="def_id" index="18" name=""/>
+    <alias field="def_shape" index="19" name=""/>
+    <alias field="def_width" index="20" name=""/>
+    <alias field="def_height" index="21" name=""/>
+    <alias field="def_code" index="22" name=""/>
+>>>>>>> siebrand-gisib
   </aliases>
   <excludeAttributesWMS/>
   <excludeAttributesWFS/>
@@ -264,6 +321,7 @@
     <default field="def_code" applyOnUpdate="0" expression=""/>
   </defaults>
   <constraints>
+<<<<<<< HEAD
     <constraint exp_strength="0" unique_strength="1" field="id" notnull_strength="1" constraints="3"/>
     <constraint exp_strength="0" unique_strength="0" field="pipe_id" notnull_strength="0" constraints="0"/>
     <constraint exp_strength="0" unique_strength="0" field="pipe_display_name" notnull_strength="0" constraints="0"/>
@@ -287,6 +345,31 @@
     <constraint exp_strength="0" unique_strength="0" field="def_width" notnull_strength="0" constraints="0"/>
     <constraint exp_strength="0" unique_strength="0" field="def_height" notnull_strength="0" constraints="0"/>
     <constraint exp_strength="0" unique_strength="0" field="def_code" notnull_strength="0" constraints="0"/>
+=======
+    <constraint exp_strength="0" field="id" unique_strength="1" constraints="3" notnull_strength="1"/>
+    <constraint exp_strength="0" field="pipe_id" unique_strength="0" constraints="0" notnull_strength="0"/>
+    <constraint exp_strength="0" field="pipe_display_name" unique_strength="0" constraints="0" notnull_strength="0"/>
+    <constraint exp_strength="0" field="pipe_code" unique_strength="0" constraints="0" notnull_strength="0"/>
+    <constraint exp_strength="0" field="pipe_profile_num" unique_strength="0" constraints="0" notnull_strength="0"/>
+    <constraint exp_strength="0" field="pipe_sewerage_type" unique_strength="0" constraints="0" notnull_strength="0"/>
+    <constraint exp_strength="0" field="pipe_calculation_type" unique_strength="0" constraints="0" notnull_strength="0"/>
+    <constraint exp_strength="0" field="pipe_invert_level_start_point" unique_strength="0" constraints="0" notnull_strength="0"/>
+    <constraint exp_strength="0" field="pipe_invert_level_end_point" unique_strength="0" constraints="0" notnull_strength="0"/>
+    <constraint exp_strength="0" field="pipe_cross_section_definition_id" unique_strength="0" constraints="0" notnull_strength="0"/>
+    <constraint exp_strength="0" field="pipe_friction_value" unique_strength="0" constraints="0" notnull_strength="0"/>
+    <constraint exp_strength="0" field="pipe_friction_type" unique_strength="0" constraints="0" notnull_strength="0"/>
+    <constraint exp_strength="0" field="pipe_dist_calc_points" unique_strength="0" constraints="0" notnull_strength="0"/>
+    <constraint exp_strength="0" field="pipe_material" unique_strength="0" constraints="0" notnull_strength="0"/>
+    <constraint exp_strength="0" field="pipe_original_length" unique_strength="0" constraints="0" notnull_strength="0"/>
+    <constraint exp_strength="0" field="pipe_zoom_category" unique_strength="0" constraints="0" notnull_strength="0"/>
+    <constraint exp_strength="0" field="pipe_connection_node_start_id" unique_strength="0" constraints="0" notnull_strength="0"/>
+    <constraint exp_strength="0" field="pipe_connection_node_end_id" unique_strength="0" constraints="0" notnull_strength="0"/>
+    <constraint exp_strength="0" field="def_id" unique_strength="0" constraints="0" notnull_strength="0"/>
+    <constraint exp_strength="0" field="def_shape" unique_strength="0" constraints="0" notnull_strength="0"/>
+    <constraint exp_strength="0" field="def_width" unique_strength="0" constraints="0" notnull_strength="0"/>
+    <constraint exp_strength="0" field="def_height" unique_strength="0" constraints="0" notnull_strength="0"/>
+    <constraint exp_strength="0" field="def_code" unique_strength="0" constraints="0" notnull_strength="0"/>
+>>>>>>> siebrand-gisib
   </constraints>
   <constraintExpressions>
     <constraint exp="" field="id" desc=""/>
@@ -315,7 +398,11 @@
   </constraintExpressions>
   <expressionfields/>
   <attributeactions/>
+<<<<<<< HEAD
   <attributetableconfig actionWidgetStyle="dropDown" sortOrder="0" sortExpression="">
+=======
+  <attributetableconfig actionWidgetStyle="dropDown" sortExpression="" sortOrder="0">
+>>>>>>> siebrand-gisib
     <columns/>
   </attributetableconfig>
   <conditionalstyles>

@@ -1,10 +1,15 @@
 <!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
+<<<<<<< HEAD
 <qgis styleCategories="AllStyleCategories" hasScaleBasedVisibilityFlag="0" minScale="1e+08" readOnly="0" version="3.8.0-Zanzibar" simplifyDrawingTol="1" labelsEnabled="0" simplifyLocal="1" simplifyMaxScale="1" simplifyDrawingHints="1" maxScale="0" simplifyAlgorithm="0">
+=======
+<qgis simplifyAlgorithm="0" readOnly="0" version="3.8.0-Zanzibar" simplifyDrawingTol="1" styleCategories="AllStyleCategories" simplifyMaxScale="1" maxScale="0" labelsEnabled="0" hasScaleBasedVisibilityFlag="0" minScale="1e+08" simplifyDrawingHints="1" simplifyLocal="1">
+>>>>>>> siebrand-gisib
   <flags>
     <Identifiable>1</Identifiable>
     <Removable>1</Removable>
     <Searchable>1</Searchable>
   </flags>
+<<<<<<< HEAD
   <renderer-v2 forceraster="0" enableorderby="0" type="singleSymbol" symbollevels="0">
     <symbols>
       <symbol clip_to_extent="1" alpha="1" name="0" type="line" force_rhr="0">
@@ -25,6 +30,28 @@
           <prop v="0" k="ring_filter"/>
           <prop v="0" k="use_custom_dash"/>
           <prop v="3x:0,0,0,0,0,0" k="width_map_unit_scale"/>
+=======
+  <renderer-v2 enableorderby="0" forceraster="0" symbollevels="0" type="singleSymbol">
+    <symbols>
+      <symbol alpha="1" clip_to_extent="1" force_rhr="0" name="0" type="line">
+        <layer enabled="1" locked="0" class="SimpleLine" pass="0">
+          <prop k="capstyle" v="square"/>
+          <prop k="customdash" v="5;2"/>
+          <prop k="customdash_map_unit_scale" v="3x:0,0,0,0,0,0"/>
+          <prop k="customdash_unit" v="MM"/>
+          <prop k="draw_inside_polygon" v="0"/>
+          <prop k="joinstyle" v="bevel"/>
+          <prop k="line_color" v="133,182,111,255"/>
+          <prop k="line_style" v="solid"/>
+          <prop k="line_width" v="0.26"/>
+          <prop k="line_width_unit" v="MM"/>
+          <prop k="offset" v="0"/>
+          <prop k="offset_map_unit_scale" v="3x:0,0,0,0,0,0"/>
+          <prop k="offset_unit" v="MM"/>
+          <prop k="ring_filter" v="0"/>
+          <prop k="use_custom_dash" v="0"/>
+          <prop k="width_map_unit_scale" v="3x:0,0,0,0,0,0"/>
+>>>>>>> siebrand-gisib
           <data_defined_properties>
             <Option type="Map">
               <Option value="" name="name" type="QString"/>
@@ -42,7 +69,11 @@
   <blendMode>0</blendMode>
   <featureBlendMode>0</featureBlendMode>
   <layerOpacity>1</layerOpacity>
+<<<<<<< HEAD
   <geometryOptions removeDuplicateNodes="0" geometryPrecision="0">
+=======
+  <geometryOptions geometryPrecision="0" removeDuplicateNodes="0">
+>>>>>>> siebrand-gisib
     <activeChecks type="StringList">
       <Option value="" type="QString"/>
     </activeChecks>
@@ -135,6 +166,7 @@
     </field>
   </fieldConfiguration>
   <aliases>
+<<<<<<< HEAD
     <alias field="id" name="" index="0"/>
     <alias field="leiding" name="" index="1"/>
     <alias field="threedi_id" name="" index="2"/>
@@ -147,6 +179,20 @@
     <alias field="dekking_put_maaiveldhoogte" name="" index="9"/>
     <alias field="dekking_ahn_maaiveldhoogte" name="" index="10"/>
     <alias field="status" name="" index="11"/>
+=======
+    <alias field="id" index="0" name=""/>
+    <alias field="leiding" index="1" name=""/>
+    <alias field="threedi_id" index="2" name=""/>
+    <alias field="beginpunt" index="3" name=""/>
+    <alias field="bob_beginpunt" index="4" name=""/>
+    <alias field="hoogte_profiel" index="5" name=""/>
+    <alias field="bovenkant_leiding" index="6" name=""/>
+    <alias field="put_maaiveldhoogte" index="7" name=""/>
+    <alias field="ahn_maaiveldhoogte" index="8" name=""/>
+    <alias field="dekking_put_maaiveldhoogte" index="9" name=""/>
+    <alias field="dekking_ahn_maaiveldhoogte" index="10" name=""/>
+    <alias field="status" index="11" name=""/>
+>>>>>>> siebrand-gisib
   </aliases>
   <excludeAttributesWMS/>
   <excludeAttributesWFS/>
@@ -165,6 +211,7 @@
     <default field="status" applyOnUpdate="0" expression=""/>
   </defaults>
   <constraints>
+<<<<<<< HEAD
     <constraint exp_strength="0" unique_strength="1" field="id" notnull_strength="1" constraints="3"/>
     <constraint exp_strength="0" unique_strength="0" field="leiding" notnull_strength="0" constraints="0"/>
     <constraint exp_strength="0" unique_strength="0" field="threedi_id" notnull_strength="0" constraints="0"/>
@@ -177,6 +224,20 @@
     <constraint exp_strength="0" unique_strength="0" field="dekking_put_maaiveldhoogte" notnull_strength="0" constraints="0"/>
     <constraint exp_strength="0" unique_strength="0" field="dekking_ahn_maaiveldhoogte" notnull_strength="0" constraints="0"/>
     <constraint exp_strength="0" unique_strength="0" field="status" notnull_strength="0" constraints="0"/>
+=======
+    <constraint exp_strength="0" field="id" unique_strength="1" constraints="3" notnull_strength="1"/>
+    <constraint exp_strength="0" field="leiding" unique_strength="0" constraints="0" notnull_strength="0"/>
+    <constraint exp_strength="0" field="threedi_id" unique_strength="0" constraints="0" notnull_strength="0"/>
+    <constraint exp_strength="0" field="beginpunt" unique_strength="0" constraints="0" notnull_strength="0"/>
+    <constraint exp_strength="0" field="bob_beginpunt" unique_strength="0" constraints="0" notnull_strength="0"/>
+    <constraint exp_strength="0" field="hoogte_profiel" unique_strength="0" constraints="0" notnull_strength="0"/>
+    <constraint exp_strength="0" field="bovenkant_leiding" unique_strength="0" constraints="0" notnull_strength="0"/>
+    <constraint exp_strength="0" field="put_maaiveldhoogte" unique_strength="0" constraints="0" notnull_strength="0"/>
+    <constraint exp_strength="0" field="ahn_maaiveldhoogte" unique_strength="0" constraints="0" notnull_strength="0"/>
+    <constraint exp_strength="0" field="dekking_put_maaiveldhoogte" unique_strength="0" constraints="0" notnull_strength="0"/>
+    <constraint exp_strength="0" field="dekking_ahn_maaiveldhoogte" unique_strength="0" constraints="0" notnull_strength="0"/>
+    <constraint exp_strength="0" field="status" unique_strength="0" constraints="0" notnull_strength="0"/>
+>>>>>>> siebrand-gisib
   </constraints>
   <constraintExpressions>
     <constraint exp="" field="id" desc=""/>
@@ -194,7 +255,11 @@
   </constraintExpressions>
   <expressionfields/>
   <attributeactions/>
+<<<<<<< HEAD
   <attributetableconfig actionWidgetStyle="dropDown" sortOrder="0" sortExpression="">
+=======
+  <attributetableconfig actionWidgetStyle="dropDown" sortExpression="" sortOrder="0">
+>>>>>>> siebrand-gisib
     <columns/>
   </attributetableconfig>
   <conditionalstyles>

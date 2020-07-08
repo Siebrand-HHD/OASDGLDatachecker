@@ -40,17 +40,21 @@ CREATE OR REPLACE VIEW {schema}.put_afmeting_leeg AS
     SELECT
         a.code AS rioolput,
         a.id AS threedi_id,
-        shape AS vorm,
+        CASE
+            WHEN shape = '00' or shape = '02' THEN 'rechthoekig'
+            WHEN shape = '01' THEN 'rond'
+            ELSE 'overige'
+ 		END as vorm,
         (width * 1000)::double precision AS breedte,
         (length * 1000)::double precision AS lengte,
         CASE 
             WHEN width IS NULL THEN 'breedte ontbreekt'::text
-            WHEN (width IS NULL OR length IS NULL) AND shape = 'rect' THEN 'rechthoekig: breedte of lengte ontbreekt'::text
+            WHEN (width IS NULL OR length IS NULL) AND shape = '02' THEN 'rechthoekig: breedte of lengte ontbreekt'::text
         END AS bericht,
 	NULL::text AS status,
         b.the_geom::geometry(Point, 28992)
     FROM v2_manhole a JOIN v2_connection_nodes b ON a.connection_node_id = b.id
-    WHERE (width IS NULL) OR ((width IS NULL OR length IS NULL) AND shape = 'rect');
+    WHERE (width IS NULL) OR ((width IS NULL OR length IS NULL) AND shape = '02');
 """,
     "sql_completeness_pipe": """
 ----------------- Leidingen ------------------------
@@ -86,7 +90,7 @@ CREATE OR REPLACE VIEW {schema}.leiding_bob_leeg AS
         end_node.code AS eindpunt,
         pipe.invert_level_start_point AS bob_beginpunt,
         pipe.invert_level_end_point AS bob_eindpunt,
-        (array_greatest(string_to_array(height,' '))::float * 1000)::double precision AS hoogte_profiel,
+        (array_greatest(string_to_array(height,' '))::float * 1000)::double precision AS hoogte,
         CASE
             WHEN pipe.invert_level_start_point IS NULL AND pipe.invert_level_end_point != NULL THEN 'bob beginpunt ontbreekt'::text
             WHEN pipe.invert_level_start_point != NULL AND pipe.invert_level_end_point IS NULL THEN 'bob eindpunt ontbreekt'::text
@@ -542,13 +546,13 @@ CREATE OR REPLACE VIEW {schema}.put_afmeting_onlogisch AS
         (length * 1000)::double precision AS lengte,
         CASE 
             WHEN width = 0 THEN 'breedte is nul'::text
-            WHEN legnth = 0 THEN 'lengte is nul'::text
-            WHEN width != length AND shape != 'rect' THEN 'rond/vierkant: breedte is ongelijk aan lengte'::text
+            WHEN length = 0 THEN 'lengte is nul'::text
+            WHEN width != length AND shape != '02' THEN 'breedte is ongelijk aan lengte'::text
         END AS bericht,
 	NULL::text AS status,
         b.the_geom::geometry(Point, 28992)
     FROM v2_manhole a JOIN v2_connection_nodes b ON a.connection_node_id = b.id
-    WHERE width = 0 OR length = 0 OR (width != length AND shape != 'rect');
+    WHERE width = 0 OR length = 0 OR (width != length AND shape != '02');
 -- Check putten buiten de dem
 CREATE OR REPLACE VIEW {schema}.put_buiten_dem AS
     SELECT
@@ -842,6 +846,23 @@ CREATE OR REPLACE VIEW {schema}.put_uitlaat_op_eindpunt_gemaal AS
     "sql_quality_pipe": """
 ----------------- Leidingen ------------------------
 ----------------------------------------------------
+-- Beginpunt leiding is gelijk aan eindpunt
+CREATE OR REPLACE VIEW {schema}.leiding_beginpunt_is_eindpunt AS
+    SELECT
+        pipe.code AS leiding,
+        pipe.id AS threedi_id,
+        start_node.code AS beginpunt,
+        end_node.code AS eindpunt,
+        start_node.id AS beginpunt_threedi_id,
+        end_node.id AS eindpunt_threedi_id,
+	NULL::text AS status,
+        start_node.the_geom::geometry(Point, 28992)
+    FROM v2_pipe pipe
+    LEFT JOIN v2_connection_nodes start_node
+        ON 	pipe.connection_node_start_id = start_node.id 
+    LEFT JOIN v2_connection_nodes end_node
+        ON 	pipe.connection_node_end_id = end_node.id
+    WHERE start_node.id = end_node.id;
 -- Materiaal ontbreekt
 CREATE OR REPLACE VIEW {schema}.leiding_materiaal_onlogisch AS
     SELECT
@@ -901,7 +922,7 @@ CREATE OR REPLACE VIEW {schema}.leiding_kort AS
         ON 	pipe.connection_node_start_id = start_node.id 
     LEFT JOIN v2_connection_nodes end_node
         ON 	pipe.connection_node_end_id = end_node.id
-    WHERE ST_Length(st_makeline(start_node.the_geom, end_node.the_geom)) < {min_length};
+    WHERE (ST_Length(st_makeline(start_node.the_geom, end_node.the_geom)) < {min_length}) AND (start_node.id != end_node.id);
 -- Zeer lange lange leidingen (> x m)
 CREATE OR REPLACE VIEW {schema}.leiding_lang AS
     SELECT
