@@ -23,21 +23,6 @@ SELECT count(*) FROM src.putten_gisib;
 SELECT count(*) FROM src.leidingen_gisib;
 */
 
-ALTER TABLE src.leidingen_gisib
-	ADD COLUMN IF NOT EXISTS soort_afva VARCHAR(255);
-	
-ALTER TABLE src.leidingen_gisib
-	ADD COLUMN IF NOT EXISTS materiaal VARCHAR(255);
-	
-ALTER TABLE src.leidingen_gisib
-	ADD COLUMN IF NOT EXISTS buismateri VARCHAR(255);
-
-ALTER TABLE src.leidingen_gisib
-	ADD COLUMN IF NOT EXISTS breedte_le INTEGER;
-/*
-ALTER TABLE src.leidingen_gisib
-	ALTER COLUMN id TYPE INTEGER;
-*/
 -------------------------------------------------
 -------- Stap 3: Leidingen invoeren -------
 -------------------------------------------------
@@ -48,71 +33,42 @@ INSERT INTO v2_pipe(
             id, display_name, code, sewerage_type,
             invert_level_start_point, invert_level_end_point, cross_section_definition_id,
             material, zoom_category, connection_node_start_id, connection_node_end_id)
-
 SELECT
 	a.id::integer AS id,
     COALESCE(a.naam_of_nu,'leeg') as display_name,
 	COALESCE(s.naam_of_nu,'0') || '_' || COALESCE(e.naam_of_nu,'0')	AS code,
-	-- GISIB gebruikers: Midden-Delfland gebruikt de kolom 'soort_afva' en Westland de kolom 'gebruik_af'
-	CASE 
-		WHEN a.soort_afva IS NULL THEN
-			CASE
-				WHEN lower(a.type_afwat) LIKE '%bergbezink%'										THEN 7 -- BERGBEZINKVOORZIENING
-				WHEN lower(a.type_afwat) LIKE '%zinker%' 	OR lower(a.type_afwat) LIKE '%duiker%'	THEN 3 -- TRANSPORT
+	CASE
+		--We halen strengtype uit std_streng en type water uit std_stelse 
+		--strengtype kunstwerken--
+        WHEN lower(a.type_afwat) LIKE '%bergbezink%'		                                     THEN 7 -- BERGBEZINKVOORZIENING
+		WHEN lower(a.type_afwat) LIKE '%zinker%' OR lower(a.type_afwat) LIKE '%duiker%'     	 THEN 3 -- TRANSPORT
 
-				WHEN lower(a.gebruik_af) LIKE '%combi%'												THEN 0	-- GEMENGD
-				WHEN lower(a.gebruik_af) LIKE '%hemel%'												THEN 1	-- RWA
-				WHEN lower(a.gebruik_af) LIKE '%afval%'												THEN 2	-- DWA
+        --std_stelse--
+		WHEN lower(a.soort_afva) LIKE '%gemengd%'	                                             THEN 0	-- GEMENGD
+		WHEN lower(a.soort_afva) LIKE '%regen%' OR lower(a.soort_afva) LIKE '%hemel%'            THEN 1	-- RWA
+		WHEN lower(a.soort_afva) LIKE '%vuil%'	OR lower(a.soort_afva) LIKE '%droog%'            THEN 2	-- DWA
 
-				WHEN lower(a.gebruik_af) LIKE '%overig%'											THEN 10	-- OVERIG
-				WHEN lower(a.gebruik_af) IS NOT NULL												THEN 11	-- OVERIG
-				ELSE NULL																		-- onbekend
-			END
-		ELSE
-			CASE
-				-- Een duiker, zinker of bergbezinkbassin worden eerst
-				WHEN lower(a.type_afwat) LIKE '%bergbezink%'										THEN 7 -- BERGBEZINKVOORZIENING
-				WHEN lower(a.type_afwat) LIKE '%zinker%' 	OR lower(a.type_afwat) LIKE '%duiker%'	THEN 3 -- TRANSPORT
+		WHEN lower(a.soort_afva) LIKE '%overig%'                                               THEN 10	-- OVERIG
+		WHEN lower(a.soort_afva) IS NOT NULL                                                   THEN 11	-- OVERIG
 
-				WHEN lower(a.soort_afva) LIKE '%gemengd%'											THEN 0	-- GEMENGD
-				WHEN lower(a.soort_afva) LIKE '%regen%'		OR lower(a.soort_afva) LIKE '%hemel%'	THEN 1	-- RWA
-				WHEN lower(a.soort_afva) LIKE '%vuil%'		OR lower(a.soort_afva) LIKE '%droog%'	THEN 2	-- DWA
-
-				WHEN lower(a.soort_afva) LIKE '%overig%'											THEN 10	-- OVERIG
-				WHEN lower(a.soort_afva) IS NOT NULL												THEN 11	-- OVERIG
-				ELSE NULL																				-- onbekend
-			END
+        ELSE NULL 																						-- onbekend
+   
 	END AS sewerage_type,
+    
 	a.begin_bob AS invert_level_start_point,
 	a.eind_bob AS invert_level_end_point,
 	NULL as cross_section_definition_id,
 	CASE
-		WHEN a.materiaal IS NULL THEN
-			CASE
-				WHEN lower(a.buismateri) LIKE '%beton%' THEN 0
-				WHEN lower(a.buismateri) LIKE '%pvc%' THEN 1
-				WHEN lower(a.buismateri) LIKE '%gres%' THEN 2
-				WHEN lower(a.buismateri) LIKE '%gietijzer%' THEN 3
-				WHEN lower(a.buismateri) LIKE '%metselwerk%' THEN 4
-				WHEN lower(a.buismateri) LIKE '%PE%' OR lower(a.buismateri) LIKE '%poly%' THEN 5
-				WHEN lower(a.buismateri) LIKE '%plaatijzer%' THEN 7
-				WHEN lower(a.buismateri) LIKE '%staal%' THEN 8        	    
-				WHEN lower(a.buismateri) LIKE '%overig%' THEN 99 --overig
-				ELSE NULL
-			END
-		ELSE
-			CASE
-				WHEN lower(a.materiaal) LIKE '%beton%' THEN 0
-				WHEN lower(a.materiaal) LIKE '%pvc%' THEN 1
-				WHEN lower(a.materiaal) LIKE '%gres%' THEN 2
-				WHEN lower(a.materiaal) LIKE '%gietijzer%' THEN 3
-				WHEN lower(a.materiaal) LIKE '%metselwerk%' THEN 4
-				WHEN lower(a.materiaal) LIKE '%PE%' OR lower(a.materiaal) LIKE '%poly%' THEN 5
-				WHEN lower(a.materiaal) LIKE '%plaatijzer%' THEN 7
-				WHEN lower(a.materiaal) LIKE '%staal%' THEN 8        	    
-				WHEN lower(a.materiaal) LIKE '%overig%' THEN 99 --overig
-				ELSE NULL
-			END
+		WHEN lower(a.materiaal) LIKE '%beton%' THEN 0
+		WHEN lower(a.materiaal) LIKE '%pvc%' THEN 1
+		WHEN lower(a.materiaal) LIKE '%gres%' THEN 2
+		WHEN lower(a.materiaal) LIKE '%gietijzer%' THEN 3
+		WHEN lower(a.materiaal) LIKE '%metselwerk%' THEN 4
+		WHEN lower(a.materiaal) LIKE '%PE%' OR lower(a.materiaal) LIKE '%poly%' THEN 5
+		WHEN lower(a.materiaal) LIKE '%plaatijzer%' THEN 7
+		WHEN lower(a.materiaal) LIKE '%staal%' THEN 8        	    
+		WHEN lower(a.materiaal) LIKE '%overig%' THEN 99 --overig
+		ELSE NULL
 	END AS material,
 	2 AS zoom_category,
 	s.id::integer AS connection_node_start_id,
