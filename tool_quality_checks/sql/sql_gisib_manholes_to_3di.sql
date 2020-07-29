@@ -29,21 +29,32 @@ INSERT INTO v2_connection_nodes (id, storage_area, code, the_geom)
 	SELECT
 		id::integer as id,
 		NULL as storage_area, -- use guess_indicators
-		COALESCE(naam, naam_of_nu,'leeg') as code,
+		COALESCE(naam_of_nu,'leeg') as code,
 		ST_SetSRID(st_force2d(geom), 28992) as the_geom
 	FROM src.putten_gisib;
+
+SELECT * FROM v2_connection_nodes;
+SELECT COUNT(*) FROM v2_connection_nodes;
+SELECT COUNT(DISTINCT code) FROM v2_connection_nodes;
 
 -------------------------------------------------
 ---------- Stap 2: manholes toevoegen -----------
 -------------------------------------------------
+--SELECT putafmetin, CASE
+--		WHEN lower(putafmetin) LIKE '%vierkant%' THEN 'sqr'
+--		WHEN lower(putafmetin) LIKE '%rond%' THEN 'rnd'
+--		WHEN lower(putafmetin) LIKE '%rechthoekig%' THEN 'rect'
+--		ELSE NULL END, COUNT(*) FROM src.putten_gisib GROUP BY putafmetin LIMIT 10;
+
+SELECT * FROM v2_manhole WHERE shape IS NOT NULL LIMIT 10;
 DELETE FROM v2_manhole;
 INSERT INTO v2_manhole(
 			id, display_name, code, connection_node_id, shape, width, length,
 			manhole_indicator,bottom_level, surface_level, drain_level, zoom_category)
 SELECT
 	id::integer as id,
-	COALESCE(naam, naam_of_nu,'leeg') as display_name,
-	COALESCE(naam, naam_of_nu,'leeg') as code,
+	COALESCE(naam_of_nu,'leeg') as display_name,
+	COALESCE(naam_of_nu,'leeg') as code,
 	id as connection_node_id,
 	CASE
 		WHEN lower(vorm_knoop) LIKE '%vierkant%' THEN 'sqr' -- not supported by GWSW, just to be sure
@@ -69,7 +80,7 @@ SELECT
 		WHEN lower(type_knoop) LIKE '%uitlaat%' THEN 1
 		ELSE 0
 	END AS manhole_indicator,
-	(replace(straatpeil,',','.')::double precision) - putbodem AS bottom_level,
+	putbodem AS bottom_level,
 	replace(straatpeil,',','.')::double precision AS surface_level,
 	NULL AS drain_level,
 	1 AS zoom_category

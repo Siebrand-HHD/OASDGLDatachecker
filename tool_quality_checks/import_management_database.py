@@ -86,7 +86,7 @@ def import_file_based_on_filetype(settings, file_path, out_name):
     filename, file_extension = os.path.splitext(file_with_extention)
     out_source = set_ogr_connection_pg_database(settings)
 
-    if file_extension == ".shp" or ".SHP":
+    if file_extension.lower() == ".shp":
         in_source = set_ogr_connection(file_path)
         copy2ogr(in_source, filename, out_source, out_name, schema="src")
         in_source.Destroy()
