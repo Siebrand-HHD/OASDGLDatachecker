@@ -718,7 +718,7 @@ CREATE OR REPLACE VIEW {schema}.put_kleine_afstand AS
         ON rioolput_een.connection_node_id = a.id
     LEFT JOIN v2_manhole rioolput_twee
         ON rioolput_twee.connection_node_id = b.id
-    WHERE (a.id < b.id) AND (ST_Distance(a.the_geom, b.the_geom) > 0)
+    WHERE a.id < b.id
     ORDER BY a.id, ST_Distance(a.the_geom, b.the_geom);
 -- aantal inkomende leidingen
 CREATE OR REPLACE VIEW {schema}.put_inkomende_leidingen AS

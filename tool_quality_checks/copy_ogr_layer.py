@@ -99,9 +99,11 @@ def copy2ogr(in_source, in_name, out_source, out_name, schema="public"):
     fixed_layer_definition = fixed_in_layer.GetLayerDefn()
     for i in range(fixed_layer_definition.GetFieldCount()):
         if fixed_layer_definition.GetFieldDefn(i).GetName() == "ID":
+            #  print("Voor:", fixed_layer_definition.GetFieldDefn(i).GetType())
             fixed_layer_definition.GetFieldDefn(i).SetType(
                 ogr.OFTInteger
             )  # fix error ID field type verkeerd
+        #  print("Na:", fixed_layer_definition.GetFieldDefn(i).GetType())
         new_layer.CreateField(fixed_layer_definition.GetFieldDefn(i))
         field_names.append(fixed_layer_definition.GetFieldDefn(i).GetName())
 
