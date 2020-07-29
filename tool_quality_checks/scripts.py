@@ -21,15 +21,14 @@ logger = logging.getLogger(__name__)
 OUR_DIR = os.path.dirname(__file__)
 
 
-def run_scripts_task(task, settings):
+def run_scripts_task(task,settings):
     """
     background program for running all functionalities
     """
 
     run_scripts(settings)
     return True
-
-
+    
 def run_scripts(settings):
     """
     background program for running all functionalities
@@ -78,10 +77,10 @@ def run_scripts(settings):
         logger.info("Completed - Check your sewerage system")
 
     if settings.export:
-        print("export")
         logger.info("Export database to geopackage")
         export_checks_from_db_to_gpkg(settings)
         logger.info("Completed - Export database to geopackage")
+
 
     return True
 
