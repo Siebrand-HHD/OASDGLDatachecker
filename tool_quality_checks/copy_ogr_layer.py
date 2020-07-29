@@ -98,10 +98,12 @@ def copy2ogr(in_source, in_name, out_source, out_name, schema="public"):
     field_names = []
     fixed_layer_definition = fixed_in_layer.GetLayerDefn()
     for i in range(fixed_layer_definition.GetFieldCount()):
-        if fixed_layer_definition.GetFieldDefn(i).GetName() == 'ID':
-          #  print("Voor:", fixed_layer_definition.GetFieldDefn(i).GetType()) 
-            fixed_layer_definition.GetFieldDefn(i).SetType(ogr.OFTInteger) # fix error ID field type verkeerd
-          #  print("Na:", fixed_layer_definition.GetFieldDefn(i).GetType())
+        if fixed_layer_definition.GetFieldDefn(i).GetName() == "ID":
+            #  print("Voor:", fixed_layer_definition.GetFieldDefn(i).GetType())
+            fixed_layer_definition.GetFieldDefn(i).SetType(
+                ogr.OFTInteger
+            )  # fix error ID field type verkeerd
+        #  print("Na:", fixed_layer_definition.GetFieldDefn(i).GetType())
         new_layer.CreateField(fixed_layer_definition.GetFieldDefn(i))
         field_names.append(fixed_layer_definition.GetFieldDefn(i).GetName())
 
@@ -126,7 +128,14 @@ def copy2ogr(in_source, in_name, out_source, out_name, schema="public"):
     new_layer.CommitTransaction()
 
     if new_layer.GetFeatureCount() == 0 and in_layer.GetFeatureCount() > 0:
-        raise ValueError("Output feature count is 0, while input is not, in layer:", new_layer.GetName(), "Input nr features:", in_layer.GetFeatureCount(), "Output nr features:", new_layer.GetFeatureCount())
+        raise ValueError(
+            "Output feature count is 0, while input is not, in layer:",
+            new_layer.GetName(),
+            "Input nr features:",
+            in_layer.GetFeatureCount(),
+            "Output nr features:",
+            new_layer.GetFeatureCount(),
+        )
 
     new_layer = None  # used to close and save the new_layer
 
