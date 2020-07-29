@@ -33,20 +33,9 @@ INSERT INTO v2_connection_nodes (id, storage_area, code, the_geom)
 		ST_SetSRID(st_force2d(geom), 28992) as the_geom
 	FROM src.putten_gbi;
 
-SELECT * FROM v2_connection_nodes;
-SELECT COUNT(*) FROM v2_connection_nodes;
-SELECT COUNT(DISTINCT code) FROM v2_connection_nodes;
-
 -------------------------------------------------
 ---------- Stap 2: manholes toevoegen -----------
 -------------------------------------------------
-SELECT putafmetin, CASE
-		WHEN lower(putafmetin) LIKE '%vierkant%' THEN 'sqr'
-		WHEN lower(putafmetin) LIKE '%rond%' THEN 'rnd'
-		WHEN lower(putafmetin) LIKE '%rechthoekig%' THEN 'rect'
-		ELSE NULL END, COUNT(*) FROM src.putten_gbi GROUP BY putafmetin LIMIT 10;
-
-SELECT * FROM v2_manhole WHERE shape IS NOT NULL LIMIT 10;
 DELETE FROM v2_manhole;
 INSERT INTO v2_manhole(
 			id, display_name, code, connection_node_id, shape, width, length,
