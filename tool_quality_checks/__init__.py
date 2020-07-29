@@ -1,7 +1,6 @@
 # package
 import os
 import logging
-
 logger = logging.getLogger(__name__)
 
 os.environ["SHAPE_ENCODING"] = "ISO-8859-4"

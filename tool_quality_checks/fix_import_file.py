@@ -2,6 +2,7 @@
 """
 Import OGR Datasource into the database
 """
+import os
 import ogr
 import osr
 import logging
