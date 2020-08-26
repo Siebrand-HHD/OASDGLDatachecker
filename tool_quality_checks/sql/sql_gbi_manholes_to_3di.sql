@@ -64,6 +64,7 @@ SELECT
 		ELSE COALESCE(lengte,diameter)
 	END)::numeric/1000.0 AS length,
 	CASE
+		WHEN lower(std_rioolp) LIKE '%overstort%' THEN 4  -- not supported by 3Di
 		WHEN lower(std_rioolp) LIKE '%inprikpunt%' THEN 3
 		WHEN lower(std_rioolp) LIKE '%gemaal%' THEN 2
 		WHEN lower(std_rioolp) LIKE '%uitlaat%' THEN 1

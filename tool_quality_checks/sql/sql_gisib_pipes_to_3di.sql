@@ -87,32 +87,16 @@ SELECT
 	a.eind_bob AS invert_level_end_point,
 	NULL as cross_section_definition_id,
 	CASE
-		WHEN a.materiaal IS NULL THEN
-			CASE
-				WHEN lower(a.buismateri) LIKE '%beton%' THEN 0
-				WHEN lower(a.buismateri) LIKE '%pvc%' THEN 1
-				WHEN lower(a.buismateri) LIKE '%gres%' THEN 2
-				WHEN lower(a.buismateri) LIKE '%gietijzer%' THEN 3
-				WHEN lower(a.buismateri) LIKE '%metselwerk%' THEN 4
-				WHEN lower(a.buismateri) LIKE '%PE%' OR lower(a.buismateri) LIKE '%poly%' THEN 5
-				WHEN lower(a.buismateri) LIKE '%plaatijzer%' THEN 7
-				WHEN lower(a.buismateri) LIKE '%staal%' THEN 8        	    
-				WHEN lower(a.buismateri) LIKE '%overig%' THEN 99 --overig
-				ELSE NULL
-			END
-		ELSE
-			CASE
-				WHEN lower(a.materiaal) LIKE '%beton%' THEN 0
-				WHEN lower(a.materiaal) LIKE '%pvc%' THEN 1
-				WHEN lower(a.materiaal) LIKE '%gres%' THEN 2
-				WHEN lower(a.materiaal) LIKE '%gietijzer%' THEN 3
-				WHEN lower(a.materiaal) LIKE '%metselwerk%' THEN 4
-				WHEN lower(a.materiaal) LIKE '%PE%' OR lower(a.materiaal) LIKE '%poly%' THEN 5
-				WHEN lower(a.materiaal) LIKE '%plaatijzer%' THEN 7
-				WHEN lower(a.materiaal) LIKE '%staal%' THEN 8        	    
-				WHEN lower(a.materiaal) LIKE '%overig%' THEN 99 --overig
-				ELSE NULL
-			END
+		WHEN lower(COALESCE(a.buismateri, a.materiaal)) LIKE '%beton%' THEN 0
+		WHEN lower(COALESCE(a.buismateri, a.materiaal)) LIKE '%pvc%' THEN 1
+		WHEN lower(COALESCE(a.buismateri, a.materiaal)) LIKE '%gres%' THEN 2
+		WHEN lower(COALESCE(a.buismateri, a.materiaal)) LIKE '%gietijzer%' THEN 3
+		WHEN lower(COALESCE(a.buismateri, a.materiaal)) LIKE '%metselwerk%' THEN 4
+		WHEN lower(COALESCE(a.buismateri, a.materiaal)) LIKE '%PE%' OR lower(COALESCE(a.buismateri, a.materiaal)) LIKE '%poly%' THEN 5
+		WHEN lower(COALESCE(a.buismateri, a.materiaal)) LIKE '%plaatijzer%' THEN 7
+		WHEN lower(COALESCE(a.buismateri, a.materiaal)) LIKE '%staal%' THEN 8
+		WHEN lower(COALESCE(a.buismateri, a.materiaal)) LIKE '%overig%' THEN 99 --overig
+		ELSE NULL
 	END AS material,
 	2 AS zoom_category,
 	s.id::integer AS connection_node_start_id,

@@ -105,7 +105,7 @@ sql_understandable_model_views = {
             WHEN shape = 5 THEN 'rechthoekig (getabelleerd)'
             WHEN shape = 6 THEN 'getabelleerd trapezium'
             ELSE 'overige'
- 		END AS vormprofiel,
+ 		END AS vorm_profiel,
         array_greatest(string_to_array(width,' ')) AS breedte,
         array_greatest(string_to_array(height,' ')) AS hoogte,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
@@ -164,8 +164,9 @@ sql_understandable_model_views = {
             WHEN manhole_indicator = 0 THEN 'inspectieput'
             WHEN manhole_indicator = 1 THEN 'uitlaat'
             WHEN manhole_indicator = 2 THEN 'pomp'
+            WHEN manhole_indicator = 4 THEN 'overstort'
             ELSE 'overige'
- 		END as typeknooppunt,
+ 		END as type_knooppunt,
         bottom_level AS bodemhoogte,
         surface_level AS maaiveldhoogte,
         b.the_geom::geometry(Point, 28992)

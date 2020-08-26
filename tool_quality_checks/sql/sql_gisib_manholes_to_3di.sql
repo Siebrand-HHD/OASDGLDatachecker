@@ -64,6 +64,7 @@ SELECT
 		ELSE COALESCE(breedte_01,breedte_pu)
 	END)::numeric/1000.0 AS length,
 	CASE
+		WHEN lower(type_knoop) LIKE '%overstort%' THEN 4  -- not supported by 3Di
 		WHEN lower(type_knoop) LIKE '%inprik%' THEN 3
 		WHEN lower(type_knoop) LIKE '%pomp%' THEN 2
 		WHEN lower(type_knoop) LIKE '%uitlaat%' THEN 1
