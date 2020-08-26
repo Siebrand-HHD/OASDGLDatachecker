@@ -648,8 +648,10 @@ CREATE OR REPLACE VIEW {schema}.put_afm_vs_leiding_afm AS
             WHEN manhole_indicator = 2 THEN 'pomp'
             ELSE 'overige'
 	    END as typeknooppunt,
+        (a.width * 1000)::double precision AS breedte_put,
+        (a.length * 1000)::double precision AS lengte_put,
         (greatest(a.width, a.length) * 1000)::double precision AS grootste_put_afmeting,
-        (array_greatest(string_to_array(d.width,' '))::float * 1000)::float AS grootste_leiding_afmeting,
+        (array_greatest(string_to_array(d.width,' '))::float * 1000)::double precision AS breedte_leiding,
 	    NULL::text AS status,
         b.the_geom::geometry(Point, 28992)
     FROM v2_manhole a
@@ -663,7 +665,7 @@ CREATE OR REPLACE VIEW {schema}.put_afm_vs_leiding_afm AS
     )
     SELECT DISTINCT ON (threedi_id) * 
     FROM aangesloten_diameters 
-    WHERE grootste_put_afmeting < grootste_leiding_afmeting + {padding_manhole}
+    WHERE (grootste_put_afmeting < grootste_leiding_afmeting + {padding_manhole}) AND (grootste_put_afmeting > 0)
     ORDER BY threedi_id, grootste_leiding_afmeting DESC;
 -- Dubbele putten
 CREATE OR REPLACE VIEW {schema}.put_dubbel AS
