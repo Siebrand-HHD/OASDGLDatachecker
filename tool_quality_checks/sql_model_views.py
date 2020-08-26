@@ -3,28 +3,6 @@
 # TODO putmateriaal toevoegen      material AS materiaalput,
 
 sql_understandable_model_views = {
-    "put": """CREATE OR REPLACE VIEW {schema}.put AS
-    SELECT
-        a.code AS rioolput,
-        a.id AS threedi_id,
-        CASE
-            WHEN shape = '00' or shape = '02' THEN 'rechthoekig'
-            WHEN shape = '01' THEN 'rond'
-            ELSE 'overige'
- 		END as vorm,
-        (width * 1000)::double precision AS breedte,
-        (length * 1000)::double precision AS lengte,
-        CASE
-            WHEN manhole_indicator = 0 THEN 'inspectieput'
-            WHEN manhole_indicator = 1 THEN 'uitlaat'
-            WHEN manhole_indicator = 2 THEN 'pomp'
-            WHEN manhole_indicator = 4 THEN 'overstort'
-            ELSE 'overige'
- 		END as type_knooppunt,
-        bottom_level AS bodemhoogte,
-        surface_level AS maaiveldhoogte,
-        b.the_geom::geometry(Point, 28992)
-    FROM v2_manhole a JOIN v2_connection_nodes b ON a.connection_node_id = b.id;""",
     "leiding": """CREATE OR REPLACE VIEW {schema}.leiding AS
     SELECT
         pipe.code AS leiding,
@@ -171,4 +149,26 @@ sql_understandable_model_views = {
         ON 	pump.connection_node_start_id = start_node.id 
     LEFT JOIN v2_connection_nodes end_node
         ON 	pump.connection_node_end_id = end_node.id;""",
+    "put": """CREATE OR REPLACE VIEW {schema}.put AS
+    SELECT
+        a.code AS rioolput,
+        a.id AS threedi_id,
+        CASE
+            WHEN shape = '00' or shape = '02' THEN 'rechthoekig'
+            WHEN shape = '01' THEN 'rond'
+            ELSE 'overige'
+ 		END as vorm,
+        (width * 1000)::double precision AS breedte,
+        (length * 1000)::double precision AS lengte,
+        CASE
+            WHEN manhole_indicator = 0 THEN 'inspectieput'
+            WHEN manhole_indicator = 1 THEN 'uitlaat'
+            WHEN manhole_indicator = 2 THEN 'pomp'
+            WHEN manhole_indicator = 4 THEN 'overstort'
+            ELSE 'overige'
+ 		END as type_knooppunt,
+        bottom_level AS bodemhoogte,
+        surface_level AS maaiveldhoogte,
+        b.the_geom::geometry(Point, 28992)
+    FROM v2_manhole a JOIN v2_connection_nodes b ON a.connection_node_id = b.id;""",
 }
