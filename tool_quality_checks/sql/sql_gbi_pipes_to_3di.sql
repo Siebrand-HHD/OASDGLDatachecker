@@ -59,6 +59,7 @@ SELECT
 	bob_eind_a AS invert_level_end_point,
 	NULL as cross_section_definition_id,
 	CASE
+		WHEN lower(a.std_materi) IS NULL THEN NULL
 		WHEN lower(a.std_materi) LIKE '%beton%' THEN 0
 		WHEN lower(a.std_materi) LIKE '%pvc%' THEN 1
 		WHEN lower(a.std_materi) LIKE '%gres%' THEN 2
@@ -67,8 +68,8 @@ SELECT
 		WHEN lower(a.std_materi) LIKE '%PE%' OR lower(a.std_materi) LIKE '%poly%' THEN 5
 		WHEN lower(a.std_materi) LIKE '%plaatijzer%' THEN 7
 		WHEN lower(a.std_materi) LIKE '%staal%' THEN 8        	    
-		WHEN lower(a.std_materi) LIKE '%overig%' THEN 99 --overig
-		ELSE NULL
+		WHEN lower(a.std_materi) LIKE '%overig%' THEN 9 --overig
+		ELSE 99
 	END AS material,
 	2 AS zoom_category,
 	s.id AS connection_node_start_id,
