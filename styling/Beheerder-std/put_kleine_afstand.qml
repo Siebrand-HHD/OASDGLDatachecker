@@ -5,7 +5,7 @@
       <symbol force_rhr="0" clip_to_extent="1" type="marker" name="0" alpha="1">
         <layer enabled="1" pass="0" locked="0" class="SimpleMarker">
           <prop k="angle" v="0"/>
-          <prop k="color" v="255,79,247,255"/>
+          <prop k="color" v="0,0,116,255"/>
           <prop k="horizontal_anchor_point" v="1"/>
           <prop k="joinstyle" v="bevel"/>
           <prop k="name" v="circle"/>

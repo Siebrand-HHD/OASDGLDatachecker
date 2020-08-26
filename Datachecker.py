@@ -461,17 +461,17 @@ class Datachecker:
             else:
                 if not basis in oldstatement:
                     statement = "status is null or status IN ('gecontroleerd', 'verwerkt')"
-                    statement = statement.replace("'" + waarde + "', ", "")
+                    statement = statement.replace("'" + waarde + "', ","")
                 elif oldstatement.find(waarde) == -1:
                     statement = oldstatement
                 else:
                     statement = oldstatement.replace(basis, "")
                     statement = statement.replace(")", "")
-                    statement = statement.replace("'" + waarde + "'", "")
+                    statement = statement.replace("'" + waarde + "'","")
                     if len(statement) == 0:
                         statement = basis +  ")"
                     elif len(statement) > 2:
-                        statement = statement.replace(",," , ",")
+                        statement = statement.replace(",," ,",")
                         statement = statement.strip(",")
                         statement = basis +  statement + ")"
         except:

@@ -10,7 +10,7 @@ CREATE OR REPLACE VIEW {schema}.put_maaiveldniveau_leeg AS
         a.code AS rioolput,
         a.id AS threedi_id,
         surface_level AS maaiveldhoogte,
-	NULL::text AS status,
+	    NULL::text AS status,
         b.the_geom::geometry(Point, 28992)
     FROM v2_manhole a JOIN v2_connection_nodes b ON a.connection_node_id = b.id
     WHERE surface_level IS NULL;
@@ -20,7 +20,7 @@ CREATE OR REPLACE VIEW {schema}.put_bodemhoogte_leeg AS
         a.code AS rioolput,
         a.id AS threedi_id,
         bottom_level AS bodemhoogte,
-	NULL::text AS status,
+	    NULL::text AS status,
         b.the_geom::geometry(Point, 28992)
     FROM v2_manhole a JOIN v2_connection_nodes b ON a.connection_node_id = b.id
     WHERE bottom_level IS NULL;
@@ -31,7 +31,7 @@ CREATE OR REPLACE VIEW {schema}.put_vorm_leeg AS
         a.id AS threedi_id,
         shape AS vorm,
         'vorm ontbreekt'::text AS bericht,
-	NULL::text AS status,
+	    NULL::text AS status,
         b.the_geom::geometry(Point, 28992)
     FROM v2_manhole a JOIN v2_connection_nodes b ON a.connection_node_id = b.id
     WHERE shape IS NULL;
@@ -51,7 +51,7 @@ CREATE OR REPLACE VIEW {schema}.put_afmeting_leeg AS
             WHEN width IS NULL THEN 'breedte ontbreekt'::text
             WHEN (width IS NULL OR length IS NULL) AND shape = '02' THEN 'rechthoekig: breedte of lengte ontbreekt'::text
         END AS bericht,
-	NULL::text AS status,
+	    NULL::text AS status,
         b.the_geom::geometry(Point, 28992)
     FROM v2_manhole a JOIN v2_connection_nodes b ON a.connection_node_id = b.id
     WHERE (width IS NULL) OR ((width IS NULL OR length IS NULL) AND shape = '02');
@@ -67,12 +67,12 @@ CREATE OR REPLACE VIEW {schema}.leiding_punten_leeg AS
         start_node.code AS beginpunt,
         end_node.code AS eindpunt,
         CASE
-            WHEN pipe.connection_node_start_id IS NULL AND pipe.connection_node_end_id != NULL THEN 'beginpunt ontbreekt'::text
-            WHEN pipe.connection_node_start_id != NULL AND pipe.connection_node_end_id IS NULL THEN 'eindpunt ontbreekt'::text
+            WHEN pipe.connection_node_start_id IS NULL AND pipe.connection_node_end_id IS NOT NULL THEN 'beginpunt ontbreekt'::text
+            WHEN pipe.connection_node_start_id IS NOT NULL AND pipe.connection_node_end_id IS NULL THEN 'eindpunt ontbreekt'::text
             WHEN pipe.connection_node_start_id IS NULL AND pipe.connection_node_end_id IS NULL THEN 'begin en eindpunt ontbreken'::text
             ELSE NULL
         END AS bericht,
-	NULL::text AS status
+	    NULL::text AS status
     FROM v2_pipe pipe
     LEFT JOIN v2_connection_nodes start_node
         ON 	pipe.connection_node_start_id = start_node.id 
@@ -92,12 +92,12 @@ CREATE OR REPLACE VIEW {schema}.leiding_bob_leeg AS
         pipe.invert_level_end_point AS bob_eindpunt,
         (array_greatest(string_to_array(height,' '))::float * 1000)::double precision AS hoogte,
         CASE
-            WHEN pipe.invert_level_start_point IS NULL AND pipe.invert_level_end_point != NULL THEN 'bob beginpunt ontbreekt'::text
-            WHEN pipe.invert_level_start_point != NULL AND pipe.invert_level_end_point IS NULL THEN 'bob eindpunt ontbreekt'::text
+            WHEN pipe.invert_level_start_point IS NULL AND pipe.invert_level_end_point IS NOT NULL THEN 'bob beginpunt ontbreekt'::text
+            WHEN pipe.invert_level_start_point IS NOT NULL AND pipe.invert_level_end_point IS NULL THEN 'bob eindpunt ontbreekt'::text
             WHEN pipe.invert_level_start_point IS NULL AND pipe.invert_level_end_point IS NULL THEN 'bob begin en eindpunt ontbreken'::text
             ELSE NULL
         END AS bericht,
-	NULL::text AS status,
+	    NULL::text AS status,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_pipe pipe
     LEFT JOIN v2_connection_nodes start_node
@@ -115,7 +115,7 @@ CREATE OR REPLACE VIEW {schema}.leiding_vorm_leeg AS
         start_node.code AS beginpunt,
         end_node.code AS eindpunt,
         'dwarsdoorsnede ontbreekt'::text AS bericht,
-	NULL::text AS status,
+	    NULL::text AS status,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_pipe pipe
     LEFT JOIN v2_connection_nodes start_node
@@ -133,7 +133,7 @@ CREATE OR REPLACE VIEW {schema}.leiding_riooltype_leeg AS
         start_node.code AS beginpunt,
         end_node.code AS eindpunt,
         'riooltype ontbreekt'::text AS bericht,
-	NULL::text AS status,
+	    NULL::text AS status,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_pipe pipe
     LEFT JOIN v2_connection_nodes start_node
@@ -149,7 +149,7 @@ CREATE OR REPLACE VIEW {schema}.leiding_materiaal_leeg AS
         start_node.code AS beginpunt,
         end_node.code AS eindpunt,
         'materiaal ontbreekt'::text AS bericht,
-	NULL::text AS status,
+	    NULL::text AS status,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_pipe pipe
     LEFT JOIN v2_connection_nodes start_node
@@ -181,7 +181,7 @@ CREATE OR REPLACE VIEW {schema}.leiding_afmeting_leeg AS
             WHEN height = NULL THEN 'hoogte ontbreekt'
             ELSE NULL
         END AS bericht,
-	NULL::text AS status,
+	    NULL::text AS status,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_pipe pipe
     LEFT JOIN v2_connection_nodes start_node
@@ -210,7 +210,7 @@ CREATE OR REPLACE VIEW {schema}.overstort_punten_leeg AS
             WHEN weir.connection_node_start_id IS NULL AND weir.connection_node_end_id IS NULL THEN 'begin en eindpunt ontbreken'::text
             ELSE NULL
         END AS bericht,
-	NULL::text AS status
+	    NULL::text AS status
     FROM v2_weir weir
     LEFT JOIN v2_connection_nodes start_node
         ON 	weir.connection_node_start_id = start_node.id 
@@ -227,7 +227,7 @@ CREATE OR REPLACE VIEW {schema}.overstort_niveau_leeg AS
         start_node.code AS beginpunt,
         end_node.code AS eindpunt,
         'drempelniveau ontbreekt'::text AS bericht,
-	NULL::text AS status,
+	    NULL::text AS status,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_weir weir
     LEFT JOIN v2_connection_nodes start_node
@@ -245,7 +245,7 @@ CREATE OR REPLACE VIEW {schema}.overstort_dwarsdoorsnede_leeg AS
         start_node.code AS beginpunt,
         end_node.code AS eindpunt,
         'dwarsdoorsnede ontbreekt'::text AS bericht,
-	NULL::text AS status,
+	    NULL::text AS status,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_weir weir
     LEFT JOIN v2_connection_nodes start_node
@@ -261,7 +261,7 @@ CREATE OR REPLACE VIEW {schema}.overstort_breedte_leeg AS
         start_node.code AS beginpunt,
         end_node.code AS eindpunt,
         'drempelbreedte ontbreekt'::text AS bericht,
-	NULL::text AS status,
+	    NULL::text AS status,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_weir weir
     LEFT JOIN v2_connection_nodes start_node
@@ -298,7 +298,7 @@ CREATE OR REPLACE VIEW {schema}.overstort_stroming_leeg AS
             WHEN discharge_coefficient_positive = 0 OR discharge_coefficient_negative = 0 THEN 'eenrichting stroming'::text
             ELSE NULL
         END AS bericht,
-	NULL::text AS status,
+	    NULL::text AS status,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_weir weir
     LEFT JOIN v2_connection_nodes start_node
@@ -328,7 +328,7 @@ CREATE OR REPLACE VIEW {schema}.doorlaat_punten_leeg AS
             WHEN orf.connection_node_start_id IS NULL AND orf.connection_node_end_id IS NULL THEN 'begin en eindpunt ontbreken'::text
             ELSE NULL
         END AS bericht,
-	NULL::text AS status
+	    NULL::text AS status
     FROM v2_orifice orf
     LEFT JOIN v2_connection_nodes start_node
         ON 	orf.connection_node_start_id = start_node.id 
@@ -345,7 +345,7 @@ CREATE OR REPLACE VIEW {schema}.doorlaat_niveau_leeg AS
         start_node.code AS beginpunt,
         end_node.code AS eindpunt,
         'doorlaatniveau ontbreekt'::text AS bericht,
-	NULL::text AS status,
+	    NULL::text AS status,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_orifice orf
     LEFT JOIN v2_connection_nodes start_node
@@ -363,7 +363,7 @@ CREATE OR REPLACE VIEW {schema}.doorlaat_vorm_leeg AS
         start_node.code AS beginpunt,
         end_node.code AS eindpunt,
         'dwarsdoorsnede ontbreekt'::text AS bericht,
-	NULL::text AS status,
+	    NULL::text AS status,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_orifice orf
     LEFT JOIN v2_connection_nodes start_node
@@ -379,7 +379,7 @@ CREATE OR REPLACE VIEW {schema}.doorlaat_breedte_leeg AS
         start_node.code AS beginpunt,
         end_node.code AS eindpunt,
         'drempelbreedte ontbreekt'::text AS bericht,
-	NULL::text AS status,
+	    NULL::text AS status,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_orifice orf
     LEFT JOIN v2_connection_nodes start_node
@@ -416,7 +416,7 @@ CREATE OR REPLACE VIEW {schema}.doorlaat_stroming_leeg AS
             WHEN discharge_coefficient_positive = 0 OR discharge_coefficient_negative = 0 THEN 'eenrichting stroming'::text
             ELSE NULL
         END AS bericht,
-	NULL::text AS status,
+	    NULL::text AS status,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_orifice orf
     LEFT JOIN v2_connection_nodes start_node
@@ -440,7 +440,7 @@ CREATE OR REPLACE VIEW {schema}.pomp_punt_leeg AS
         pump.id AS threedi_id,
         start_node.code AS beginpuntpomp,
         end_node.code AS eindpuntpomp,
-	NULL::text AS status
+	    NULL::text AS status
     FROM v2_pumpstation pump
     LEFT JOIN v2_connection_nodes start_node
         ON 	pump.connection_node_start_id = start_node.id 
@@ -479,8 +479,8 @@ CREATE OR REPLACE VIEW {schema}.pomp_aan_afslagpeil_leeg AS
             WHEN start_level != NULL AND lower_stop_level = NULL THEN 'afslagniveau ontbreekt'::text
             WHEN start_level = NULL AND lower_stop_level = NULL THEN 'aan- en afslagniveau ontbreken'::text
             ELSE NULL
-	END AS bericht,
-	NULL::text AS status,
+	    END AS bericht,
+	    NULL::text AS status,
         start_node.the_geom::geometry(Point, 28992)
     FROM v2_pumpstation pump
     LEFT JOIN v2_connection_nodes start_node
@@ -496,7 +496,7 @@ CREATE OR REPLACE VIEW {schema}.pomp_capaciteit_leeg AS
         start_node.code AS beginpuntpomp,
         end_node.code AS eindpuntpomp,
         'pompcapaciteit ontbreekt'::text AS bericht,
-	NULL::text AS status,
+	    NULL::text AS status,
         start_node.the_geom::geometry(Point, 28992)
     FROM v2_pumpstation pump
     LEFT JOIN v2_connection_nodes start_node
@@ -517,7 +517,7 @@ CREATE OR REPLACE VIEW {schema}.put_maaiveldniveau_onlogisch AS
         a.code AS rioolput,
         a.id AS threedi_id,
         surface_level AS maaiveldhoogte,
-	NULL::text AS status,
+	    NULL::text AS status,
         b.the_geom::geometry(Point, 28992)
     FROM v2_manhole a JOIN v2_connection_nodes b ON a.connection_node_id = b.id
     WHERE surface_level = 0
@@ -529,7 +529,7 @@ CREATE OR REPLACE VIEW {schema}.put_bodemhoogte_onlogisch AS
         a.code AS rioolput,
         a.id AS threedi_id,
         bottom_level AS bodemhoogte,
-	NULL::text AS status,
+	    NULL::text AS status,
         b.the_geom::geometry(Point, 28992)
     FROM v2_manhole a JOIN v2_connection_nodes b ON a.connection_node_id = b.id
     WHERE bottom_level = 0
@@ -549,7 +549,7 @@ CREATE OR REPLACE VIEW {schema}.put_afmeting_onlogisch AS
             WHEN length = 0 THEN 'lengte is nul'::text
             WHEN width != length AND shape != '02' THEN 'breedte is ongelijk aan lengte'::text
         END AS bericht,
-	NULL::text AS status,
+	    NULL::text AS status,
         b.the_geom::geometry(Point, 28992)
     FROM v2_manhole a JOIN v2_connection_nodes b ON a.connection_node_id = b.id
     WHERE width = 0 OR length = 0 OR (width != length AND shape != '02');
@@ -558,7 +558,7 @@ CREATE OR REPLACE VIEW {schema}.put_buiten_dem AS
     SELECT
         a.code AS rioolput,
         a.id AS threedi_id,
-	NULL::text AS status,
+	    NULL::text AS status,
         b.the_geom::geometry(Point, 28992)
     FROM v2_manhole a
     LEFT JOIN v2_connection_nodes b
@@ -574,7 +574,7 @@ CREATE OR REPLACE VIEW {schema}.put_maaiveld_vs_ahn AS
         round(surface_level::numeric,2) AS put_maaiveldhoogte,
         maaiveld AS ahn_maaiveldhoogte,
         round((maaiveld - surface_level)::numeric,2) AS hoogte_verschil,
-	NULL::text AS status,
+	    NULL::text AS status,
         b.the_geom::geometry(Point, 28992)
     FROM v2_manhole a
     LEFT JOIN v2_connection_nodes b
@@ -597,7 +597,7 @@ CREATE OR REPLACE VIEW {schema}.put_maaiveld_vs_bodemhoogte AS
         surface_level AS maaiveldhoogte,
         surface_level - bottom_level AS hoogte_verschil,
         {min_dekking} AS minimale_dekking,
-	NULL::text AS status,
+	    NULL::text AS status,
         b.the_geom::geometry(Point, 28992)
     FROM v2_manhole a JOIN v2_connection_nodes b ON a.connection_node_id = b.id
     WHERE surface_level < bottom_level + {min_dekking}
@@ -615,7 +615,7 @@ CREATE OR REPLACE VIEW {schema}.put_bodemhoogte_vs_bob AS
             WHEN manhole_indicator = 1 THEN 'uitlaat'
             WHEN manhole_indicator = 2 THEN 'pomp'
             ELSE 'overige'
-	END as typeknooppunt,
+	    END as typeknooppunt,
         bottom_level AS bodemhoogte,
         surface_level AS maaiveldhoogte,
 	CASE
@@ -623,7 +623,7 @@ CREATE OR REPLACE VIEW {schema}.put_bodemhoogte_vs_bob AS
 	    WHEN a.connection_node_id = c.connection_node_end_id::integer THEN c.invert_level_end_point
             ELSE NULL
         END AS bob_hoogte,
-	NULL::text AS status,
+	    NULL::text AS status,
         b.the_geom::geometry(Point, 28992)
     FROM v2_manhole a
     LEFT JOIN v2_connection_nodes b
@@ -647,10 +647,10 @@ CREATE OR REPLACE VIEW {schema}.put_afm_vs_leiding_afm AS
             WHEN manhole_indicator = 1 THEN 'uitlaat'
             WHEN manhole_indicator = 2 THEN 'pomp'
             ELSE 'overige'
-	END as typeknooppunt,
+	    END as typeknooppunt,
         (greatest(a.width, a.length) * 1000)::double precision AS grootste_put_afmeting,
         (array_greatest(string_to_array(d.width,' '))::float * 1000)::float AS grootste_leiding_afmeting,
-	NULL::text AS status,
+	    NULL::text AS status,
         b.the_geom::geometry(Point, 28992)
     FROM v2_manhole a
     LEFT JOIN v2_connection_nodes b
@@ -665,12 +665,48 @@ CREATE OR REPLACE VIEW {schema}.put_afm_vs_leiding_afm AS
     FROM aangesloten_diameters 
     WHERE grootste_put_afmeting < grootste_leiding_afmeting + {padding_manhole}
     ORDER BY threedi_id, grootste_leiding_afmeting DESC;
+-- Dubbele putten
+CREATE OR REPLACE VIEW {schema}.put_dubbel AS
+    WITH dubbele_put AS (
+        SELECT
+            the_geom::geometry(Point, 28992),
+            count(*) as aantal
+        FROM v2_connection_nodes
+        GROUP BY the_geom
+        HAVING count(*) > 1)
+    SELECT
+        b.id as threedi_connection_node_id,
+        aantal,
+		NULL::text AS status,
+        b.the_geom::geometry(Point, 28992)
+    FROM v2_manhole a JOIN v2_connection_nodes b ON a.connection_node_id = b.id, dubbele_put c
+    WHERE b.the_geom && c.the_geom;
+-- Putten binnen 20 cm van elkaar
+CREATE OR REPLACE VIEW {schema}.put_kleine_afstand AS
+    SELECT
+        DISTINCT ON (a.id) a.id,
+        rioolput_een.code AS rioolput_een,
+        rioolput_twee.code AS rioolput_twee,
+        rioolput_een.id AS threedi_id_een,
+        rioolput_twee.id AS threedi_id_twee,
+        ST_Distance(a.the_geom, b.the_geom) AS afstand,
+	    NULL::text AS status,
+        a.the_geom::geometry(Point, 28992)
+    FROM v2_connection_nodes a
+    JOIN v2_connection_nodes b
+        ON ST_DWithin(a.the_geom, b.the_geom,0.2)
+    LEFT JOIN v2_manhole rioolput_een
+        ON rioolput_een.connection_node_id = a.id
+    LEFT JOIN v2_manhole rioolput_twee
+        ON rioolput_twee.connection_node_id = b.id
+    WHERE (a.id < b.id) AND (ST_Distance(a.the_geom, b.the_geom) > 0)
+    ORDER BY a.id, ST_Distance(a.the_geom, b.the_geom);
 -- Losliggende putten
 CREATE OR REPLACE VIEW {schema}.put_losliggend AS
     SELECT
         a.code AS rioolput,
         a.id AS threedi_id,
-	NULL::text AS status,
+	    NULL::text AS status,
         b.the_geom::geometry(Point, 28992)
     FROM v2_manhole a JOIN v2_connection_nodes b ON a.connection_node_id = b.id
     WHERE
@@ -684,42 +720,6 @@ CREATE OR REPLACE VIEW {schema}.put_losliggend AS
         AND b.id NOT IN (SELECT connection_node_end_id FROM v2_culvert WHERE connection_node_end_id  IS NOT NULL)
         AND b.id NOT IN (SELECT connection_node_start_id FROM v2_channel WHERE connection_node_start_id IS NOT NULL)
         AND b.id NOT IN (SELECT connection_node_end_id FROM v2_channel WHERE connection_node_end_id  IS NOT NULL));
--- Dubbele putten
-CREATE OR REPLACE VIEW {schema}.put_dubbel AS
-    WITH dubbele_put AS (
-        SELECT
-            the_geom::geometry(Point, 28992),
-            count(*) as aantal
-        FROM v2_connection_nodes
-        GROUP BY the_geom
-        HAVING count(*) > 1)
-    SELECT
-            b.id as threedi_connection_node_id,
-            aantal,
-		NULL::text AS status,
-            b.the_geom::geometry(Point, 28992)
-    FROM v2_manhole a JOIN v2_connection_nodes b ON a.connection_node_id = b.id, dubbele_put c
-    WHERE b.the_geom && c.the_geom;
--- Putten binnen 20 cm van elkaar
-CREATE OR REPLACE VIEW {schema}.put_kleine_afstand AS
-    SELECT
-        DISTINCT ON (a.id) a.id,
-        rioolput_een.code AS rioolput_een,
-        rioolput_twee.code AS rioolput_twee,
-        rioolput_een.id AS threedi_id_een,
-        rioolput_twee.id AS threedi_id_twee,
-        ST_Distance(a.the_geom, b.the_geom) AS afstand,
-	NULL::text AS status,
-        a.the_geom::geometry(Point, 28992)
-    FROM v2_connection_nodes a
-    JOIN v2_connection_nodes b
-        ON ST_DWithin(a.the_geom, b.the_geom,0.2)
-    LEFT JOIN v2_manhole rioolput_een
-        ON rioolput_een.connection_node_id = a.id
-    LEFT JOIN v2_manhole rioolput_twee
-        ON rioolput_twee.connection_node_id = b.id
-    WHERE (a.id < b.id) AND (ST_Distance(a.the_geom, b.the_geom) > 0)
-    ORDER BY a.id, ST_Distance(a.the_geom, b.the_geom);
 -- aantal inkomende leidingen
 CREATE OR REPLACE VIEW {schema}.put_inkomende_leidingen AS
     WITH verbindingen AS (
@@ -766,7 +766,7 @@ nr_connections AS (
         c.id AS threedi_id,
         b.nr_con AS aantal_verbindingen,
         b.line_types AS type_verbindingen,
-	NULL::text AS status,
+	    NULL::text AS status,
         a.the_geom::geometry(Point, 28992)
     FROM
         v2_connection_nodes AS a JOIN v2_manhole c ON a.id = c.connection_node_id,
@@ -833,8 +833,8 @@ CREATE OR REPLACE VIEW {schema}.put_uitlaat_op_eindpunt_gemaal AS
             WHEN b.manhole_indicator = 1 THEN 'uitlaat'
             WHEN b.manhole_indicator = 2 THEN 'pomp'
             ELSE 'overige'
-	END as typeknooppunt,
-	NULL::text AS status,
+	    END as typeknooppunt,
+	    NULL::text AS status,
         a.the_geom::geometry(Point, 28992)
     FROM v2_connection_nodes a
     LEFT JOIN v2_manhole b
@@ -855,7 +855,7 @@ CREATE OR REPLACE VIEW {schema}.leiding_beginpunt_is_eindpunt AS
         end_node.code AS eindpunt,
         start_node.id AS beginpunt_threedi_id,
         end_node.id AS eindpunt_threedi_id,
-	NULL::text AS status,
+	    NULL::text AS status,
         start_node.the_geom::geometry(Point, 28992)
     FROM v2_pipe pipe
     LEFT JOIN v2_connection_nodes start_node
@@ -871,7 +871,7 @@ CREATE OR REPLACE VIEW {schema}.leiding_materiaal_onlogisch AS
         start_node.code AS beginpunt,
         end_node.code AS eindpunt,
         'materiaal type onlogisch'::text AS bericht,
-	NULL::text AS status,
+	    NULL::text AS status,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_pipe pipe
     LEFT JOIN v2_connection_nodes start_node
@@ -892,7 +892,7 @@ CREATE OR REPLACE VIEW {schema}.leiding_bob_onlogisch AS
         pipe.invert_level_end_point AS bob_eindpunt,
         (array_greatest(string_to_array(height,' '))::float * 1000)::double precision AS hoogte_profiel,
         'bob beginpunt en/of eindpunt onlogsich'::text AS bericht,
-	NULL::text AS status,
+	    NULL::text AS status,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_pipe pipe
     LEFT JOIN v2_connection_nodes start_node
@@ -915,7 +915,7 @@ CREATE OR REPLACE VIEW {schema}.leiding_kort AS
         start_node.code AS beginpunt,
         end_node.code AS eindpunt,
         ST_Length(st_makeline(start_node.the_geom, end_node.the_geom)) AS lengte_leiding,
-	NULL::text AS status,
+	    NULL::text AS status,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_pipe pipe
     LEFT JOIN v2_connection_nodes start_node
@@ -931,7 +931,7 @@ CREATE OR REPLACE VIEW {schema}.leiding_lang AS
         start_node.code AS beginpunt,
         end_node.code AS eindpunt,
         ST_Length(st_makeline(start_node.the_geom, end_node.the_geom)) AS lengte_leiding,
-	NULL::text AS status,
+	    NULL::text AS status,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_pipe pipe
     LEFT JOIN v2_connection_nodes start_node
@@ -948,7 +948,7 @@ CREATE OR REPLACE VIEW {schema}.leiding_dubbel AS
         string_agg(display_name::text, ', ' ORDER BY line_type) AS leidingen,
         string_agg(line_type::text, ', ' ORDER BY line_type) AS type_leidingen,
         count(*) AS aantal_leidingen,
-	NULL::text AS status,
+	    NULL::text AS status,
         the_geom::geometry(Linestring, 28992)
     FROM (
         SELECT
@@ -997,7 +997,14 @@ CREATE OR REPLACE VIEW {schema}.leiding_verkeerde_types_verbonden AS
     WITH nodes AS (
         SELECT
             point AS geom,
-            sewerage_type
+            CASE
+                WHEN sewerage_type = 0 THEN 'gemengd'
+                WHEN sewerage_type = 1 THEN 'rwa'
+                WHEN sewerage_type = 2 THEN 'dwa'
+                WHEN sewerage_type = 3 THEN 'transport'
+                WHEN sewerage_type = 7 THEN 'bergbezink'
+                WHEN sewerage_type >= 10 THEN 'overige'
+            END AS sewerage_type
         FROM (
             SELECT
                 start_pipe.the_geom::geometry(Point, 28992) AS point,
@@ -1022,7 +1029,14 @@ CREATE OR REPLACE VIEW {schema}.leiding_verkeerde_types_verbonden AS
         c.code AS rioolput,
         c.id AS threedi_id,
         typologies AS type_inzameling,
-	NULL::text AS status,
+        CASE
+            WHEN manhole_indicator = 0 THEN 'inspectieput'
+            WHEN manhole_indicator = 1 THEN 'uitlaat'
+            WHEN manhole_indicator = 2 THEN 'pomp'
+            WHEN manhole_indicator = 4 THEN 'overstort'
+            ELSE 'overige'
+ 		END as type_knooppunt,
+	    NULL::text AS status,
         a.the_geom::geometry(Point, 28992)
     FROM
         v2_connection_nodes AS a JOIN v2_manhole c ON a.id = c.connection_node_id,
@@ -1040,7 +1054,7 @@ CREATE OR REPLACE VIEW {schema}.leiding_groot_verhang AS
         (invert_level_start_point - invert_level_end_point) AS hoogte_verschil_bob,
         ST_Length(st_makeline(start_node.the_geom, end_node.the_geom)) AS lengte_leiding,
         ST_Length(st_makeline(start_node.the_geom, end_node.the_geom))/abs(invert_level_start_point - invert_level_end_point) AS verhang,
-	NULL::text AS status,
+	    NULL::text AS status,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_pipe pipe
     LEFT JOIN v2_connection_nodes start_node
@@ -1089,7 +1103,7 @@ CREATE OR REPLACE VIEW {schema}.leiding_dekking_start AS
 			ELSE 0
 			END
 		))::numeric,3) AS dekking_ahn_maaiveldhoogte,
-	NULL::text AS status,
+	    NULL::text AS status,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_pipe pipe
     LEFT JOIN v2_connection_nodes start_node
@@ -1214,7 +1228,7 @@ CREATE OR REPLACE VIEW {schema}.leiding_doorsnede_onlogisch AS
             WHEN height > {max_dimensions} THEN 'hoogte is zeer groot'
             ELSE NULL
         END AS bericht,
-	NULL::text AS status,
+	    NULL::text AS status,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     --SELECT DISTINCT shape, width, height, def.code 
 	FROM v2_pipe pipe
@@ -1238,7 +1252,6 @@ CREATE OR REPLACE VIEW {schema}.leiding_doorsnede_onlogisch AS
     "sql_quality_weir": """
 ----------------- Overstorten ----------------------
 ----------------------------------------------------
-
 -- Drempelhoogte logisch
 CREATE OR REPLACE VIEW {schema}.overstort_niveau_onlogisch AS
     SELECT
@@ -1253,7 +1266,7 @@ CREATE OR REPLACE VIEW {schema}.overstort_niveau_onlogisch AS
             WHEN weir.crest_level > {max_levels} THEN 'drempelniveau is zeer hoog'::text
             ELSE NULL
         END AS bericht,
-	NULL::text AS status,
+	    NULL::text AS status,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_weir weir
     LEFT JOIN v2_connection_nodes start_node
@@ -1282,7 +1295,7 @@ CREATE OR REPLACE VIEW {schema}.overstort_drempel_boven_maaiveld AS
             WHEN weir.crest_level > manh.surface_level THEN 'boven put maaiveld'
             WHEN weir.crest_level > ahn.maaiveld THEN 'boven ahn maaiveld'
         END AS maaiveld_check,
-	NULL::text AS status,
+	    NULL::text AS status,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_weir weir
     LEFT JOIN v2_connection_nodes start_node
@@ -1303,7 +1316,7 @@ CREATE OR REPLACE VIEW {schema}.overstort_drempel_onder_putbodem AS
         start_node.code AS beginpunt,
         crest_level AS drempelniveau,
         manh.bottom_level AS bodemhoogte,
-	NULL::text AS status,
+	    NULL::text AS status,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_weir weir
     LEFT JOIN v2_connection_nodes start_node
@@ -1321,7 +1334,7 @@ CREATE OR REPLACE VIEW {schema}.overstort_korte_lengte AS
         start_node.code AS beginpunt,
         end_node.code AS eindpunt,
         ST_Length(st_makeline(start_node.the_geom, end_node.the_geom)) AS lengte_overstort,
-	NULL::text AS status,
+	    NULL::text AS status,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_weir weir
     LEFT JOIN v2_connection_nodes start_node
@@ -1359,7 +1372,7 @@ CREATE OR REPLACE VIEW {schema}.overstort_doorsnede_onlogisch AS
             WHEN (height::float < {max_dimensions}::float AND shape < 5) OR (array_greatest(string_to_array(height,' '))::float < {max_dimensions}::float AND shape > 4) THEN 'hoogte is zeer groot'
             ELSE NULL
         END AS bericht,
-	NULL::text AS status,
+	    NULL::text AS status,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_weir weir
     LEFT JOIN v2_connection_nodes start_node
@@ -1400,7 +1413,7 @@ CREATE OR REPLACE VIEW {schema}.doorlaat_niveau_onlogisch AS
             WHEN orf.crest_level > {max_levels} THEN 'doorlaatniveau is zeer hoog'::text
             ELSE NULL
         END AS bericht,
-	NULL::text AS status,
+	    NULL::text AS status,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_orifice orf
     LEFT JOIN v2_connection_nodes start_node
@@ -1429,7 +1442,7 @@ CREATE OR REPLACE VIEW {schema}.doorlaat_drempel_boven_maaiveld AS
             WHEN orf.crest_level > manh.surface_level THEN 'boven put maaiveld'
             WHEN orf.crest_level > ahn.maaiveld THEN 'boven ahn maaiveld'
         END AS maaiveld_check,
-	NULL::text AS status,
+	    NULL::text AS status,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_orifice orf
     LEFT JOIN v2_connection_nodes start_node
@@ -1450,7 +1463,7 @@ CREATE OR REPLACE VIEW {schema}.doorlaat_drempel_onder_putbodem AS
         start_node.code AS beginpunt,
         crest_level AS doorlaatniveau,
         manh.bottom_level AS bodemhoogte,
-	NULL::text AS status,
+	    NULL::text AS status,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_orifice orf
     LEFT JOIN v2_connection_nodes start_node
@@ -1468,7 +1481,7 @@ CREATE OR REPLACE VIEW {schema}.doorlaat_korte_lengte AS
         start_node.code AS beginpunt,
         end_node.code AS eindpunt,
         ST_Length(st_makeline(start_node.the_geom, end_node.the_geom)) AS lengte_overstort,
-	NULL::text AS status,
+	    NULL::text AS status,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_orifice orf
     LEFT JOIN v2_connection_nodes start_node
@@ -1506,7 +1519,7 @@ CREATE OR REPLACE VIEW {schema}.doorlaat_doorsnede_onlogisch AS
             WHEN (height::float < {max_dimensions}::float AND shape < 5) OR (array_greatest(string_to_array(height,' '))::float < {max_dimensions}::float AND shape > 4) THEN 'hoogte is zeer groot'
             ELSE NULL
         END AS bericht,
-	NULL::text AS status,
+	    NULL::text AS status,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_orifice orf
     LEFT JOIN v2_connection_nodes start_node
@@ -1545,8 +1558,8 @@ CREATE OR REPLACE VIEW {schema}.pomp_capaciteit_onlogisch AS
             WHEN capacity = 0 THEN 'pompcapaciteit = 0'::text
             WHEN capacity < 0 THEN 'pompcapaciteit is negatief'::text
             ELSE NULL
-	END AS bericht,
-	NULL::text AS status,
+	    END AS bericht,
+	    NULL::text AS status,
         start_node.the_geom::geometry(Point, 28992)
     FROM v2_pumpstation pump
     LEFT JOIN v2_connection_nodes start_node
@@ -1565,22 +1578,22 @@ CREATE OR REPLACE VIEW {schema}.pomp_aan_afslagpeil_onlogisch AS
             WHEN type = 1 THEN start_level
             WHEN type = 2 THEN NULL
             ELSE NULL
-	END AS aanslagniveau_bovenstrooms,
+	    END AS aanslagniveau_bovenstrooms,
         CASE
             WHEN type = 1 THEN lower_stop_level
             WHEN type = 2 THEN NULL
             ELSE NULL
-	END AS afslagniveau_bovenstrooms,
+	    END AS afslagniveau_bovenstrooms,
         CASE
             WHEN type = 1 THEN NULL
             WHEN type = 2 THEN start_level
             ELSE NULL
-	END AS aanslagniveau_benedenstrooms,
+	    END AS aanslagniveau_benedenstrooms,
         CASE
             WHEN type = 1 THEN NULL
             WHEN type = 2 THEN lower_stop_level
             ELSE NULL
-	END AS afslagniveau_benedenstrooms,
+	    END AS afslagniveau_benedenstrooms,
         CASE
             WHEN (start_level = 0 OR start_level < {min_levels} OR start_level > {max_levels})
                 AND (lower_stop_level != 0 AND lower_stop_level > {min_levels} AND lower_stop_level < {max_levels})
@@ -1599,7 +1612,7 @@ CREATE OR REPLACE VIEW {schema}.pomp_aan_afslagpeil_onlogisch AS
             WHEN upper_stop_level > {max_levels} THEN 'bijzonder hoog'::text
             ELSE NULL
         END AS bericht_hoogafslagniveau,
-	NULL::text AS status,
+	    NULL::text AS status,
         start_node.the_geom::geometry(Point, 28992)
     FROM v2_pumpstation pump
     LEFT JOIN v2_connection_nodes start_node
@@ -1622,7 +1635,7 @@ CREATE OR REPLACE VIEW {schema}.pomp_aan_vs_afslagpeil AS
         start_node.code AS beginpunt,
         pump.start_level AS aanslagniveau_bovenstrooms,
         pump.lower_stop_level AS afslagniveau_bovenstrooms,
-	NULL::text AS status,
+	    NULL::text AS status,
         start_node.the_geom::geometry(Point, 28992)
     FROM v2_pumpstation pump
     LEFT JOIN v2_connection_nodes start_node
@@ -1639,7 +1652,7 @@ CREATE OR REPLACE VIEW {schema}.pomp_afslagpeil_vs_bodemkelder AS
         manh.bottom_level AS bodemhoogte,
         pump.start_level AS aanslagniveau_bovenstrooms,
         pump.lower_stop_level AS afslagniveau_bovenstrooms,
-	NULL::text AS status,
+	    NULL::text AS status,
         start_node.the_geom::geometry(Point, 28992)
     FROM v2_pumpstation pump
     LEFT JOIN v2_connection_nodes start_node
@@ -1659,7 +1672,7 @@ CREATE OR REPLACE VIEW {schema}.pomp_aanslagpeil_vs_maaiveld AS
         maaiveld AS ahn_maaiveldhoogte,
         pump.start_level AS aanslagniveau_bovenstrooms,
         pump.lower_stop_level AS afslagniveau_bovenstrooms,
-	NULL::text AS status,
+	    NULL::text AS status,
         start_node.the_geom::geometry(Point, 28992)
     FROM v2_pumpstation pump
     LEFT JOIN v2_connection_nodes start_node
