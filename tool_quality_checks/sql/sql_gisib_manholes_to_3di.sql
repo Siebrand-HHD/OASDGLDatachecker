@@ -56,13 +56,13 @@ SELECT
 		WHEN lower(vorm_knoop) LIKE '%rond%' THEN COALESCE(diameter,breedte_pu)
 		WHEN lower(vorm_knoop) LIKE '%rechthoekig%' THEN COALESCE(breedte_pu,breedte_01)
 		ELSE COALESCE(breedte_pu,breedte_01)
-	END)::numeric AS width,
+	END)::numeric/1000.0 AS width,
 	(CASE
 		WHEN lower(vorm_knoop) LIKE '%vierkant%' THEN COALESCE(breedte_01,breedte_pu)
 		WHEN lower(vorm_knoop) LIKE '%rond%' THEN COALESCE(diameter,breedte_01)
 		WHEN lower(vorm_knoop) LIKE '%rechthoekig%' THEN COALESCE(breedte_01,breedte_pu)
 		ELSE COALESCE(breedte_01,breedte_pu)
-	END)::numeric AS length,
+	END)::numeric/1000.0 AS length,
 	CASE
 		WHEN lower(type_knoop) LIKE '%overstort%' THEN 4  -- not supported by 3Di
 		WHEN lower(type_knoop) LIKE '%inprik%' THEN 3
