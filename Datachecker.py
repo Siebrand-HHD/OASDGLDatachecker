@@ -297,7 +297,8 @@ class Datachecker:
         self.s_postgresql.beginGroup("PostgreSQL/connections")
         all_pgsql_dbkeys = self.s_postgresql.allKeys()
         for key in all_pgsql_dbkeys:
-            databases.append("Postgresql: " + key.split("/")[0])
+            if not key.startswith('selected'):
+                databases.append("Postgresql: " + key.split("/")[0])
         databases = list(dict.fromkeys(databases))
         return databases
 
