@@ -2,8 +2,8 @@
 <qgis labelsEnabled="0" version="3.4.15-Madeira" styleCategories="Symbology|Labeling">
   <renderer-v2 type="singleSymbol" symbollevels="0" enableorderby="0" forceraster="0">
     <symbols>
-      <symbol force_rhr="0" clip_to_extent="1" type="line" name="0" alpha="1">
-        <layer enabled="1" pass="0" locked="0" class="SimpleLine">
+      <symbol clip_to_extent="1" alpha="1" name="0" type="line" force_rhr="0">
+        <layer class="SimpleLine" enabled="1" pass="0" locked="0">
           <prop k="capstyle" v="square"/>
           <prop k="customdash" v="5;2"/>
           <prop k="customdash_map_unit_scale" v="3x:0,0,0,0,0,0"/>
@@ -22,9 +22,9 @@
           <prop k="width_map_unit_scale" v="3x:0,0,0,0,0,0"/>
           <data_defined_properties>
             <Option type="Map">
-              <Option type="QString" name="name" value=""/>
+              <Option value="" name="name" type="QString"/>
               <Option name="properties"/>
-              <Option type="QString" name="type" value="collection"/>
+              <Option value="collection" name="type" type="QString"/>
             </Option>
           </data_defined_properties>
         </layer>
