@@ -57,7 +57,7 @@
           <property name="title">
            <string>Checkresultaten selecteren</string>
           </property>
-          <property name="collapsed">
+          <property name="collapsed" stdset="0">
            <bool>false</bool>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -88,7 +88,7 @@
                 </size>
                </property>
                <property name="toolTip">
-                <string>Herladen</string>
+                <string>Herladen van inoud van de folder</string>
                </property>
                <property name="text">
                 <string>R</string>
@@ -166,10 +166,10 @@
           <property name="checkable">
            <bool>false</bool>
           </property>
-          <property name="collapsed">
+          <property name="collapsed" stdset="0">
            <bool>false</bool>
           </property>
-          <property name="scrollOnExpand">
+          <property name="scrollOnExpand" stdset="0">
            <bool>false</bool>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -231,11 +231,11 @@
               </widget>
              </item>
              <item>
-              <widget class="QgsFileWidget" name="putFile">
+              <widget class="QgsFileWidget" name="putFile" native="true">
                <property name="acceptDrops">
                 <bool>true</bool>
                </property>
-               <property name="filter">
+               <property name="filter" stdset="0">
                 <string>*.shp</string>
                </property>
               </widget>
@@ -252,20 +252,20 @@
               </widget>
              </item>
              <item>
-              <widget class="QgsFileWidget" name="leidingFile">
+              <widget class="QgsFileWidget" name="leidingFile" native="true">
                <property name="acceptDrops">
                 <bool>true</bool>
                </property>
-               <property name="useLink">
+               <property name="useLink" stdset="0">
                 <bool>false</bool>
                </property>
-               <property name="fullUrl">
+               <property name="fullUrl" stdset="0">
                 <bool>false</bool>
                </property>
-               <property name="dialogTitle">
+               <property name="dialogTitle" stdset="0">
                 <string>Selecteer een te controleren bestand voor de Leingen</string>
                </property>
-               <property name="filter">
+               <property name="filter" stdset="0">
                 <string>*.shp</string>
                </property>
               </widget>
@@ -377,8 +377,11 @@
           <property name="features">
            <set>QDockWidget::AllDockWidgetFeatures</set>
           </property>
+          <property name="allowedAreas">
+           <set>Qt::AllDockWidgetAreas</set>
+          </property>
           <widget class="QWidget" name="dockWidgetContents_2">
-           <layout class="QVBoxLayout" name="verticalLayout_7" stretch="0,0,0">
+           <layout class="QVBoxLayout" name="verticalLayout_7" stretch="0,0,0,0,0,0,0,0">
             <property name="sizeConstraint">
              <enum>QLayout::SetDefaultConstraint</enum>
             </property>
@@ -386,6 +389,9 @@
              <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="3,0,0,1,1">
               <item>
                <widget class="QComboBox" name="stylingbox">
+                <property name="toolTip">
+                 <string>Kies de styling die je wilt gebruiken.</string>
+                </property>
                 <property name="editable">
                  <bool>false</bool>
                 </property>
@@ -473,6 +479,9 @@
                   <bold>false</bold>
                  </font>
                 </property>
+                <property name="toolTip">
+                 <string>Voeg een nieuwe stijlinggroep toe</string>
+                </property>
                 <property name="text">
                  <string>+</string>
                 </property>
@@ -486,6 +495,9 @@
                   <height>1600</height>
                  </size>
                 </property>
+                <property name="toolTip">
+                 <string>Verwijder een stijlinggroep</string>
+                </property>
                 <property name="text">
                  <string>-</string>
                 </property>
@@ -493,6 +505,9 @@
               </item>
               <item>
                <widget class="QPushButton" name="applyStylingButton">
+                <property name="toolTip">
+                 <string>Laad de geselcteerde stijlinggroep in op je project.</string>
+                </property>
                 <property name="text">
                  <string>Laad styling</string>
                 </property>
@@ -500,6 +515,9 @@
               </item>
               <item>
                <widget class="QPushButton" name="savelayer">
+                <property name="toolTip">
+                 <string>Sla de stijling zoals nu is ingesteld op in de geselecteerde stijlgroep.</string>
+                </property>
                 <property name="text">
                  <string>Save styling</string>
                 </property>
@@ -508,12 +526,29 @@
              </layout>
             </item>
             <item>
+             <widget class="Line" name="line_4">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_6">
+              <property name="text">
+               <string>Objectgrootte slider</string>
+              </property>
+             </widget>
+            </item>
+            <item>
              <widget class="QSlider" name="ObjectSlider">
               <property name="focusPolicy">
                <enum>Qt::WheelFocus</enum>
               </property>
               <property name="acceptDrops">
                <bool>true</bool>
+              </property>
+              <property name="toolTip">
+               <string>Met deze slider kun je de grootte van de objecten in de active laag aanpassen.</string>
               </property>
               <property name="minimum">
                <number>1</number>
@@ -544,6 +579,30 @@
               </property>
               <property name="tickInterval">
                <number>1</number>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="Line" name="line_3">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="layerIsolate">
+              <property name="toolTip">
+               <string>Wanneer actief,dan worden alleen de geselecteerde lagen weergegeven.</string>
+              </property>
+              <property name="text">
+               <string>Laag isoleren</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="Line" name="line_5">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
               </property>
              </widget>
             </item>
@@ -594,7 +653,7 @@
             <item row="2" column="1">
              <widget class="QCheckBox" name="cbverwerkt">
               <property name="text">
-               <string/>
+               <string>Verwerkt</string>
               </property>
               <property name="checked">
                <bool>true</bool>
@@ -654,10 +713,36 @@
               </property>
              </widget>
             </item>
-            <item row="0" column="0">
-             <widget class="QLabel" name="label_2">
+            <item row="2" column="0">
+             <widget class="QPushButton" name="pverwerkt">
               <property name="text">
-               <string>Wijzig status</string>
+               <string>Verwerkt</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QCheckBox" name="cbgecontroleerd">
+              <property name="text">
+               <string>Gecontroleerd</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+              <property name="tristate">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QPushButton" name="pgecontroleerd">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text">
+               <string>Gecontroleerd</string>
               </property>
              </widget>
             </item>
@@ -670,6 +755,9 @@
             </item>
             <item row="0" column="0">
              <widget class="QLabel" name="label_2">
+              <property name="toolTip">
+               <string>Hiermee pas je de status aan van je geselecteerde objecten.</string>
+              </property>
               <property name="text">
                <string>Wijzig status</string>
               </property>
@@ -677,6 +765,9 @@
             </item>
             <item row="0" column="1">
              <widget class="QLabel" name="label_3">
+              <property name="toolTip">
+               <string>Hier kies je de zichtbaarheid van de objecten op basis van hun status.</string>
+              </property>
               <property name="text">
                <string>Zichtbaarheid</string>
               </property>
@@ -688,46 +779,7 @@
         </item>
         <item>
          <widget class="QgsCollapsibleGroupBox" name="mGroupBox_3">
-          <layout class="QVBoxLayout" name="verticalLayout_6">
-           <item>
-            <widget class="QCheckBox" name="layerIsolate">
-             <property name="text">
-              <string>Laag isoleren</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_4">
-             <item>
-              <widget class="QPushButton" name="pushButton_3">
-               <property name="text">
-                <string>PushButton</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="pushButton">
-               <property name="text">
-                <string>PushButton</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QCommandLinkButton" name="commandLinkButton">
-               <property name="text">
-                <string>Reset</string>
-               </property>
-               <property name="checkable">
-                <bool>false</bool>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-           <item>
-            <widget class="QTreeView" name="treeView"/>
-           </item>
-          </layout>
+          <layout class="QVBoxLayout" name="verticalLayout_6"/>
          </widget>
         </item>
         <item>
@@ -760,7 +812,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QgsFileWidget" name="dem">
+           <widget class="QgsFileWidget" name="dem" native="true">
             <property name="toolTip">
              <string>=gettattr(value)</string>
             </property>
@@ -826,6 +878,9 @@
           </item>
           <item>
            <widget class="QPushButton" name="instellingenopslaan">
+            <property name="toolTip">
+             <string>Sla de huidige instellingen op als de nieuwe default.</string>
+            </property>
             <property name="text">
              <string>Opslaan als default</string>
             </property>
@@ -909,6 +964,9 @@
             <property name="decimals">
              <number>1</number>
             </property>
+            <property name="singleStep">
+             <double>0.100000000000000</double>
+            </property>
             <property name="value">
              <double>0.500000000000000</double>
             </property>
@@ -921,6 +979,9 @@
               <width>100</width>
               <height>0</height>
              </size>
+            </property>
+            <property name="toolTip">
+             <string>Pas hier je instellingen aan, deze worden automatisch opgeslagen.</string>
             </property>
             <property name="decimals">
              <number>1</number>
@@ -973,6 +1034,9 @@
            <widget class="QDoubleSpinBox" name="min_dimensions">
             <property name="decimals">
              <number>1</number>
+            </property>
+            <property name="singleStep">
+             <double>0.100000000000000</double>
             </property>
             <property name="value">
              <double>0.200000000000000</double>
@@ -1030,6 +1094,9 @@
             </property>
             <property name="maximum">
              <double>100000.000000000000000</double>
+            </property>
+            <property name="singleStep">
+             <double>0.100000000000000</double>
             </property>
             <property name="value">
              <double>5.000000000000000</double>
