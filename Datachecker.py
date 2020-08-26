@@ -733,9 +733,9 @@ class Datachecker:
     def draai_de_checks(self):
         settings = self.get_settings()
 
-        #task1 = QgsTask.fromFunction('Draai checks', run_scripts_task, on_finished=self.completed, settings=settings)
-        #QgsApplication.taskManager().addTask(task1)
-        run_scripts(settings) #aanzetten voor weergave python error in QGIS, uitzetten en bovenste 2 regels aanzetten voor soepele versie
+        task1 = QgsTask.fromFunction('Draai checks', run_scripts_task, on_finished=self.completed, settings=settings)
+        QgsApplication.taskManager().addTask(task1)
+        #run_scripts(settings)
 
         self.initialize_paths()
         

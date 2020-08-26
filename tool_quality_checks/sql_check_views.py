@@ -870,7 +870,6 @@ CREATE OR REPLACE VIEW {schema}.leiding_materiaal_onlogisch AS
         pipe.id AS threedi_id,
         start_node.code AS beginpunt,
         end_node.code AS eindpunt,
-        material AS materiaal,
         'materiaal type onlogisch'::text AS bericht,
 	    NULL::text AS status,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
@@ -879,7 +878,7 @@ CREATE OR REPLACE VIEW {schema}.leiding_materiaal_onlogisch AS
         ON 	pipe.connection_node_start_id = start_node.id
     LEFT JOIN v2_connection_nodes end_node
         ON 	pipe.connection_node_end_id = end_node.id
-    WHERE material > 9;
+    WHERE material > 8;
 -- BOB's aanwezig
 CREATE OR REPLACE VIEW {schema}.leiding_bob_onlogisch AS
     SELECT
