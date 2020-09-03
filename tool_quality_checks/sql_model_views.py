@@ -36,7 +36,7 @@ sql_understandable_model_views = {
             WHEN sewerage_type = 1 THEN 'afvloeiend_hemelwater'
             WHEN sewerage_type = 2 THEN 'droogweerafvoer'
             ELSE NULL
- 		END as typeinzameling,
+ 		END as type_inzameling,
         invert_level_start_point AS bob_beginpunt,
         invert_level_end_point AS bob_eindpunt,
         CASE
@@ -59,7 +59,7 @@ sql_understandable_model_views = {
             WHEN shape = 5 THEN 'rechthoekig (getabelleerd)'
             WHEN shape = 6 THEN 'getabelleerd trapezium'
             ELSE 'overige'
- 		END as vormprofiel,
+ 		END as vorm_profiel,
         (array_greatest(string_to_array(width,' '))::float * 1000)::double precision AS breedte,
         (array_greatest(string_to_array(height,' '))::float * 1000)::double precision AS hoogte,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
