@@ -673,39 +673,6 @@
               </property>
              </spacer>
             </item>
-            <item row="2" column="0">
-             <widget class="QPushButton" name="pverwerkt">
-              <property name="text">
-               <string>verwerkt</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="1">
-             <widget class="QCheckBox" name="cbgecontroleerd">
-              <property name="text">
-               <string/>
-              </property>
-              <property name="checked">
-               <bool>true</bool>
-              </property>
-              <property name="tristate">
-               <bool>false</bool>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="0">
-             <widget class="QPushButton" name="pgecontroleerd">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="text">
-               <string>gecontroleerd</string>
-              </property>
-             </widget>
-            </item>
             <item row="3" column="0">
              <widget class="QPushButton" name="pushButton_2">
               <property name="text">
