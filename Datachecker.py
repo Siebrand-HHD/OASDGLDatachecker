@@ -553,7 +553,7 @@ class Datachecker:
 
         settings = SettingsObjectPlugin()
         # settings.s='localhost' #self.threedi_db_settings["threedi_host"]
-
+        self.getConnectionDetails
         settings.host = self.threedi_db_settings['threedi_host']
         settings.database = self.threedi_db_settings['threedi_dbname']
         settings.port = self.threedi_db_settings['threedi_port']
@@ -562,7 +562,7 @@ class Datachecker:
         settings.emptydb = True
 
         settings.import_type = self.get_qsetting("Instellingen", "ImportSoftware") #"gbi"
-        if settings.import_type == "":
+        if not settings.import_type or settings.import_type == "":
             settings.import_type ="gbi"
 
         settings.export = True

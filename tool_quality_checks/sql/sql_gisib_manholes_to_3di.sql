@@ -22,6 +22,10 @@ SELECT * FROM src.leidingen_gisib LIMIT 10;
 SELECT count(*) FROM src.putten_gisib;
 SELECT count(*) FROM src.leidingen_gisib;
 */
+
+ALTER TABLE src.putten_gisib
+	ADD COLUMN IF NOT EXISTS naam VARCHAR(255);
+
 -------------------------------------------------
 ------ Stap 1: connection-nodes toevoegen -------
 -------------------------------------------------
