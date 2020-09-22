@@ -100,9 +100,9 @@ CREATE OR REPLACE VIEW {schema}.leiding_bob_leeg AS
 	    NULL::text AS status,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_pipe pipe
-    LEFT JOIN v2_connection_nodes start_node
+    JOIN v2_connection_nodes start_node
         ON 	pipe.connection_node_start_id = start_node.id
-    LEFT JOIN v2_connection_nodes end_node
+    JOIN v2_connection_nodes end_node
         ON 	pipe.connection_node_end_id = end_node.id
     LEFT JOIN v2_cross_section_definition def
         ON pipe.cross_section_definition_id = def.id
@@ -118,9 +118,9 @@ CREATE OR REPLACE VIEW {schema}.leiding_vorm_leeg AS
 	    NULL::text AS status,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_pipe pipe
-    LEFT JOIN v2_connection_nodes start_node
+    JOIN v2_connection_nodes start_node
         ON 	pipe.connection_node_start_id = start_node.id
-    LEFT JOIN v2_connection_nodes end_node
+    JOIN v2_connection_nodes end_node
         ON 	pipe.connection_node_end_id = end_node.id
     WHERE cross_section_definition_id IS NULL;
 -- Riooltype ontbreekt
@@ -136,9 +136,9 @@ CREATE OR REPLACE VIEW {schema}.leiding_riooltype_leeg AS
 	    NULL::text AS status,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_pipe pipe
-    LEFT JOIN v2_connection_nodes start_node
+    JOIN v2_connection_nodes start_node
         ON 	pipe.connection_node_start_id = start_node.id
-    LEFT JOIN v2_connection_nodes end_node
+    JOIN v2_connection_nodes end_node
         ON 	pipe.connection_node_end_id = end_node.id
     WHERE sewerage_type IS NULL;
 -- Materiaal ontbreekt
@@ -152,9 +152,9 @@ CREATE OR REPLACE VIEW {schema}.leiding_materiaal_leeg AS
 	    NULL::text AS status,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_pipe pipe
-    LEFT JOIN v2_connection_nodes start_node
+    JOIN v2_connection_nodes start_node
         ON 	pipe.connection_node_start_id = start_node.id
-    LEFT JOIN v2_connection_nodes end_node
+    JOIN v2_connection_nodes end_node
         ON 	pipe.connection_node_end_id = end_node.id
     WHERE material IS NULL;
 -- Dwarsdoorsnede compleet
@@ -184,9 +184,9 @@ CREATE OR REPLACE VIEW {schema}.leiding_afmeting_leeg AS
 	    NULL::text AS status,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_pipe pipe
-    LEFT JOIN v2_connection_nodes start_node
+    JOIN v2_connection_nodes start_node
         ON 	pipe.connection_node_start_id = start_node.id 
-    LEFT JOIN v2_connection_nodes end_node
+    JOIN v2_connection_nodes end_node
         ON 	pipe.connection_node_end_id = end_node.id 
     LEFT JOIN v2_cross_section_definition def
         ON pipe.cross_section_definition_id = def.id
@@ -230,9 +230,9 @@ CREATE OR REPLACE VIEW {schema}.overstort_niveau_leeg AS
 	    NULL::text AS status,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_weir weir
-    LEFT JOIN v2_connection_nodes start_node
+    JOIN v2_connection_nodes start_node
         ON 	weir.connection_node_start_id = start_node.id 
-    LEFT JOIN v2_connection_nodes end_node
+    JOIN v2_connection_nodes end_node
         ON 	weir.connection_node_end_id = end_node.id 
     LEFT JOIN v2_cross_section_definition def
         ON weir.cross_section_definition_id = def.id
@@ -248,9 +248,9 @@ CREATE OR REPLACE VIEW {schema}.overstort_dwarsdoorsnede_leeg AS
 	    NULL::text AS status,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_weir weir
-    LEFT JOIN v2_connection_nodes start_node
+    JOIN v2_connection_nodes start_node
         ON 	weir.connection_node_start_id = start_node.id
-    LEFT JOIN v2_connection_nodes end_node
+    JOIN v2_connection_nodes end_node
         ON 	weir.connection_node_end_id = end_node.id
     WHERE cross_section_definition_id IS NULL;
 -- Drempelbreedte aanwezig
@@ -264,9 +264,9 @@ CREATE OR REPLACE VIEW {schema}.overstort_breedte_leeg AS
 	    NULL::text AS status,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_weir weir
-    LEFT JOIN v2_connection_nodes start_node
+    JOIN v2_connection_nodes start_node
         ON 	weir.connection_node_start_id = start_node.id 
-    LEFT JOIN v2_connection_nodes end_node
+    JOIN v2_connection_nodes end_node
         ON 	weir.connection_node_end_id = end_node.id 
     LEFT JOIN v2_cross_section_definition def
         ON weir.cross_section_definition_id = def.id
@@ -301,9 +301,9 @@ CREATE OR REPLACE VIEW {schema}.overstort_stroming_leeg AS
 	    NULL::text AS status,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_weir weir
-    LEFT JOIN v2_connection_nodes start_node
+    JOIN v2_connection_nodes start_node
         ON 	weir.connection_node_start_id = start_node.id 
-    LEFT JOIN v2_connection_nodes end_node
+    JOIN v2_connection_nodes end_node
         ON 	weir.connection_node_end_id = end_node.id 
     LEFT JOIN v2_cross_section_definition def
         ON weir.cross_section_definition_id = def.id
@@ -348,9 +348,9 @@ CREATE OR REPLACE VIEW {schema}.doorlaat_niveau_leeg AS
 	    NULL::text AS status,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_orifice orf
-    LEFT JOIN v2_connection_nodes start_node
+    JOIN v2_connection_nodes start_node
         ON 	orf.connection_node_start_id = start_node.id 
-    LEFT JOIN v2_connection_nodes end_node
+    JOIN v2_connection_nodes end_node
         ON 	orf.connection_node_end_id = end_node.id 
     LEFT JOIN v2_cross_section_definition def
         ON orf.cross_section_definition_id = def.id
@@ -366,9 +366,9 @@ CREATE OR REPLACE VIEW {schema}.doorlaat_vorm_leeg AS
 	    NULL::text AS status,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_orifice orf
-    LEFT JOIN v2_connection_nodes start_node
+    JOIN v2_connection_nodes start_node
         ON 	orf.connection_node_start_id = start_node.id
-    LEFT JOIN v2_connection_nodes end_node
+    JOIN v2_connection_nodes end_node
         ON 	orf.connection_node_end_id = end_node.id
     WHERE cross_section_definition_id IS NULL;
 -- Drempelbreedte aanwezig
@@ -382,9 +382,9 @@ CREATE OR REPLACE VIEW {schema}.doorlaat_breedte_leeg AS
 	    NULL::text AS status,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_orifice orf
-    LEFT JOIN v2_connection_nodes start_node
+    JOIN v2_connection_nodes start_node
         ON 	orf.connection_node_start_id = start_node.id 
-    LEFT JOIN v2_connection_nodes end_node
+    JOIN v2_connection_nodes end_node
         ON 	orf.connection_node_end_id = end_node.id 
     LEFT JOIN v2_cross_section_definition def
         ON orf.cross_section_definition_id = def.id
@@ -419,9 +419,9 @@ CREATE OR REPLACE VIEW {schema}.doorlaat_stroming_leeg AS
 	    NULL::text AS status,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_orifice orf
-    LEFT JOIN v2_connection_nodes start_node
+    JOIN v2_connection_nodes start_node
         ON 	orf.connection_node_start_id = start_node.id 
-    LEFT JOIN v2_connection_nodes end_node
+    JOIN v2_connection_nodes end_node
         ON 	orf.connection_node_end_id = end_node.id 
     LEFT JOIN v2_cross_section_definition def
         ON orf.cross_section_definition_id = def.id
@@ -483,9 +483,9 @@ CREATE OR REPLACE VIEW {schema}.pomp_aan_afslagpeil_leeg AS
 	    NULL::text AS status,
         start_node.the_geom::geometry(Point, 28992)
     FROM v2_pumpstation pump
-    LEFT JOIN v2_connection_nodes start_node
+    JOIN v2_connection_nodes start_node
         ON 	pump.connection_node_start_id = start_node.id 
-    LEFT JOIN v2_connection_nodes end_node
+    JOIN v2_connection_nodes end_node
         ON 	pump.connection_node_end_id = end_node.id
     WHERE start_level IS NULL OR lower_stop_level IS NULL;
 -- capaciteit onbekend
@@ -499,9 +499,9 @@ CREATE OR REPLACE VIEW {schema}.pomp_capaciteit_leeg AS
 	    NULL::text AS status,
         start_node.the_geom::geometry(Point, 28992)
     FROM v2_pumpstation pump
-    LEFT JOIN v2_connection_nodes start_node
+    JOIN v2_connection_nodes start_node
         ON 	pump.connection_node_start_id = start_node.id 
-    LEFT JOIN v2_connection_nodes end_node
+    JOIN v2_connection_nodes end_node
         ON 	pump.connection_node_end_id = end_node.id
     WHERE capacity IS NULL;
 """,
@@ -561,7 +561,7 @@ CREATE OR REPLACE VIEW {schema}.put_buiten_dem AS
 	    NULL::text AS status,
         b.the_geom::geometry(Point, 28992)
     FROM v2_manhole a
-    LEFT JOIN v2_connection_nodes b
+    JOIN v2_connection_nodes b
         ON a.connection_node_id = b.id
     LEFT JOIN src.manhole_maaiveld c
         ON a.id = c.manh_id
@@ -577,7 +577,7 @@ CREATE OR REPLACE VIEW {schema}.put_maaiveld_vs_ahn AS
 	    NULL::text AS status,
         b.the_geom::geometry(Point, 28992)
     FROM v2_manhole a
-    LEFT JOIN v2_connection_nodes b
+    JOIN v2_connection_nodes b
         ON 	a.connection_node_id = b.id 
     LEFT JOIN src.manhole_maaiveld c
         ON 	a.id = c.manh_id
@@ -626,7 +626,7 @@ CREATE OR REPLACE VIEW {schema}.put_bodemhoogte_vs_bob AS
 	    NULL::text AS status,
         b.the_geom::geometry(Point, 28992)
     FROM v2_manhole a
-    LEFT JOIN v2_connection_nodes b
+    JOIN v2_connection_nodes b
         ON a.connection_node_id = b.id
     LEFT JOIN v2_pipe c
         ON a.connection_node_id = c.connection_node_start_id::integer OR a.connection_node_id = c.connection_node_end_id::integer
@@ -655,7 +655,7 @@ CREATE OR REPLACE VIEW {schema}.put_afm_vs_leiding_afm AS
 	    NULL::text AS status,
         b.the_geom::geometry(Point, 28992)
     FROM v2_manhole a
-    LEFT JOIN v2_connection_nodes b
+    JOIN v2_connection_nodes b
         ON a.connection_node_id = b.id
     LEFT JOIN v2_pipe c
         ON a.connection_node_id = c.connection_node_start_id::integer OR a.connection_node_id = c.connection_node_end_id::integer
@@ -876,9 +876,9 @@ CREATE OR REPLACE VIEW {schema}.leiding_materiaal_onlogisch AS
 	    NULL::text AS status,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_pipe pipe
-    LEFT JOIN v2_connection_nodes start_node
+    JOIN v2_connection_nodes start_node
         ON 	pipe.connection_node_start_id = start_node.id
-    LEFT JOIN v2_connection_nodes end_node
+    JOIN v2_connection_nodes end_node
         ON 	pipe.connection_node_end_id = end_node.id
     WHERE material > 8;
 -- BOB's aanwezig
@@ -897,9 +897,9 @@ CREATE OR REPLACE VIEW {schema}.leiding_bob_onlogisch AS
 	    NULL::text AS status,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_pipe pipe
-    LEFT JOIN v2_connection_nodes start_node
+    JOIN v2_connection_nodes start_node
         ON 	pipe.connection_node_start_id = start_node.id
-    LEFT JOIN v2_connection_nodes end_node
+    JOIN v2_connection_nodes end_node
         ON 	pipe.connection_node_end_id = end_node.id
     LEFT JOIN v2_cross_section_definition def
         ON pipe.cross_section_definition_id = def.id
@@ -920,9 +920,9 @@ CREATE OR REPLACE VIEW {schema}.leiding_kort AS
 	    NULL::text AS status,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_pipe pipe
-    LEFT JOIN v2_connection_nodes start_node
+    JOIN v2_connection_nodes start_node
         ON 	pipe.connection_node_start_id = start_node.id 
-    LEFT JOIN v2_connection_nodes end_node
+    JOIN v2_connection_nodes end_node
         ON 	pipe.connection_node_end_id = end_node.id
     WHERE (ST_Length(st_makeline(start_node.the_geom, end_node.the_geom)) < {min_length}) AND (start_node.id != end_node.id);
 -- Zeer lange lange leidingen (> x m)
@@ -936,9 +936,9 @@ CREATE OR REPLACE VIEW {schema}.leiding_lang AS
 	    NULL::text AS status,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_pipe pipe
-    LEFT JOIN v2_connection_nodes start_node
+    JOIN v2_connection_nodes start_node
         ON 	pipe.connection_node_start_id = start_node.id 
-    LEFT JOIN v2_connection_nodes end_node
+    JOIN v2_connection_nodes end_node
         ON 	pipe.connection_node_end_id = end_node.id
     WHERE ST_Length(st_makeline(start_node.the_geom, end_node.the_geom)) > {max_length};
 -- Dubbele leidingen
@@ -961,9 +961,9 @@ CREATE OR REPLACE VIEW {schema}.leiding_dubbel AS
             end_node.code AS end_point,
             st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
         FROM v2_pipe pipe
-        LEFT JOIN v2_connection_nodes start_node
+        JOIN v2_connection_nodes start_node
             ON 	pipe.connection_node_start_id = start_node.id 
-        LEFT JOIN v2_connection_nodes end_node
+        JOIN v2_connection_nodes end_node
             ON 	pipe.connection_node_end_id = end_node.id
         UNION ALL
         SELECT
@@ -974,9 +974,9 @@ CREATE OR REPLACE VIEW {schema}.leiding_dubbel AS
             end_node.code AS end_point,
             st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
         FROM v2_weir weir
-        LEFT JOIN v2_connection_nodes start_node
+        JOIN v2_connection_nodes start_node
             ON 	weir.connection_node_start_id = start_node.id 
-        LEFT JOIN v2_connection_nodes end_node
+        JOIN v2_connection_nodes end_node
             ON 	weir.connection_node_end_id = end_node.id
         UNION ALL
         SELECT
@@ -987,9 +987,9 @@ CREATE OR REPLACE VIEW {schema}.leiding_dubbel AS
             end_node.code AS end_point,
             st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
         FROM v2_orifice orf
-        LEFT JOIN v2_connection_nodes start_node
+        JOIN v2_connection_nodes start_node
             ON 	orf.connection_node_start_id = start_node.id 
-        LEFT JOIN v2_connection_nodes end_node
+        JOIN v2_connection_nodes end_node
             ON 	orf.connection_node_end_id = end_node.id
     ) AS a
     GROUP BY the_geom
@@ -1059,9 +1059,9 @@ CREATE OR REPLACE VIEW {schema}.leiding_groot_verhang AS
 	    NULL::text AS status,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_pipe pipe
-    LEFT JOIN v2_connection_nodes start_node
+    JOIN v2_connection_nodes start_node
         ON 	pipe.connection_node_start_id = start_node.id 
-    LEFT JOIN v2_connection_nodes end_node
+    JOIN v2_connection_nodes end_node
         ON 	pipe.connection_node_end_id = end_node.id
     WHERE invert_level_start_point != invert_level_end_point
         AND (ST_Length(st_makeline(start_node.the_geom, end_node.the_geom))/abs(invert_level_start_point - invert_level_end_point)) < {max_verhang};
@@ -1108,9 +1108,9 @@ CREATE OR REPLACE VIEW {schema}.leiding_dekking_start AS
 	    NULL::text AS status,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_pipe pipe
-    LEFT JOIN v2_connection_nodes start_node
+    JOIN v2_connection_nodes start_node
         ON 	pipe.connection_node_start_id = start_node.id 
-    LEFT JOIN v2_connection_nodes end_node
+    JOIN v2_connection_nodes end_node
         ON 	pipe.connection_node_end_id = end_node.id 
     LEFT JOIN v2_cross_section_definition def
         ON pipe.cross_section_definition_id = def.id,
@@ -1170,9 +1170,9 @@ CREATE OR REPLACE VIEW {schema}.leiding_dekking_eind AS
 	NULL::text AS status,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_pipe pipe
-    LEFT JOIN v2_connection_nodes start_node
+    JOIN v2_connection_nodes start_node
         ON 	pipe.connection_node_start_id = start_node.id 
-    LEFT JOIN v2_connection_nodes end_node
+    JOIN v2_connection_nodes end_node
         ON 	pipe.connection_node_end_id = end_node.id 
     LEFT JOIN v2_cross_section_definition def
         ON pipe.cross_section_definition_id = def.id,
@@ -1234,9 +1234,9 @@ CREATE OR REPLACE VIEW {schema}.leiding_doorsnede_onlogisch AS
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     --SELECT DISTINCT shape, width, height, def.code 
 	FROM v2_pipe pipe
-    LEFT JOIN v2_connection_nodes start_node
+    JOIN v2_connection_nodes start_node
         ON 	pipe.connection_node_start_id = start_node.id 
-    LEFT JOIN v2_connection_nodes end_node
+    JOIN v2_connection_nodes end_node
         ON 	pipe.connection_node_end_id = end_node.id 
     LEFT JOIN xsecs def
         ON pipe.cross_section_definition_id = def.id
@@ -1271,9 +1271,9 @@ CREATE OR REPLACE VIEW {schema}.overstort_niveau_onlogisch AS
 	    NULL::text AS status,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_weir weir
-    LEFT JOIN v2_connection_nodes start_node
+    JOIN v2_connection_nodes start_node
         ON 	weir.connection_node_start_id = start_node.id 
-    LEFT JOIN v2_connection_nodes end_node
+    JOIN v2_connection_nodes end_node
         ON 	weir.connection_node_end_id = end_node.id 
     LEFT JOIN v2_cross_section_definition def
         ON weir.cross_section_definition_id = def.id
@@ -1300,9 +1300,9 @@ CREATE OR REPLACE VIEW {schema}.overstort_drempel_boven_maaiveld AS
 	    NULL::text AS status,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_weir weir
-    LEFT JOIN v2_connection_nodes start_node
+    JOIN v2_connection_nodes start_node
         ON 	weir.connection_node_start_id = start_node.id
-    LEFT JOIN v2_connection_nodes end_node
+    JOIN v2_connection_nodes end_node
         ON 	weir.connection_node_end_id = end_node.id
     LEFT JOIN src.manhole_maaiveld ahn
         ON (weir.connection_node_start_id = ahn.manh_id OR weir.connection_node_end_id = ahn.manh_id)
@@ -1321,9 +1321,9 @@ CREATE OR REPLACE VIEW {schema}.overstort_drempel_onder_putbodem AS
 	    NULL::text AS status,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_weir weir
-    LEFT JOIN v2_connection_nodes start_node
+    JOIN v2_connection_nodes start_node
         ON 	weir.connection_node_start_id = start_node.id
-    LEFT JOIN v2_connection_nodes end_node
+    JOIN v2_connection_nodes end_node
         ON 	weir.connection_node_end_id = end_node.id
     LEFT JOIN v2_manhole manh
         ON 	manh.connection_node_id = start_node.id
@@ -1339,9 +1339,9 @@ CREATE OR REPLACE VIEW {schema}.overstort_korte_lengte AS
 	    NULL::text AS status,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_weir weir
-    LEFT JOIN v2_connection_nodes start_node
+    JOIN v2_connection_nodes start_node
         ON 	weir.connection_node_start_id = start_node.id
-    LEFT JOIN v2_connection_nodes end_node
+    JOIN v2_connection_nodes end_node
         ON 	weir.connection_node_end_id = end_node.id
     WHERE ST_Length(st_makeline(start_node.the_geom, end_node.the_geom)) < {min_length};
 -- Dwarsdoorsnede logisch
@@ -1377,9 +1377,9 @@ CREATE OR REPLACE VIEW {schema}.overstort_doorsnede_onlogisch AS
 	    NULL::text AS status,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_weir weir
-    LEFT JOIN v2_connection_nodes start_node
+    JOIN v2_connection_nodes start_node
         ON 	weir.connection_node_start_id = start_node.id 
-    LEFT JOIN v2_connection_nodes end_node
+    JOIN v2_connection_nodes end_node
         ON 	weir.connection_node_end_id = end_node.id 
     LEFT JOIN v2_cross_section_definition def
         ON weir.cross_section_definition_id = def.id
@@ -1418,9 +1418,9 @@ CREATE OR REPLACE VIEW {schema}.doorlaat_niveau_onlogisch AS
 	    NULL::text AS status,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_orifice orf
-    LEFT JOIN v2_connection_nodes start_node
+    JOIN v2_connection_nodes start_node
         ON 	orf.connection_node_start_id = start_node.id 
-    LEFT JOIN v2_connection_nodes end_node
+    JOIN v2_connection_nodes end_node
         ON 	orf.connection_node_end_id = end_node.id 
     LEFT JOIN v2_cross_section_definition def
         ON orf.cross_section_definition_id = def.id
@@ -1447,9 +1447,9 @@ CREATE OR REPLACE VIEW {schema}.doorlaat_drempel_boven_maaiveld AS
 	    NULL::text AS status,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_orifice orf
-    LEFT JOIN v2_connection_nodes start_node
+    JOIN v2_connection_nodes start_node
         ON 	orf.connection_node_start_id = start_node.id
-    LEFT JOIN v2_connection_nodes end_node
+    JOIN v2_connection_nodes end_node
         ON 	orf.connection_node_end_id = end_node.id
     LEFT JOIN src.manhole_maaiveld ahn
         ON (orf.connection_node_start_id = ahn.manh_id OR orf.connection_node_end_id = ahn.manh_id)
@@ -1468,9 +1468,9 @@ CREATE OR REPLACE VIEW {schema}.doorlaat_drempel_onder_putbodem AS
 	    NULL::text AS status,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_orifice orf
-    LEFT JOIN v2_connection_nodes start_node
+    JOIN v2_connection_nodes start_node
         ON 	orf.connection_node_start_id = start_node.id
-    LEFT JOIN v2_connection_nodes end_node
+    JOIN v2_connection_nodes end_node
         ON 	orf.connection_node_end_id = end_node.id
     LEFT JOIN v2_manhole manh
         ON 	(manh.connection_node_id = start_node.id OR manh.connection_node_id = end_node.id)
@@ -1486,9 +1486,9 @@ CREATE OR REPLACE VIEW {schema}.doorlaat_korte_lengte AS
 	    NULL::text AS status,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_orifice orf
-    LEFT JOIN v2_connection_nodes start_node
+    JOIN v2_connection_nodes start_node
         ON 	orf.connection_node_start_id = start_node.id
-    LEFT JOIN v2_connection_nodes end_node
+    JOIN v2_connection_nodes end_node
         ON 	orf.connection_node_end_id = end_node.id
     WHERE ST_Length(st_makeline(start_node.the_geom, end_node.the_geom)) < {min_length};
 -- Dwarsdoorsnede logisch
@@ -1524,9 +1524,9 @@ CREATE OR REPLACE VIEW {schema}.doorlaat_doorsnede_onlogisch AS
 	    NULL::text AS status,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
     FROM v2_orifice orf
-    LEFT JOIN v2_connection_nodes start_node
+    JOIN v2_connection_nodes start_node
         ON 	orf.connection_node_start_id = start_node.id 
-    LEFT JOIN v2_connection_nodes end_node
+    JOIN v2_connection_nodes end_node
         ON 	orf.connection_node_end_id = end_node.id 
     LEFT JOIN v2_cross_section_definition def
         ON orf.cross_section_definition_id = def.id
@@ -1564,9 +1564,9 @@ CREATE OR REPLACE VIEW {schema}.pomp_capaciteit_onlogisch AS
 	    NULL::text AS status,
         start_node.the_geom::geometry(Point, 28992)
     FROM v2_pumpstation pump
-    LEFT JOIN v2_connection_nodes start_node
+    JOIN v2_connection_nodes start_node
         ON 	pump.connection_node_start_id = start_node.id 
-    LEFT JOIN v2_connection_nodes end_node
+    JOIN v2_connection_nodes end_node
         ON 	pump.connection_node_end_id = end_node.id
     WHERE capacity = 0 OR capacity < 0;
 -- Aan- en afslagpeilen logisch
@@ -1617,9 +1617,9 @@ CREATE OR REPLACE VIEW {schema}.pomp_aan_afslagpeil_onlogisch AS
 	    NULL::text AS status,
         start_node.the_geom::geometry(Point, 28992)
     FROM v2_pumpstation pump
-    LEFT JOIN v2_connection_nodes start_node
+    JOIN v2_connection_nodes start_node
         ON 	pump.connection_node_start_id = start_node.id 
-    LEFT JOIN v2_connection_nodes end_node
+    JOIN v2_connection_nodes end_node
         ON 	pump.connection_node_end_id = end_node.id
     WHERE start_level = 0
         OR start_level < {min_levels}
@@ -1640,9 +1640,9 @@ CREATE OR REPLACE VIEW {schema}.pomp_aan_vs_afslagpeil AS
 	    NULL::text AS status,
         start_node.the_geom::geometry(Point, 28992)
     FROM v2_pumpstation pump
-    LEFT JOIN v2_connection_nodes start_node
+    JOIN v2_connection_nodes start_node
         ON 	pump.connection_node_start_id = start_node.id 
-    LEFT JOIN v2_connection_nodes end_node
+    JOIN v2_connection_nodes end_node
         ON 	pump.connection_node_end_id = end_node.id
     WHERE start_level < lower_stop_level AND pump.type = 1;
 -- Afslagpeil < bok => pomp slaat nooit af
@@ -1657,9 +1657,9 @@ CREATE OR REPLACE VIEW {schema}.pomp_afslagpeil_vs_bodemkelder AS
 	    NULL::text AS status,
         start_node.the_geom::geometry(Point, 28992)
     FROM v2_pumpstation pump
-    LEFT JOIN v2_connection_nodes start_node
+    JOIN v2_connection_nodes start_node
         ON 	pump.connection_node_start_id = start_node.id 
-    LEFT JOIN v2_connection_nodes end_node
+    JOIN v2_connection_nodes end_node
         ON 	pump.connection_node_end_id = end_node.id
     LEFT JOIN v2_manhole manh
         ON start_node.id = manh.connection_node_id
@@ -1677,9 +1677,9 @@ CREATE OR REPLACE VIEW {schema}.pomp_aanslagpeil_vs_maaiveld AS
 	    NULL::text AS status,
         start_node.the_geom::geometry(Point, 28992)
     FROM v2_pumpstation pump
-    LEFT JOIN v2_connection_nodes start_node
+    JOIN v2_connection_nodes start_node
         ON 	pump.connection_node_start_id = start_node.id 
-    LEFT JOIN v2_connection_nodes end_node
+    JOIN v2_connection_nodes end_node
         ON 	pump.connection_node_end_id = end_node.id
     LEFT JOIN v2_manhole manh
         ON start_node.id = manh.connection_node_id
