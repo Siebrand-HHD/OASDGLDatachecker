@@ -33,7 +33,7 @@
        <bool>true</bool>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <property name="documentMode">
        <bool>true</bool>
@@ -672,13 +672,6 @@
                </size>
               </property>
              </spacer>
-            </item>
-            <item row="3" column="0">
-             <widget class="QPushButton" name="pushButton_2">
-              <property name="text">
-               <string>Leeg</string>
-              </property>
-             </widget>
             </item>
             <item row="2" column="0">
              <widget class="QPushButton" name="pverwerkt">
