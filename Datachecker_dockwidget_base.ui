@@ -57,7 +57,7 @@
           <property name="title">
            <string>Checkresultaten selecteren</string>
           </property>
-          <property name="collapsed" stdset="0">
+          <property name="collapsed">
            <bool>false</bool>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -166,10 +166,10 @@
           <property name="checkable">
            <bool>false</bool>
           </property>
-          <property name="collapsed" stdset="0">
+          <property name="collapsed">
            <bool>false</bool>
           </property>
-          <property name="scrollOnExpand" stdset="0">
+          <property name="scrollOnExpand">
            <bool>false</bool>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -231,11 +231,11 @@
               </widget>
              </item>
              <item>
-              <widget class="QgsFileWidget" name="putFile" native="true">
+              <widget class="QgsFileWidget" name="putFile">
                <property name="acceptDrops">
                 <bool>true</bool>
                </property>
-               <property name="filter" stdset="0">
+               <property name="filter">
                 <string>*.shp</string>
                </property>
               </widget>
@@ -252,20 +252,20 @@
               </widget>
              </item>
              <item>
-              <widget class="QgsFileWidget" name="leidingFile" native="true">
+              <widget class="QgsFileWidget" name="leidingFile">
                <property name="acceptDrops">
                 <bool>true</bool>
                </property>
-               <property name="useLink" stdset="0">
+               <property name="useLink">
                 <bool>false</bool>
                </property>
-               <property name="fullUrl" stdset="0">
+               <property name="fullUrl">
                 <bool>false</bool>
                </property>
-               <property name="dialogTitle" stdset="0">
+               <property name="dialogTitle">
                 <string>Selecteer een te controleren bestand voor de Leingen</string>
                </property>
-               <property name="filter" stdset="0">
+               <property name="filter">
                 <string>*.shp</string>
                </property>
               </widget>
@@ -772,7 +772,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QgsFileWidget" name="dem" native="true">
+           <widget class="QgsFileWidget" name="dem">
             <property name="toolTip">
              <string>=gettattr(value)</string>
             </property>
