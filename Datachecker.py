@@ -343,6 +343,9 @@ class Datachecker:
                 for child2 in child.children():
                     if isinstance(child2, QgsLayerTreeLayer):
                         child2.setCustomProperty("showFeatureCount", True)
+        self.laad_qml_styling('beheerder-std')
+        self.dockwidget.stylingbox.setCurrentIndex(1)
+
 
     def pb_select_exp_folder(self):
         foldername = QFileDialog.getExistingDirectory()
@@ -374,8 +377,11 @@ class Datachecker:
             layer.saveNamedStyle(file)
             # print(result)
 
-    def laad_qml_styling(self):
-        folder = "styling\\" + self.dockwidget.stylingbox.currentText()
+    def laad_qml_styling(self, stylingnaam):
+        if not stylingnaam :
+            folder = "styling\\" + self.dockwidget.stylingbox.currentText()
+        else:
+            folder = "styling\\" + stylingnaam
         # print(folder)
         for layer in QgsProject.instance().mapLayers().values():
             scriptLocatie = os.path.dirname(os.path.realpath(__file__))
