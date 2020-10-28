@@ -41,8 +41,9 @@ CREATE OR REPLACE VIEW {schema}.put_afmeting_leeg AS
         a.code AS rioolput,
         a.id AS threedi_id,
         CASE
-            WHEN shape = '00' or shape = '02' THEN 'rechthoekig'
-            WHEN shape = '01' THEN 'rond'
+            WHEN shape = 'sqr' THEN 'vierkant' 
+            WHEN shape = 'rect' THEN 'rechthoekig'
+            WHEN shape = 'rnd' THEN 'rond'
             WHEN shape IS NULL THEN NULL
             ELSE 'overige'
  		END as vorm,
@@ -544,18 +545,24 @@ CREATE OR REPLACE VIEW {schema}.put_afmeting_onlogisch AS
     SELECT
         a.code AS rioolput,
         a.id AS threedi_id,
-        shape AS vorm,
+        CASE
+            WHEN shape = 'sqr' THEN 'vierkant' 
+            WHEN shape = 'rect' THEN 'rechthoekig'
+            WHEN shape = 'rnd' THEN 'rond'
+            WHEN shape IS NULL THEN NULL
+            ELSE 'overige'
+ 		END as vorm,
         (width * 1000)::double precision AS breedte,
         (length * 1000)::double precision AS lengte,
         CASE 
             WHEN width = 0 THEN 'breedte is nul'::text
             WHEN length = 0 THEN 'lengte is nul'::text
-            WHEN width != length AND shape != '02' THEN 'breedte is ongelijk aan lengte'::text
+            WHEN width != length AND shape != 'rect' THEN 'breedte is ongelijk aan lengte'::text
         END AS bericht,
 	    NULL::text AS status,
         b.the_geom::geometry(Point, 28992)
     FROM v2_manhole a JOIN v2_connection_nodes b ON a.connection_node_id = b.id
-    WHERE width = 0 OR length = 0 OR (width != length AND shape != '02');
+    WHERE width = 0 OR length = 0 OR (width != length AND shape != 'rect');
 -- Check putten buiten de dem
 CREATE OR REPLACE VIEW {schema}.put_buiten_dem AS
     SELECT
