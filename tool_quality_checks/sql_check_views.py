@@ -207,8 +207,8 @@ CREATE OR REPLACE VIEW {schema}.overstort_punten_leeg AS
         start_node.code AS beginpunt,
         end_node.code AS eindpunt,
         CASE
-            WHEN weir.connection_node_start_id IS NULL AND weir.connection_node_end_id != NULL THEN 'beginpunt ontbreekt'::text
-            WHEN weir.connection_node_start_id != NULL AND weir.connection_node_end_id IS NULL THEN 'eindpunt ontbreekt'::text
+            WHEN weir.connection_node_start_id IS NULL AND weir.connection_node_end_id IS NOT NULL THEN 'beginpunt ontbreekt'::text
+            WHEN weir.connection_node_start_id IS NOT NULL AND weir.connection_node_end_id IS NULL THEN 'eindpunt ontbreekt'::text
             WHEN weir.connection_node_start_id IS NULL AND weir.connection_node_end_id IS NULL THEN 'begin en eindpunt ontbreken'::text
             ELSE NULL
         END AS bericht,
@@ -325,8 +325,8 @@ CREATE OR REPLACE VIEW {schema}.doorlaat_punten_leeg AS
         start_node.code AS beginpunt,
         end_node.code AS eindpunt,
         CASE
-            WHEN orf.connection_node_start_id IS NULL AND orf.connection_node_end_id != NULL THEN 'beginpunt ontbreekt'::text
-            WHEN orf.connection_node_start_id != NULL AND orf.connection_node_end_id IS NULL THEN 'eindpunt ontbreekt'::text
+            WHEN orf.connection_node_start_id IS NULL AND orf.connection_node_end_id IS NOT NULL THEN 'beginpunt ontbreekt'::text
+            WHEN orf.connection_node_start_id IS NOT NULL AND orf.connection_node_end_id IS NULL THEN 'eindpunt ontbreekt'::text
             WHEN orf.connection_node_start_id IS NULL AND orf.connection_node_end_id IS NULL THEN 'begin en eindpunt ontbreken'::text
             ELSE NULL
         END AS bericht,
@@ -477,8 +477,8 @@ CREATE OR REPLACE VIEW {schema}.pomp_aan_afslagpeil_leeg AS
             ELSE NULL
 	END AS afslagniveaubenedenstrooms,
         CASE
-            WHEN start_level IS NULL AND lower_stop_level != NULL THEN 'aanslagniveau ontbreekt'::text
-            WHEN start_level != NULL AND lower_stop_level IS NULL THEN 'afslagniveau ontbreekt'::text
+            WHEN start_level IS NULL AND lower_stop_level IS NOT NULL THEN 'aanslagniveau ontbreekt'::text
+            WHEN start_level IS NOT NULL AND lower_stop_level IS NULL THEN 'afslagniveau ontbreekt'::text
             WHEN start_level IS NULL AND lower_stop_level IS NULL THEN 'aan- en afslagniveau ontbreken'::text
             ELSE NULL
 	    END AS bericht,
