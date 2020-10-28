@@ -50,12 +50,13 @@ CREATE OR REPLACE VIEW {schema}.put_afmeting_leeg AS
         (length * 1000)::double precision AS lengte,
         CASE 
             WHEN width IS NULL THEN 'breedte ontbreekt'::text
-            WHEN (width IS NULL OR length IS NULL) AND shape = '02' THEN 'rechthoekig: breedte of lengte ontbreekt'::text
-        END AS bericht,
+	    WHEN width != length AND shape != 'rect' THEN 'rond/vierkant: breedte is ongelijk aan lengte'::text
+            WHEN (width IS NULL OR length IS NULL) AND shape = 'rect' THEN 'rechthoekig: breedte of lengte ontbreekt'::text
+         END AS bericht,
 	    NULL::text AS status,
         b.the_geom::geometry(Point, 28992)
     FROM v2_manhole a JOIN v2_connection_nodes b ON a.connection_node_id = b.id
-    WHERE (width IS NULL) OR ((width IS NULL OR length IS NULL) AND shape = '02');
+    WHERE (width IS NULL) OR (width != length AND shape != 'rect') OR ((width IS NULL OR length IS NULL) AND shape = 'rect');
 """,
     "sql_completeness_pipe": """
 ----------------- Leidingen ------------------------
@@ -656,7 +657,7 @@ CREATE OR REPLACE VIEW {schema}.put_afm_vs_leiding_afm AS
         (a.width * 1000)::double precision AS breedte_put,
         (a.length * 1000)::double precision AS lengte_put,
         (greatest(a.width, a.length) * 1000)::double precision AS grootste_put_afmeting,
-        (array_greatest(string_to_array(d.width,' '))::float * 1000)::double precision AS breedte_leiding,
+        (array_greatest(string_to_array(d.width,' '))::float * 1000)::float AS grootste_leiding_afmeting,
 	    NULL::text AS status,
         b.the_geom::geometry(Point, 28992)
     FROM v2_manhole a
