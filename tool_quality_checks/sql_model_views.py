@@ -8,8 +8,10 @@ sql_understandable_model_views = {
         a.code AS rioolput,
         a.id AS threedi_id,
         CASE
-            WHEN shape = '00' or shape = '02' THEN 'rechthoekig'
-            WHEN shape = '01' THEN 'rond'
+            WHEN shape = 'sqr' THEN 'vierkant' 
+            WHEN shape = 'rect' THEN 'rechthoekig'
+            WHEN shape = 'rnd' THEN 'rond'
+            WHEN shape IS NULL THEN NULL
             ELSE 'overige'
  		END as vorm,
         (width * 1000)::double precision AS breedte,
