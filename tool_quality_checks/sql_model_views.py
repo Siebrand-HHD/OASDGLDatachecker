@@ -128,7 +128,7 @@ sql_understandable_model_views = {
             WHEN shape = 6 THEN 'getabelleerd trapezium'
             WHEN shape IS NULL THEN NULL
             ELSE 'overige'
- 		END AS vormprofiel,
+ 		END AS vorm_profiel,
         array_greatest(string_to_array(width,' ')) AS breedte,
         array_greatest(string_to_array(height,' ')) AS hoogte,
         st_makeline(start_node.the_geom, end_node.the_geom)::geometry(Linestring, 28992) AS the_geom
