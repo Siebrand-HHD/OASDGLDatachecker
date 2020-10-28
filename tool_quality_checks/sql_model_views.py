@@ -139,7 +139,7 @@ sql_understandable_model_views = {
         ON 	orf.connection_node_end_id = end_node.id 
     LEFT JOIN v2_cross_section_definition def
         ON orf.cross_section_definition_id = def.id;""",
-    "pompkelder": """CREATE OR REPLACE VIEW {schema}.pompkelder AS
+    "pomp": """CREATE OR REPLACE VIEW {schema}.pomp AS
     SELECT
         pump.code AS pomp,
         pump.id AS threedi_id,
@@ -177,7 +177,7 @@ sql_understandable_model_views = {
         ON 	pump.connection_node_start_id = start_node.id
     LEFT JOIN v2_connection_nodes end_node
         ON 	pump.connection_node_end_id = end_node.id;""",
-    "pomp": """CREATE OR REPLACE VIEW {schema}.pomp AS
+    "pompverbinding": """CREATE OR REPLACE VIEW {schema}.pompverbinding AS
     SELECT
         pump.code AS pomp,
         pump.id AS threedi_id,
