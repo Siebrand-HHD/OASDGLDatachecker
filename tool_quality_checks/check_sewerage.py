@@ -94,7 +94,6 @@ def initialize_db_checks(db):
         ["model", "leiding"],
         ["model", "overstort"],
         ["model", "doorlaat"],
-        ["model", "pompkelder"],
         ["model", "pomp"],
     ]:
         db.create_preset_view_from_dictionary(
