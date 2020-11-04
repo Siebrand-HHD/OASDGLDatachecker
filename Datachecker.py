@@ -468,7 +468,10 @@ class Datachecker:
             else:
                 if not basis in oldstatement:
                     statement = "status is null or status IN ('gecontroleerd', 'verwerkt')"
-                    statement = statement.replace("'" + waarde + "', ","")
+                    if waarde == 'gecontroleerd':
+                        statement = statement.replace("'" + waarde + "', ","")
+                    else:
+                        statement = statement.replace(", '" + waarde + "'","")
                 elif oldstatement.find(waarde) == -1:
                     statement = oldstatement
                 else:
