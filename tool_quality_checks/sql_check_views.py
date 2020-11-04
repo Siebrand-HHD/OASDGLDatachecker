@@ -678,8 +678,8 @@ CREATE OR REPLACE VIEW {schema}.put_afm_vs_leiding_afm AS
     )
     SELECT DISTINCT ON (threedi_id) * 
     FROM aangesloten_diameters 
-    WHERE (grootste_put_afmeting < breedte_leiding + {padding_manhole}) AND (grootste_put_afmeting > 0)
-    ORDER BY threedi_id, breedte_leiding DESC;
+    WHERE (grootste_put_afmeting < grootste_leiding_afmeting + {padding_manhole}) AND (grootste_put_afmeting > 0)
+    ORDER BY threedi_id, grootste_leiding_afmeting DESC;
 -- Dubbele putten
 CREATE OR REPLACE VIEW {schema}.put_dubbel AS
     WITH dubbele_put AS (
