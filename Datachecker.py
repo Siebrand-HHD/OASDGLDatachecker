@@ -311,7 +311,7 @@ class Datachecker:
             "chk.put": "putten",
             "chk.profiel": "profielen",
             'chk.kunstwerken': 'kunstwerken',
-            'model.': 'brongegevens'
+            'model.': 'brongegevens',
         }
 
 
@@ -325,7 +325,7 @@ class Datachecker:
                 for key, value in group_mapping.items():
                     group = root.addGroup(value)
                     for layer in conn:
-                        if layer.GetName().split('_')[0] == key:
+                        if layer.GetName().split('_')[0] == key or layer.GetName().startswith(key):
                             if layer.GetFeatureCount() > 0:
                                 combined = file + "|layername={}".format(layer.GetName())
                                 vlayer = QgsVectorLayer(combined, layer.GetName(), "ogr")
@@ -623,9 +623,10 @@ class Datachecker:
         #QgsMessageLog.logMessage('stylings opgeslagen', 'datachecker')
         renderer=layer.renderer()
         if hasattr(renderer, 'symbol')==False:
-            root_rule=renderer.rootRule()
-            for rule in root_rule.children():
-                rule.symbol().setSize(value)            
+            if hasattr(renderer, 'Rule')==True:
+                root_rule=renderer.rootRule()
+                for rule in root_rule.children():
+                    rule.symbol().setSize(value)            
         
         elif layer.renderer().symbol().type() == 1: # Lijnen
             layer.renderer().symbol().symbolLayer(0).setWidth(value)
