@@ -311,7 +311,7 @@ class Datachecker:
             "chk.put": "putten",
             "chk.profiel": "profielen",
             'chk.kunstwerken': 'kunstwerken',
-            'model.': 'brongegevens'
+            'model.': 'brongegevens',
         }
 
 
@@ -325,17 +325,12 @@ class Datachecker:
                 for key, value in group_mapping.items():
                     group = root.addGroup(value)
                     for layer in conn:
-
-                        if layer.GetFeatureCount() > 0:
-                            combined = file + "|layername={}".format(layer.GetName())
-                            vlayer = QgsVectorLayer(combined, layer.GetName(), "ogr")
-                            QgsProject.instance().addMapLayer(vlayer, False)
-                            if layer.GetName().split('_')[0] == key:
+                        if layer.GetName().split('_')[0] == key or layer.GetName().startswith(key):
+                            if layer.GetFeatureCount() > 0:
+                                combined = file + "|layername={}".format(layer.GetName())
+                                vlayer = QgsVectorLayer(combined, layer.GetName(), "ogr")
+                                QgsProject.instance().addMapLayer(vlayer, False)
                                 group.addLayer(vlayer)
-                            elif layer.GetName().startswith(key):
-                                group.addLayer(vlayer)
-                            if not vlayer.isValid():
-                                print("failed to load")
 
         root = QgsProject.instance().layerTreeRoot()
         for child in root.children():
@@ -344,7 +339,7 @@ class Datachecker:
                     if isinstance(child2, QgsLayerTreeLayer):
                         child2.setCustomProperty("showFeatureCount", True)
         self.laad_qml_styling('beheerder-std')
-        self.dockwidget.stylingbox.setCurrentIndex(1)
+        self.dockwidget.stylingbox.setCurrentIndex(2)
 
 
     def pb_select_exp_folder(self):
@@ -627,7 +622,16 @@ class Datachecker:
         #for field in layer.renderer().symbol().symbolLayer(0):
                 #print(field.name(), field.typeName())
             #layer.renderer().symbol().symbolLayer(0).setSize(value)
-        if layer.renderer().symbol().type() == 1: # Lijnen
+        #layer=iface.mapCanvas().currentLayer()
+        #QgsMessageLog.logMessage('stylings opgeslagen', 'datachecker')
+        renderer=layer.renderer()
+        if hasattr(renderer, 'symbol')==False:
+            if hasattr(renderer, 'Rule')==True:
+                root_rule=renderer.rootRule()
+                for rule in root_rule.children():
+                    rule.symbol().setSize(value)            
+        
+        elif layer.renderer().symbol().type() == 1: # Lijnen
             layer.renderer().symbol().symbolLayer(0).setWidth(value)
             print(layer.renderer().symbol().symbolLayer(0).width())
 
@@ -636,6 +640,7 @@ class Datachecker:
             layer.renderer().symbol().symbolLayer(0).setSize(value)
             print(layer.renderer().symbol().symbolLayer(0).size())
         layer.triggerRepaint()
+        iface.layerTreeView().refreshLayerSymbology(layer.id())
         print(layer.name())
         #print(value)
 
