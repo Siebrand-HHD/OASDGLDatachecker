@@ -1138,7 +1138,7 @@
         <item row="2" column="0">
          <widget class="QLabel" name="label_57">
           <property name="text">
-           <string>name</string>
+           <string>name: Riooldatacheck_</string>
           </property>
          </widget>
         </item>
@@ -1169,7 +1169,7 @@
         <item row="2" column="1">
          <widget class="QLineEdit" name="dbName">
           <property name="text">
-           <string>work_checks_in_gui</string>
+           <string>WorkDatabase</string>
           </property>
          </widget>
         </item>

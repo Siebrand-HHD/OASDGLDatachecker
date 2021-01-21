@@ -285,6 +285,18 @@ class Datachecker:
             type = value.split()[0]
             value = value.split()[1]
 
+            if "Riooldatacheck_"not in value:
+                msgbox = QMessageBox()
+                msgbox.setText("De geselecteerde database: '" + value +
+                    "' is geen standaard van de riooldatacheker." +
+                    "De database zal in zijn geheel worden verwijderd op het moment dat je datachecks draait.")
+                msgbox.setInformativeText("Wil je doorgaan?")
+                msgbox.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+                ret = msgbox.exec_() 
+                if ret != QMessageBox.Ok:
+                    self.dockwidget.bestaandeDatabases.setCurrentIndex(-1)
+                    return False
+
             if type == "Postgresql:":
                 password = self.s_postgresql.value(value + "/password")
                 username = self.s_postgresql.value(value + "/username")
@@ -423,7 +435,7 @@ class Datachecker:
 
     def remove_qml_styling(self):
         stylinggroup = self.dockwidget.stylingbox.currentText()
-        msgbox = QMessageBox() # https://www.riverbankcomputing.com/static/Docs/PyQt4/qmessagebox.html#details
+        msgbox = QMessageBox() # https://doc.qt.io/qt-5/qmessagebox.html
         msgbox.setText("De stijlgroep: '" + stylinggroup + "' wordt verwijderd als je doorgaat.")
         msgbox.setInformativeText("Wil je doorgaan?")
         msgbox.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
@@ -546,7 +558,9 @@ class Datachecker:
     def create_db_from_qgis(self):
         settings = SettingsObjectPlugin()
         settings.createdb = True
-        settings.database = self.dockwidget.dbName.text()
+        settings.database = "Riooldatacheck_" + self.dockwidget.dbName.text()
+        #print (settings.database )
+        #settings.database =  self.dockwidget.dbName.text()
         settings.host = self.dockwidget.dbHost.text()
         settings.port = self.dockwidget.dbPort.text()
         settings.username = self.dockwidget.dbUsername.text()
