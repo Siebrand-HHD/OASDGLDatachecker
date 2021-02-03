@@ -285,7 +285,7 @@ class Datachecker:
             type = value.split()[0]
             value = value.split()[1]
 
-            if "Riooldatacheck_"not in value:
+            if "riooldatacheck_"not in value:
                 msgbox = QMessageBox()
                 msgbox.setText("De geselecteerde database: '" + value +
                     "' is geen standaard van de riooldatacheker." +
@@ -558,7 +558,7 @@ class Datachecker:
     def create_db_from_qgis(self):
         settings = SettingsObjectPlugin()
         settings.createdb = True
-        settings.database = "Riooldatacheck_" + self.dockwidget.dbName.text()
+        settings.database = "riooldatacheck_" + self.dockwidget.dbName.text().lower()
         #print (settings.database )
         #settings.database =  self.dockwidget.dbName.text()
         settings.host = self.dockwidget.dbHost.text()
@@ -567,6 +567,7 @@ class Datachecker:
         settings.password = self.dockwidget.dbPassword.text()
         # settings.s = self.dockwidget.?
         run_scripts(settings)
+        print("OK")
         qgs_settings = QSettings()
         qgs_settings.setValue('PostgreSQL/connections/'+settings.database+'/host', settings.host)
         qgs_settings.setValue('PostgreSQL/connections/'+settings.database+'/port', settings.port)

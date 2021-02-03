@@ -22,6 +22,7 @@ def _connect_to_server(settings, sql_statement):
         cursor = conn.cursor()
         cursor.execute(sql_statement)
         conn.close()
+        print("test)")
     except psycopg2.Error as e:
         logger.exception(e)
         raise
