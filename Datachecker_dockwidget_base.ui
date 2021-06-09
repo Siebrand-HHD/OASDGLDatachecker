@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>509</width>
+    <width>489</width>
     <height>711</height>
    </rect>
   </property>
@@ -15,6 +15,30 @@
   </property>
   <widget class="QWidget" name="dockWidgetContents">
    <layout class="QVBoxLayout" name="verticalLayout_3">
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_4">
+      <item>
+       <spacer name="horizontalSpacer_5">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pHandleiding">
+        <property name="text">
+         <string>Handleiding</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="enabled">
@@ -33,7 +57,7 @@
        <bool>true</bool>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>3</number>
       </property>
       <property name="documentMode">
        <bool>true</bool>
@@ -111,11 +135,20 @@
                <height>16777215</height>
               </size>
              </property>
+             <property name="acceptDrops">
+              <bool>true</bool>
+             </property>
              <property name="showDropIndicator" stdset="0">
               <bool>false</bool>
              </property>
              <property name="dragEnabled">
               <bool>false</bool>
+             </property>
+             <property name="dragDropMode">
+              <enum>QAbstractItemView::DragDrop</enum>
+             </property>
+             <property name="defaultDropAction">
+              <enum>Qt::MoveAction</enum>
              </property>
              <property name="alternatingRowColors">
               <bool>false</bool>
@@ -211,10 +244,10 @@
               <bool>true</bool>
              </property>
              <property name="dragDropMode">
-              <enum>QAbstractItemView::DragOnly</enum>
+              <enum>QAbstractItemView::DragDrop</enum>
              </property>
              <property name="defaultDropAction">
-              <enum>Qt::CopyAction</enum>
+              <enum>Qt::MoveAction</enum>
              </property>
              <property name="selectionMode">
               <enum>QAbstractItemView::SingleSelection</enum>
@@ -225,6 +258,9 @@
             <layout class="QHBoxLayout" name="horizontalLayout">
              <item>
               <widget class="QLabel" name="label_23">
+               <property name="acceptDrops">
+                <bool>false</bool>
+               </property>
                <property name="text">
                 <string>Putten</string>
                </property>
@@ -1085,13 +1121,6 @@
         <string>Db</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_2">
-        <item row="3" column="0">
-         <widget class="QLabel" name="label_25">
-          <property name="text">
-           <string>host</string>
-          </property>
-         </widget>
-        </item>
         <item row="6" column="0">
          <widget class="QLabel" name="label_28">
           <property name="text">
@@ -1102,76 +1131,21 @@
         <item row="2" column="0">
          <widget class="QLabel" name="label_57">
           <property name="text">
-           <string>name</string>
+           <string>name: </string>
           </property>
          </widget>
         </item>
         <item row="0" column="0" colspan="4">
          <widget class="QComboBox" name="bestaandeDatabases"/>
         </item>
-        <item row="4" column="1">
-         <widget class="QLineEdit" name="dbPort">
+        <item row="3" column="0">
+         <widget class="QLabel" name="label_25">
           <property name="text">
-           <string>5432</string>
+           <string>host</string>
           </property>
          </widget>
         </item>
-        <item row="4" column="0">
-         <widget class="QLabel" name="label_26">
-          <property name="text">
-           <string>port</string>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="0">
-         <widget class="QLabel" name="label_27">
-          <property name="text">
-           <string>username</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1">
-         <widget class="QLineEdit" name="dbName">
-          <property name="text">
-           <string>work_checks_in_gui</string>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="1">
-         <widget class="QLineEdit" name="dbUsername">
-          <property name="text">
-           <string>postgres</string>
-          </property>
-         </widget>
-        </item>
-        <item row="6" column="1">
-         <widget class="QLineEdit" name="dbPassword">
-          <property name="text">
-           <string>postgres</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="1">
-         <widget class="QLineEdit" name="dbHost">
-          <property name="text">
-           <string>localhost</string>
-          </property>
-         </widget>
-        </item>
-        <item row="7" column="1">
-         <spacer name="verticalSpacer_13">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="1" column="1">
+        <item row="1" column="2">
          <layout class="QHBoxLayout" name="horizontalLayout_6">
           <item>
            <widget class="QPushButton" name="createdbButton">
@@ -1188,6 +1162,84 @@
            </widget>
           </item>
          </layout>
+        </item>
+        <item row="4" column="0">
+         <widget class="QLabel" name="label_26">
+          <property name="text">
+           <string>port</string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="0">
+         <widget class="QLabel" name="label_27">
+          <property name="text">
+           <string>username</string>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="2">
+         <spacer name="verticalSpacer_13">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="2" column="2">
+         <widget class="QLineEdit" name="dbName">
+          <property name="text">
+           <string>workdatabase</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QLabel" name="label_7">
+          <property name="text">
+           <string>riooldatacheck_</string>
+          </property>
+          <property name="scaledContents">
+           <bool>true</bool>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+          <property name="wordWrap">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1" colspan="2">
+         <widget class="QLineEdit" name="dbHost">
+          <property name="text">
+           <string>localhost</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="1" colspan="2">
+         <widget class="QLineEdit" name="dbPort">
+          <property name="text">
+           <string>5432</string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="1" colspan="2">
+         <widget class="QLineEdit" name="dbUsername">
+          <property name="text">
+           <string>postgres</string>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="1" colspan="2">
+         <widget class="QLineEdit" name="dbPassword">
+          <property name="text">
+           <string>postgres</string>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>

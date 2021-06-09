@@ -95,7 +95,6 @@ def initialize_db_checks(db):
         ["model", "overstort"],
         ["model", "doorlaat"],
         ["model", "pomp"],
-        ["model", "pompverbinding"],
     ]:
         db.create_preset_view_from_dictionary(
             view_dictionary=sql_understandable_model_views,

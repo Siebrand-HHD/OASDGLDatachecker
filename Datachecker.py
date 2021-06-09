@@ -70,6 +70,7 @@ class SettingsObjectPlugin(object):
 
     def __init__(self):
 
+        self.settingValidatie =True
         self.origin = "plugin"               
         self.host = "localhost"
         self.database = "work_checks_in_gui"
@@ -257,6 +258,11 @@ class Datachecker:
         del self.toolbar
 
     # --------------------------------------------------------------------------
+    def openHandleiding(self):
+        #print (self.plugin_dir)
+        print(os.path.join(self.plugin_dir,"Handleiding datachecker OAS DGL.pdf"))
+        os.startfile(os.path.join(self.plugin_dir,"Handleiding datachecker OAS DGL.pdf"))
+    
     def pb_select_dc_folder(self):
         foldername = QFileDialog.getExistingDirectory()
         if foldername:
@@ -273,23 +279,45 @@ class Datachecker:
                 geopackageList.append(file)
         self.dockwidget.listChecks.addItems(geopackageList)
 
-    def getConnectionDetails(self, value):
-        type = value.split()[0]
-        value = value.split()[1]
+    def getConnectionDetails(self):
+        if self.dockwidget.bestaandeDatabases.currentIndex() != -1:        
+            value=self.dockwidget.bestaandeDatabases.currentText()
+            type = value.split()[0]
+            value = value.split()[1]
 
-        if type == "Postgresql:":
-            password = self.s_postgresql.value(value + "/password")
-            username = self.s_postgresql.value(value + "/username")
-            port = self.s_postgresql.value(value + "/port")
-            host = self.s_postgresql.value(value + "/host")
-            self.threedi_db_settings = {
-                "threedi_dbname": value,
-                "threedi_host": host,
-                "threedi_user": username,
-                "threedi_password": password,
-                "threedi_port": port,
-                "type": "Postgresql",
-            }
+            if "riooldatacheck_"not in value:
+                msgbox = QMessageBox()
+                msgbox.setText("De geselecteerde database: '" + value +
+                    "' is geen standaard van de riooldatacheker." +
+                    "De database zal in zijn geheel worden verwijderd op het moment dat je datachecks draait.")
+                msgbox.setInformativeText("Wil je doorgaan?")
+                msgbox.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+                ret = msgbox.exec_() 
+                if ret != QMessageBox.Ok:
+                    self.dockwidget.bestaandeDatabases.setCurrentIndex(-1)
+                    return False
+
+            if type == "Postgresql:":
+                password = self.s_postgresql.value(value + "/password")
+                username = self.s_postgresql.value(value + "/username")
+                port = self.s_postgresql.value(value + "/port")
+                host = self.s_postgresql.value(value + "/host")
+                self.threedi_db_settings = {
+                    "threedi_dbname": value,
+                    "threedi_host": host,
+                    "threedi_user": username,
+                    "threedi_password": password,
+                    "threedi_port": port,
+                    "type": "Postgresql",
+                }
+                return True
+        else:
+            QMessageBox.information(
+                None,
+                "No database",
+                "No database is selected"
+             )
+            return False
 
     def get_databases(self):
         databases = []
@@ -407,7 +435,7 @@ class Datachecker:
 
     def remove_qml_styling(self):
         stylinggroup = self.dockwidget.stylingbox.currentText()
-        msgbox = QMessageBox() # https://www.riverbankcomputing.com/static/Docs/PyQt4/qmessagebox.html#details
+        msgbox = QMessageBox() # https://doc.qt.io/qt-5/qmessagebox.html
         msgbox.setText("De stijlgroep: '" + stylinggroup + "' wordt verwijderd als je doorgaat.")
         msgbox.setInformativeText("Wil je doorgaan?")
         msgbox.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
@@ -463,10 +491,7 @@ class Datachecker:
             else:
                 if not basis in oldstatement:
                     statement = "status is null or status IN ('gecontroleerd', 'verwerkt')"
-                    if waarde == 'gecontroleerd':
-                        statement = statement.replace("'" + waarde + "', ","")
-                    else:
-                        statement = statement.replace(", '" + waarde + "'","")
+                    statement = statement.replace("'" + waarde + "', ","")
                 elif oldstatement.find(waarde) == -1:
                     statement = oldstatement
                 else:
@@ -533,13 +558,16 @@ class Datachecker:
     def create_db_from_qgis(self):
         settings = SettingsObjectPlugin()
         settings.createdb = True
-        settings.database = self.dockwidget.dbName.text()
+        settings.database = "riooldatacheck_" + self.dockwidget.dbName.text().lower()
+        #print (settings.database )
+        #settings.database =  self.dockwidget.dbName.text()
         settings.host = self.dockwidget.dbHost.text()
         settings.port = self.dockwidget.dbPort.text()
         settings.username = self.dockwidget.dbUsername.text()
         settings.password = self.dockwidget.dbPassword.text()
         # settings.s = self.dockwidget.?
         run_scripts(settings)
+        print("OK")
         qgs_settings = QSettings()
         qgs_settings.setValue('PostgreSQL/connections/'+settings.database+'/host', settings.host)
         qgs_settings.setValue('PostgreSQL/connections/'+settings.database+'/port', settings.port)
@@ -557,13 +585,14 @@ class Datachecker:
 
         settings = SettingsObjectPlugin()
         # settings.s='localhost' #self.threedi_db_settings["threedi_host"]
-        self.getConnectionDetails
-        settings.host = self.threedi_db_settings['threedi_host']
-        settings.database = self.threedi_db_settings['threedi_dbname']
-        settings.port = self.threedi_db_settings['threedi_port']
-        settings.username = self.threedi_db_settings['threedi_user']
-        settings.password = self.threedi_db_settings['threedi_password']
-        settings.emptydb = True
+        if self.getConnectionDetails(): 
+            settings.host = self.threedi_db_settings['threedi_host']
+            settings.database = self.threedi_db_settings['threedi_dbname']
+            settings.port = self.threedi_db_settings['threedi_port']
+            settings.username = self.threedi_db_settings['threedi_user']
+            settings.password = self.threedi_db_settings['threedi_password']
+            settings.emptydb = True
+        else: settings.settingValidatie =False
 
         settings.import_type = self.get_qsetting("Instellingen", "ImportSoftware") #"gbi"
         if not settings.import_type or settings.import_type == "":
@@ -628,6 +657,7 @@ class Datachecker:
         if hasattr(renderer, 'symbol')==False:
             if hasattr(renderer, 'Rule')==True:
                 root_rule=renderer.rootRule()
+                test = root_rule.children()
                 for rule in root_rule.children():
                     rule.symbol().setSize(value)            
         
@@ -747,6 +777,13 @@ class Datachecker:
 
     def draai_de_checks(self):
         settings = self.get_settings()
+        if settings.settingValidatie ==False: 
+            QMessageBox.information(
+                None,
+                "Settings incomplete",
+                "Er wordt geen datacheck uitgevoerd, de input is niet volledig."
+             )
+            return 
 
         task1 = QgsTask.fromFunction('Draai checks', run_scripts_task, on_finished=self.completed, settings=settings)
         QgsApplication.taskManager().addTask(task1)
@@ -806,6 +843,7 @@ class Datachecker:
                 self.dockwidget = DatacheckerDockWidget()
             databases = self.get_databases()
             self.dockwidget.bestaandeDatabases.addItems(databases)
+            self.dockwidget.bestaandeDatabases.setCurrentIndex(-1)
             stylingfolders = self.get_stylingfolders()
             self.dockwidget.stylingbox.clear()
             self.dockwidget.stylingbox.addItems(stylingfolders)
@@ -823,6 +861,7 @@ class Datachecker:
                 self.save_folderbeheerexport
             )
             # self.dockwidget.folderNaam.editingFinished.connect(self.fill_checks_list)
+            self.dockwidget.pHandleiding.clicked.connect(self.openHandleiding)
             self.dockwidget.InladenGpkgButton.clicked.connect(self.laad_gpkg)
             self.dockwidget.savelayer.clicked.connect(self.save_qml_styling)
 
